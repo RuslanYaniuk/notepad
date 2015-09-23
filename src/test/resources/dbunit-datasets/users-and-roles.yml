@@ -1,0 +1,60 @@
+users:
+- id: 1
+  login: "administrator"
+  first_name: "System"
+  last_name: "Administrator"
+  email: "admin@mynote.com"
+  password: "$2a$10$38F63J4TNXipNUKohw6mV.KVKLk4wRfKADqmEu0kT5x1irLaZ7fo2"
+  enabled: 1
+  registration_date_utc: "2015-09-30 19:20:02"
+
+- id: 2
+  login: "andrew95"
+  first_name: "Andrew"
+  last_name: "Anderson"
+  email: "andrew.anderson@mail.com"
+  password: "$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe"
+  enabled: 1
+  registration_date_utc: "2015-09-30 19:20:02"
+
+- id: 3
+  login: "1bob1678"
+  first_name: "Bob"
+  last_name: "Buerlson"
+  email: "bob.buerlson@mail.com"
+  password: "$2a$10$PRvF.IT/d24dzsrJrHIa7OoOv5DVk4V0fKp.WgxEobsnc1kTkNTcW"
+  enabled: 1
+  registration_date_utc: "2015-09-30 19:20:02"
+
+- id: 4
+  login: "$$cindy445"
+  first_name: "Cindy"
+  last_name: "Cisco"
+  email: "cindy.cisco@mail.com"
+  password: "$2a$10$jren5Bhj0.UrT6sScLQGrO9u5IEyVgKMLxFGFfu9K93R/GwWRiM.e"
+  enabled: 1
+  registration_date_utc: "2015-09-30 19:20:02"
+
+- id: 5
+  login: "daniel585ss"
+  first_name: "Deniel"
+  last_name: "Dempto"
+  email: "deniel.dempto@mail.com"
+  password: "$2a$10$eDVqEojK9uxaww/spvPfLO3ZbcVukhn0qZHNykxdG91WePgclvllC"
+  enabled: 1
+  registration_date_utc: "2015-09-30 19:20:02"
+
+- id: 6
+  login: "antony1715for$"
+  first_name: "Antony"
+  last_name: "Jones"
+  email: "antony.jones@disabled.com"
+  password: "$2a$10$J5sPJJy8eSAvMEuZaiBDseM.Hmjp.Dy1AJKDzTemH5ZRg3sWx5A/C"
+  enabled: 0
+  registration_date_utc: "2015-09-30 19:20:02"
+
+user_roles:
+- id: 1
+  role: "ROLE_USER"
+- id: 2
+  role: "ROLE_ADMIN"

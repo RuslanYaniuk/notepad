@@ -1,0 +1,21 @@
+users_to_roles:
+- user_id: 1 #admin
+  role_id: 1 #ROLE_USER
+
+- user_id: 1 #admin
+  role_id: 2 #ROLE_ADMIN
+
+- user_id: 2 #andrew95
+  role_id: 1 #ROLE_USER
+
+- user_id: 3 #1bob1678
+  role_id: 1 #ROLE_USER
+
+- user_id: 4 #$$cindy445
+  role_id: 1 #ROLE_USER
+
+- user_id: 5 #daniel585ss
+  role_id: 1 #ROLE_USER
+
+- user_id: 6 #antony1715for$
+  role_id: 1 #ROLE_USER

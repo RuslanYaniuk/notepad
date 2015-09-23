@@ -1,0 +1,11 @@
+.idea
+my-note.iml
+main.iml
+test.iml
+/target
+vendor
+node_modules
+bower_components
+.directory
+/src/main/webapp/WEB-INF/app/bin
+/webapp_link

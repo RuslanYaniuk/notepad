@@ -1,0 +1,41 @@
+<md-toolbar ng-controller="AuthController" class="md-whiteframe-1dp" ng-cloak>
+  <div class="md-toolbar-tools">
+    <h2>
+      <a href="/">My Note</a>
+    </h2>
+    <span flex></span>
+
+    <md-button ng-hide="logged" aria-label="Login" ui-sref="login">Login</md-button>
+
+    <md-menu ng-show="logged" class="ng-hide">
+      <md-button aria-label="Menu" class="md-icon-button" ng-click="$mdOpenMenu($event)">
+        <md-icon class="material-icons md-light">account_circle</md-icon>
+      </md-button>
+      <md-menu-content width="4">
+        <md-menu-item ng-show="isAdminSession()">
+          <md-button ui-sref="admin-page">
+            <md-icon class="material-icons">dashboard</md-icon>
+            Administration page
+          </md-button>
+        </md-menu-item>
+
+        <md-menu-item>
+          <md-button>
+            <md-icon class="material-icons">settings</md-icon>
+            Account settings
+          </md-button>
+        </md-menu-item>
+
+        <md-menu-divider></md-menu-divider>
+
+        <md-menu-item>
+          <md-button ng-click="logout()">
+            <md-icon class="material-icons">exit_to_app</md-icon>
+            Logout
+          </md-button>
+        </md-menu-item>
+      </md-menu-content>
+    </md-menu>
+
+  </div>
+</md-toolbar>

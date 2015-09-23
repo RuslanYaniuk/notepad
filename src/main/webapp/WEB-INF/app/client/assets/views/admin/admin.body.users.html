@@ -1,0 +1,32 @@
+<md-card ng-controller="AdminController" ng-init="loadUsers()" layout-padding flex="grow">
+
+  <md-data-table-toolbar>
+    <h2 class="md-title">Users</h2>
+  </md-data-table-toolbar>
+
+  <md-data-table-container>
+    <table md-data-table md-progress="loadProgress">
+      <thead md-order="firstName" md-trigger="loadUsers">
+      <tr>
+        <th name="First name" order-by="firstName"></th>
+        <th name="Last name" order-by="lastName"></th>
+        <th name="Login" order-by="login"></th>
+        <th name="Email" order-by="email"></th>
+        <th name="Registration date (UTC)" order-by="registrationDate"></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr md-auto-select ng-repeat="user in users">
+        <td>{{user.firstName}}</td>
+        <td>{{user.lastName}}</td>
+        <td>{{user.login}}</td>
+        <td>{{user.email}}</td>
+        <td>{{user.registrationDateUTC}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </md-data-table-container>
+
+  <md-data-table-pagination md-limit="5" md-page="1" md-total="{{users.length}}"
+                            md-trigger="onPaginationChange"></md-data-table-pagination>
+</md-card>

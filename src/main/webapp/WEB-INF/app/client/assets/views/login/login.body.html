@@ -1,0 +1,40 @@
+<div layout="column" layout-align="center center" ng-controller="AuthController">
+  <h1 class="md-headline">Login to your account</h1>
+
+  <md-card class="login-card">
+    <md-card-content>
+
+      <form name="loginForm">
+        <div class="error-message md-margin" layout="row" layout-align="start center">
+          <div>
+            <md-icon class="md-warn material-icons">error</md-icon>
+          </div>
+          <span class="md-caption md-margin" style="display: block; max-width: 240px;">Error occurred</span>
+        </div>
+        <br>
+
+        <md-input-container class="md-icon-float">
+          <label>Login or Email</label>
+          <md-icon class="material-icons person">perm_identity</md-icon>
+          <input name="login" ng-model="login" ng-required="true">
+        </md-input-container>
+
+        <md-input-container class="md-icon-float" flex>
+          <label>Password</label>
+          <md-icon class="material-icons password">lock</md-icon>
+          <input type="text" ng-model="password" ng-required="true">
+        </md-input-container>
+
+        <div layout="column" layout-align="center center">
+          <md-button class="login-button md-raised md-primary" ng-click="submit()">Login
+          </md-button>
+        </div>
+      </form>
+
+    </md-card-content>
+  </md-card>
+
+  <br><br><br>
+  <a href="register">Register an account</a>
+  <p>If you forgot your password you can easily <a href="recover-password">recover it</a></p>
+</div>

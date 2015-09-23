@@ -1,0 +1,30 @@
+<section layout="row" ng-cloak>
+
+  <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="true">
+    <md-toolbar>
+      <h1 class="md-toolbar-tools">Administration</h1>
+    </md-toolbar>
+
+    <md-content>
+      <md-menu-content>
+
+        <md-menu-item>
+          <md-button ui-sref="admin-page.users">
+            <md-icon class="material-icons">face</md-icon>Users</md-button>
+        </md-menu-item>
+
+        <md-menu-item>
+          <md-button ui-sref="admin-page.statistic">
+            <md-icon class="material-icons">insert_chart</md-icon>Statistic</md-button>
+        </md-menu-item>
+
+        <md-menu-item>
+          <md-button ui-sref="admin-page.settings">
+            <md-icon class="material-icons">settings</md-icon>Settings</md-button>
+        </md-menu-item>
+
+      </md-menu-content>
+    </md-content>
+  </md-sidenav>
+
+</section>

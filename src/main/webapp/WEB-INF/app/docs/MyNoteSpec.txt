@@ -1,0 +1,34 @@
+MyNote - a simple and convenient notebook.
+
+app/
+   |
+   /build_config  ** directory contains project configuration files and Grunt tasks **
+   /client/ ** working directory **
+          |
+          /src/ ** sources **
+              |
+              /controllers ** AngularJS controllers **
+			  / ..
+			  / ..
+			  /delegates
+		  |
+		  /test/ ** jasmine based tests **
+			   |
+			   /conf ** configuration for Karma and RequireJS **
+			   /e2e
+			   /unit
+   /bin ** build ready for deploy **
+   
+   
+1. Separation of concerns
+	Backend:
+		* data storage
+		* JSON responses
+		* user's session support
+		* validation
+		* security
+
+	Frontend:
+		* common app logic
+		* localization
+		* validation
