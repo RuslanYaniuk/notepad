@@ -35,11 +35,6 @@ public class ApplicationProperties {
     @Resource
     private Environment env;
 
-    private String dbDriver;
-    private String dbUrl;
-    private String dbPassword;
-    private String dbUsername;
-
     private String hibernateDialect;
     private String hibernateShowSql;
     private String hibernateHbm2ddlAuto;
@@ -55,11 +50,6 @@ public class ApplicationProperties {
 
     @PostConstruct
     private void init() {
-        this.dbDriver = env.getRequiredProperty(PROPERTY_NAME_DATABASE_DRIVER);
-        this.dbUrl = env.getRequiredProperty(PROPERTY_NAME_DATABASE_URL);
-        this.dbPassword = env.getRequiredProperty(PROPERTY_NAME_DATABASE_PASSWORD);
-        this.dbUsername = env.getRequiredProperty(PROPERTY_NAME_DATABASE_USERNAME);
-
         this.hibernateDialect = env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_DIALECT);
         this.hibernateShowSql = env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SHOW_SQL);
         this.hibernateHbm2ddlAuto = env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO);
@@ -69,22 +59,6 @@ public class ApplicationProperties {
         this.adminEmail = env.getRequiredProperty(PROPERTY_NAME_ADMIN_EMAIL);
         this.adminLogin = env.getRequiredProperty(PROPERTY_NAME_ADMIN_LOGIN);
         this.adminPassword = env.getRequiredProperty(PROPERTY_NAME_ADMIN_PASSWORD);
-    }
-
-    public String getDbDriver() {
-        return dbDriver;
-    }
-
-    public String getDbUrl() {
-        return dbUrl;
-    }
-
-    public String getDbPassword() {
-        return dbPassword;
-    }
-
-    public String getDbUsername() {
-        return dbUsername;
     }
 
     public String getHibernateDialect() {

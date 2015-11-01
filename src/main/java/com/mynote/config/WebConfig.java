@@ -3,13 +3,10 @@ package com.mynote.config;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mynote.config.db.DatabaseInitializer;
-import com.mynote.config.db.DatabaseInitializerImpl;
 import com.mynote.config.security.SecurityConfig;
 import com.mynote.config.validation.CustomValidator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.context.annotation.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -22,6 +19,10 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -95,11 +96,6 @@ public class WebConfig extends WebMvcConfigurationSupport {
         return jacksonConverter;
     }
 
-    @Bean(initMethod = "init")
-    public DatabaseInitializer databaseInitializer() {
-        return new DatabaseInitializerImpl();
-    }
-
     @Bean
     public PasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -113,6 +109,32 @@ public class WebConfig extends WebMvcConfigurationSupport {
         source.setDefaultEncoding("UTF-8");
 
         return source;
+    }
+
+    @Bean(initMethod = "init")
+    @Profile({"dev", "prod"})
+    public DatabaseInitializer databaseInitializer() {
+        return new DatabaseInitializer();
+    }
+
+    @Bean
+    public DataSource dataSource() {
+        Context envContext;
+        DataSource dataSource;
+
+        try {
+            envContext = (Context) initialContext().lookup("java:/comp/env");
+            dataSource = (DataSource) envContext.lookup("jdbc/mynote_datasource");
+        } catch (NamingException e) {
+            throw new BeanCreationException("dataSource", e);
+        }
+
+        return dataSource;
+    }
+
+    @Bean
+    public InitialContext initialContext() throws NamingException {
+        return new InitialContext();
     }
 
     @Override

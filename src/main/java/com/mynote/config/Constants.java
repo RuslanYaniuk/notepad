@@ -1,6 +1,5 @@
 package com.mynote.config;
 
-import com.mynote.dto.MessageDTO;
 import com.mynote.models.UserRole;
 import com.mynote.services.UserRoleService;
 import org.springframework.http.MediaType;

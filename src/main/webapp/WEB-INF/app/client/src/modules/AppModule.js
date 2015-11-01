@@ -12,7 +12,9 @@
     define(dependencies, function (AppController) {
         var moduleName = "mynote.App";
 
-        var mod = angular.module(moduleName, []).controller('AppController', AppController);
+        var mod = angular.module(moduleName, [])
+
+            .controller('AppController', AppController);
 
         /*mod.directive('note', function factory() {
          var directiveDefinitionObject = {

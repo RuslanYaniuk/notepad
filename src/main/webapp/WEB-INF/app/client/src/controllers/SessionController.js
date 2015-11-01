@@ -4,45 +4,27 @@
  */
 (function (define) {
 
-    var LOGIN_STATE = "login";
-
     define(function () {
 
-        var SessionController = function ($rootScope, $scope, $state, $http, sessionService) {
+        var SessionController = function ($rootScope,
+                                          $state,
+                                          $mdToast,
+                                          sessionService,
+                                          securityService) {
 
-            var validateSession = function () {
-                if (sessionService.isAnonymousSession()) {
-                    return;
-                }
+            var validateSession = function (event, stateTo) {
+                    if (sessionService.isAnonymousSession()) {
+                        securityService.validateNavigation(stateTo);
+                        return;
+                    }
 
-                sessionService
-                    .getAuthority()
-                    .then(
-                    function onSuccess_getAuthority(response) {
-                        var userDTO = {
-                            userRoleDTOs: response.data
-                        };
-
-                        sessionService.createSession(userDTO);
-                    },
-
-                    function onFault_getAuthority() {
-                        sessionService.createAnonymousSession();
-
-                        if ($state.current.name == 'index') {
-                            return;
-                        }
-                        if ($state.current.name != LOGIN_STATE) {
-                            $state.go(LOGIN_STATE);
-                        }
-                    });
-            };
-
-            sessionService
-                .getCsrfToken(
-                function onFault_getCsrfToken() {
-                    //TODO print critical error
-                });
+                    sessionService
+                        .getAuthority()
+                        .then(
+                        function onSuccess_getAuthority() {
+                            securityService.validateNavigation(stateTo);
+                        });
+                };
 
             /**
              * Each time a user performs transition between states
@@ -50,9 +32,15 @@
              */
             $rootScope.$on('$stateChangeStart', validateSession);
             $rootScope.isAdminSession = sessionService.isAdminSession;
+            $rootScope.getUserEmail = sessionService.getUserEmail;
         };
 
-        return ["$rootScope", "$scope", "$state", "$http", "sessionService", SessionController];
+        return [
+            "$rootScope",
+            "$state",
+            "$mdToast",
+            "sessionService",
+            "securityService", SessionController];
     })
 
 })(define);

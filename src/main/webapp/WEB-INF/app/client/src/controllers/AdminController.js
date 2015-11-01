@@ -6,7 +6,11 @@
     "use strict";
 
     define(function () {
-        var AdminController = function ($rootScope, $scope, $state, adminService) {
+        var AdminController = function ($rootScope,
+                                        $scope,
+                                        $state,
+                                        $mdDialog,
+                                        adminService) {
 
             var onLoadUsers = function () {
                     $scope.loadProgress = adminService.loadUsers()
@@ -19,13 +23,25 @@
 
                 onLoadUsersFailure = function (response) {
                     //TODO handle this. I believe in you!
+                },
+
+                onShowRegisterUserDialog = function () {
+                    $mdDialog.show({
+                        templateUrl: 'assets/views/app/forms/user.registration.html'
+                    });
                 };
 
             $scope.users = [];
             $scope.loadUsers = onLoadUsers;
+            $scope.showRegisterUserDialog = onShowRegisterUserDialog;
         };
 
-        return ["$rootScope", "$scope", "$state", "adminService", AdminController];
+        return [
+            "$rootScope",
+            "$scope",
+            "$state",
+            "$mdDialog",
+            "adminService", AdminController];
     });
 
 })(define);

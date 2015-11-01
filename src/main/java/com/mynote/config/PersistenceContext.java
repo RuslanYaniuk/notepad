@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
@@ -32,27 +31,17 @@ public class PersistenceContext {
     @Autowired
     private ApplicationProperties applicationProperties;
 
+    @Autowired DataSource dataSource;
+
     @Bean(initMethod = "migrate")
     public Flyway flyway() {
         Flyway flyway = new Flyway();
 
         flyway.setBaselineOnMigrate(true);
         flyway.setLocations("db/migration");
-        flyway.setDataSource(dataSource());
+        flyway.setDataSource(dataSource);
 
         return flyway;
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-
-        dataSource.setDriverClassName(applicationProperties.getDbDriver());
-        dataSource.setUrl(applicationProperties.getDbUrl());
-        dataSource.setUsername(applicationProperties.getDbUsername());
-        dataSource.setPassword(applicationProperties.getDbPassword());
-
-        return dataSource;
     }
 
     @Bean
@@ -60,7 +49,7 @@ public class PersistenceContext {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
 
-        entityManagerFactoryBean.setDataSource(dataSource());
+        entityManagerFactoryBean.setDataSource(dataSource);
         entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
         entityManagerFactoryBean.setPackagesToScan(applicationProperties.getEntityManagerPackagesToScan());
         entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter());

@@ -25,7 +25,7 @@ import java.sql.SQLException;
 public class DBUnitHelper {
 
     @Autowired
-    private DataSource testDataSource;
+    private DataSource dataSource;
 
     private IDatabaseConnection dbUnitCon;
 
@@ -35,7 +35,7 @@ public class DBUnitHelper {
 
     @PostConstruct
     private void init() throws DatabaseUnitException, IOException {
-        Connection con = DataSourceUtils.getConnection(testDataSource);
+        Connection con = DataSourceUtils.getConnection(dataSource);
 
         dbUnitCon = new DatabaseConnection(con);
 

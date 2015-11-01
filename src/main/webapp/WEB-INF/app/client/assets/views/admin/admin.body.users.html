@@ -1,12 +1,23 @@
 <md-card ng-controller="AdminController" ng-init="loadUsers()" layout-padding flex="grow">
 
-  <md-data-table-toolbar>
+  <md-data-table-toolbar ng-cotroller="RegistrationController">
     <h2 class="md-title">Users</h2>
+
+    <div flex></div>
+
+    <md-button class="md-icon-button">
+      <md-icon class="material-icons md-light">search</md-icon>
+    </md-button>
+
+    <md-button ng-click="showRegisterUserDialog()" class="md-icon-button">
+      <md-icon class="material-icons md-light">add</md-icon>
+    </md-button>
+
   </md-data-table-toolbar>
 
   <md-data-table-container>
     <table md-data-table md-progress="loadProgress">
-      <thead md-order="firstName" md-trigger="loadUsers">
+      <thead md-order="order" md-trigger="loadUsers">
       <tr>
         <th name="First name" order-by="firstName"></th>
         <th name="Last name" order-by="lastName"></th>
@@ -16,7 +27,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr md-auto-select ng-repeat="user in users">
+      <tr md-auto-select ng-repeat="user in users | orderBy: order">
         <td>{{user.firstName}}</td>
         <td>{{user.lastName}}</td>
         <td>{{user.login}}</td>

@@ -5,17 +5,20 @@ users_to_roles:
 - user_id: 1 #admin
   role_id: 2 #ROLE_ADMIN
 
-- user_id: 2 #andrew95
+- user_id: 2 #user2
   role_id: 1 #ROLE_USER
 
-- user_id: 3 #1bob1678
+- user_id: 3 #user3
   role_id: 1 #ROLE_USER
 
-- user_id: 4 #$$cindy445
+- user_id: 4 #user4
   role_id: 1 #ROLE_USER
 
-- user_id: 5 #daniel585ss
+- user_id: 5 #user5
   role_id: 1 #ROLE_USER
 
-- user_id: 6 #antony1715for$
+- user_id: 6 #user6
+  role_id: 1 #ROLE_USER
+
+- user_id: 7 #user7
   role_id: 1 #ROLE_USER

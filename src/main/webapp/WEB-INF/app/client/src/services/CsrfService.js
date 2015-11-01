@@ -9,24 +9,18 @@
 
     define(function () {
 
-        var CsrfService = function () {
+        var CsrfService = function ($http) {
 
-            var onGetTokenSynchronously = function (onSuccess, onFault) {
-                $.ajax({
-                    method: "GET",
-                    url: CSRF_TOKEN_URL,
-                    async: false
-                })
-                    .done(onSuccess)
-                    .fail(onFault);
+            var onGetToken = function () {
+                return $http.get(CSRF_TOKEN_URL);
             };
 
             return {
-                getTokenSynchronously: onGetTokenSynchronously
+                getToken: onGetToken
             }
         };
 
-        return [CsrfService];
+        return ["$http", CsrfService];
     });
 
 })(define);

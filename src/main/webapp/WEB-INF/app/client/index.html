@@ -6,17 +6,20 @@
 <title>Welcome to MyNote</title>
 
 <link rel="stylesheet" href="assets/vendor/angular-material/angular-material.css">
+<link rel='stylesheet' href='assets/vendor/angular-loading-bar/loading-bar.css' media='all'/>
 <link rel="stylesheet" href="assets/vendor/angular-material-data-table/md-data-table.min.css"/>
 <link rel="stylesheet" href="assets/css/main.css"/>
 
+<body ng-controller="Dispatcher">
 
-<div id="application-scope" ng-controller="SessionController" layout="row" layout-fill>
+
+<div id="application-view" ng-controller="SessionController" ng-init="updateAccountDetails()" layout="row" layout-fill>
   <div ui-view="side-menu" flex="none"></div>
 
-  <md-content class="index-content" flex>
-    <div ui-view="menu"></div>
-    <div ui-view="body"></div>
-  </md-content>
+  <div id="index-content" class="index-content" layout="column" flex>
+    <md-toolbar ui-view="menu" class="md-whiteframe-1dp" ng-cloak></md-toolbar>
+    <md-content ui-view="body" flex style="background-color: #F5F5F5" layout="column" layout-align="start center"></md-content>
+  </div>
 </div>
 
 

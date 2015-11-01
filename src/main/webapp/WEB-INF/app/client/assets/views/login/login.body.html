@@ -1,40 +1,57 @@
-<div layout="column" layout-align="center center" ng-controller="AuthController">
-  <h1 class="md-headline">Login to your account</h1>
+<div id="login-view" ng-controller="AuthController" layout="row" layout-align="center center" flex>
 
   <md-card class="login-card">
     <md-card-content>
 
-      <form name="loginForm">
-        <div class="error-message md-margin" layout="row" layout-align="start center">
-          <div>
-            <md-icon class="md-warn material-icons">error</md-icon>
-          </div>
-          <span class="md-caption md-margin" style="display: block; max-width: 240px;">Error occurred</span>
+      <div layout="column" layout-align="center center">
+        <md-icon class="material-icons" style="font-size: 112px; height: 112px; width: 112px">account_circle</md-icon>
+      </div>
+
+      <form md-padding name="loginForm">
+        <div class="md-margin">
+          <md-input-container>
+            <label>Login or Email</label>
+            <input name="userLogin"
+                   ng-model="login"
+                   ng-required="true"
+                   ng-change="clearIncorrectLoginError()">
+
+            <div ng-messages="loginForm.userLogin.$error" role="alert">
+              <div ng-message="correct-credentials">
+                Login might be incorrect
+              </div>
+            </div>
+          </md-input-container>
+
+          <md-input-container flex>
+            <label>Password</label>
+            <input type="text"
+                   name="userPassword"
+                   ng-model="password"
+                   ng-required="true"
+                   ng-change="clearIncorrectPasswordError()">
+
+            <div ng-messages="loginForm.userPassword.$error" role="alert">
+              <div ng-message="correct-credentials">
+                Password might be incorrect
+              </div>
+            </div>
+          </md-input-container>
         </div>
-        <br>
 
-        <md-input-container class="md-icon-float">
-          <label>Login or Email</label>
-          <md-icon class="material-icons person">perm_identity</md-icon>
-          <input name="login" ng-model="login" ng-required="true">
-        </md-input-container>
-
-        <md-input-container class="md-icon-float" flex>
-          <label>Password</label>
-          <md-icon class="material-icons password">lock</md-icon>
-          <input type="text" ng-model="password" ng-required="true">
-        </md-input-container>
-
-        <div layout="column" layout-align="center center">
-          <md-button class="login-button md-raised md-primary" ng-click="submit()">Login
+        <div layout="row" layout-align="end center">
+          <md-button id="submit-button" class="md-raised md-primary" ng-click="submit()" flex>
+            Sign in
           </md-button>
         </div>
       </form>
 
-    </md-card-content>
-  </md-card>
+      <div style="margin-top: 23px" layout="column" layout-align="center center">
+        <md-button class="md-primary" ui-sref="user-registration">Register account</md-button>
+        <md-button class="md-primary" href="recover-password">Recover password</md-button>
+      </div>
 
-  <br><br><br>
-  <a href="register">Register an account</a>
-  <p>If you forgot your password you can easily <a href="recover-password">recover it</a></p>
+    </md-card-content>
+
+  </md-card>
 </div>

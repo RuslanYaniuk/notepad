@@ -2,6 +2,8 @@ package com.mynote.test.utils.yaml;
 
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileNotFoundException;
@@ -14,14 +16,15 @@ import java.io.InputStream;
  */
 public class YamlDataSetLoader {
 
-    public static IDataSet load(final String file) throws IOException, DataSetException {
+    public static IDataSet load(final String resourceFile) throws IOException, DataSetException {
+        Resource resource = new ClassPathResource(resourceFile);
         IDataSet dataSet;
 
-        if (isYamlEmpty(file)) {
+        if (isYamlEmpty(resource.getInputStream())) {
             throw new FileNotFoundException("File is empty");
 
         } else {
-            final InputStream inputStream = Thread.currentThread().getClass().getResourceAsStream(file);
+            final InputStream inputStream = resource.getInputStream();
 
             dataSet = new YamlDataSet(inputStream);
 
@@ -33,8 +36,7 @@ public class YamlDataSetLoader {
         return dataSet;
     }
 
-    private static boolean isYamlEmpty(final String yamlFile) throws IOException {
-        final InputStream inputStream = Thread.currentThread().getClass().getResourceAsStream(yamlFile);
+    private static boolean isYamlEmpty(InputStream inputStream) throws IOException {
         final boolean isEmpty = new Yaml().load(inputStream) == null;
 
         if (inputStream != null) {

@@ -5,11 +5,13 @@
 (function (define) {
     "use strict";
 
-    var LOGIN_URL = "api/login",
-        LOGOUT_URL = "api/logout";
-
     define(function () {
-        var AuthService = function ($rootScope, $state, $http) {
+        var LOGIN_URL = "/api/login",
+            LOGOUT_URL = "/api/logout",
+
+            GET_AUTH_URL = "/api/login/get-authorities";
+
+        var AuthService = function ($http) {
 
             var loginUser = function (login, password) {
                     var credentials = {
@@ -17,7 +19,11 @@
                         password: password
                     };
 
-                    return $http.post(LOGIN_URL, credentials);
+                    return $http.get(GET_AUTH_URL)
+                        .then(
+                        function onSuccess_getAuthority() {
+                            return $http.post(LOGIN_URL, credentials);
+                        });
                 },
 
                 logoutUser = function () {
@@ -30,14 +36,7 @@
             }
         };
 
-        return [
-            "$rootScope",
-            "$state",
-            "$http",
-            "csrfService",
-            "sessionService",
-            AuthService
-        ];
+        return ["$http", AuthService];
     })
 
 })(define);

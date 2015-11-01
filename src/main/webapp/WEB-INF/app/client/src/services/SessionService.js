@@ -5,94 +5,83 @@
 (function (define) {
     "use strict";
 
-    var AUTH_STATUS_URL = "/api/login/get-authorities",
-
-        SESSION_KIND_ADMIN = "admin_session",
-        SESSION_KIND_USER = "customer_session",
-        SESSION_KIND_ANONYMOUS = "anonymous_session";
+    var GET_AUTH_URL = "/api/login/get-authorities";
 
     define(function () {
 
-        var SessionService = function ($rootScope, $http, csrfService) {
+        var SessionService = function ($rootScope, $http, $q, userService, userRoleService) {
 
             var onGetAuthority = function () {
-                    return $http.get(AUTH_STATUS_URL);
+
+                    return $http.get(GET_AUTH_URL)
+                        .then(
+                        function onSuccess_getAuthority(response) {
+                            var userRoles = response.data,
+                                currentRoles = _session.account.userRoles;
+
+                            if (!userRoleService.compareUserRoles(userRoles, currentRoles)) {
+                                onCreateSession(userRoles);
+
+                                if (_session.account.firstName == '' && !onIsAnonymousSession()) {
+                                    userService.getUserInfo()
+                                        .then(
+                                        function onSuccess_getUserInfo(response) {
+                                            onUpdateAccountDetails(response.data);
+                                        })
+                                }
+                            }
+                        });
                 },
 
-                onCreateSession = function (userDTO) {
-                    var userRoles = userDTO.userRoleDTOs,
-                        i;
+                onCreateSession = function (userRoles) {
+                    _session.account.userRoles = userRoles;
+                    _session.type = userRoleService.getHighestRole(userRoles);
 
-                    for (i = 0; i < userRoles.length; i++) {
-                        if (userRoles[i].role == "ROLE_ADMIN") {
-                            _session.account = userDTO;
-                            _session.kind = SESSION_KIND_ADMIN;
-                            $rootScope.logged = true;
-
-                            return;
-                        }
+                    if (onIsAdminSession() || onIsUserSession()) {
+                        $rootScope.logged = true;
                     }
-
-                    for (i = 0; i < userRoles.length; i++) {
-                        if (userRoles[i].role == "ROLE_USER") {
-                            _session.kind = SESSION_KIND_USER;
-                            _session.account = userDTO;
-                            $rootScope.logged = true;
-
-                            return;
-                        }
-                    }
-
-                    for (i = 0; i < userRoles.length; i++) {
-                        if (userRoles[i].role == "ROLE_ANONYMOUS") {
-                            onCreateAnonymousSession();
-                            return;
-                        }
-                    }
-                    throw {message: "Could not parse roles"};
-                },
-
-                onCreateAnonymousSession = function () {
-                    onClearSession();
-                    _session.kind = SESSION_KIND_ANONYMOUS;
                 },
 
                 onClearSession = function () {
                     _session.account.firstName = '';
                     _session.account.lastName = '';
-                    _session.account.emai = '';
+                    _session.account.email = '';
                     _session.account.userRoles = [];
-                    _session.csrfToken = '';
-                    _session.kind = '';
+                    _session.type = '';
 
                     $rootScope.logged = false;
+                },
 
-                    onGetCsrfToken();
+                onUpdateAccountDetails = function (userDTO) {
+                    _session.account.firstName = userDTO.firstName;
+                    _session.account.lastName = userDTO.lastName;
+                    _session.account.email = userDTO.email;
                 },
 
                 onIsEmptySession = function () {
-                    return _session.kind == '';
+                    return _session.type == '';
+                },
+
+                onIsEmptyAccountDetails = function () {
+                    return _session.account.email == '' ||
+                        _session.account.firstName == '' ||
+                        _session.account.lastName == '';
                 },
 
                 onIsAnonymousSession = function () {
-                    return _session.kind == SESSION_KIND_ANONYMOUS;
+                    return userRoleService.isAnonymous(_session.type);
                 },
 
                 onIsAdminSession = function () {
-                    return _session.kind == SESSION_KIND_ADMIN;
+                    return userRoleService.isAdmin(_session.type);
                 },
 
-                onGetCsrfToken = function (onFault) {
-                    csrfService.getTokenSynchronously(
-                        function onSuccess(response) {
-                            var token = response.headerValue;
+                onIsUserSession = function () {
+                    return userRoleService.isUser(_session.type);
+                },
 
-                            _session.csrfToken = token;
-
-                            $http.defaults.headers.common = {
-                                'X-CSRF-TOKEN': token
-                            };
-                        }, onFault);
+                onGetUserEmail = function () {
+                    return _session.account.email;
                 },
 
                 _session = {
@@ -100,26 +89,27 @@
                         firstName: '',
                         lastName: '',
                         email: '',
-                        userRoleDTOs: []
+                        userRoles: []
                     },
-                    csrfToken: '',
-                    kind: ''
+                    type: ''
                 };
 
             return {
                 getAuthority: onGetAuthority,
-                isEmptySession: onIsEmptySession,
-                isAdminSession: onIsAdminSession,
-                isAnonymousSession: onIsAnonymousSession,
-                clearSession: onClearSession,
                 createSession: onCreateSession,
-                createAnonymousSession: onCreateAnonymousSession,
-                getCsrfToken: onGetCsrfToken,
+                clearSession: onClearSession,
+                isEmptySession: onIsEmptySession,
+                isAnonymousSession: onIsAnonymousSession,
+                isUserSession: onIsUserSession,
+                isAdminSession: onIsAdminSession,
+                isEmptyAccountDetails: onIsEmptyAccountDetails,
+                updateAccountDetails: onUpdateAccountDetails,
+                getUserEmail: onGetUserEmail,
                 session: _session
             }
         };
 
-        return ["$rootScope", "$http", "csrfService", SessionService];
+        return ["$rootScope", "$http", "$q", "userService", "userRoleService", SessionService];
     })
 
 })(define);

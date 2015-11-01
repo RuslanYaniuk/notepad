@@ -1,5 +1,30 @@
+.menu-trigger-button md-icon {
+  font-size: 100px;
+  height: 100px;
+  width: 100px;
+}
+
+.menu-trigger-button p {
+  width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#loading-bar .bar {
+  background-color: @orange-600;
+}
+
+#loading-bar{
+  background-color: @orange-100;
+}
+
+#loading-bar .peg {
+  .box-shadow (1px, 0, 6px, @orange-600);
+}
+
 .login-card {
-  min-width: 350px
+  width: 350px
 }
 
 .full-height {
@@ -9,18 +34,6 @@
 div[ui-view="side-menu"] section,
 div[ui-view="side-menu"] {
   height: inherit;
-}
-
-.login-button {
-  width: 100%;
-}
-
-md-icon.password {
-  color: @orange-600;
-}
-
-md-icon.person {
-  color: @blue-600;
 }
 
 md-icon.login-card-logo {
@@ -46,14 +59,8 @@ md-icon.login-card-logo {
   width: 48px;
 }
 
-.index-content {
-  background-color: @grey-100;
-}
-
 body {
-  .index-content;
-  min-height: 640px;
-  min-width: 480px;
+  min-width: 320px;
 }
 
 //////////////////////////////////////////////////////////////////

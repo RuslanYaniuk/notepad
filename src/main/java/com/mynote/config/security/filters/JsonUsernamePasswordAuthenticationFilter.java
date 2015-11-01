@@ -3,6 +3,7 @@ package com.mynote.config.security.filters;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mynote.dto.UserLoginDTO;
 import com.mynote.exceptions.ValidationException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -90,7 +91,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends
     private UserLoginDTO getUserLoginDTOFromJsonRequest(HttpServletRequest request) {
         UserLoginDTO userLoginDTO = null;
 
-        if (!APPLICATION_JSON_UTF8.equals(request.getContentType())) {
+        if (!StringUtils.equalsIgnoreCase(APPLICATION_JSON_UTF8, request.getContentType())) { //TODO refactor. should throw message code
             throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType());
         }
 

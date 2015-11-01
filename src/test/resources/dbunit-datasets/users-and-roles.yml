@@ -1,56 +1,65 @@
 users:
 - id: 1
-  login: "administrator"
+  login: "admin"
   first_name: "System"
   last_name: "Administrator"
-  email: "admin@mynote.com"
-  password: "$2a$10$38F63J4TNXipNUKohw6mV.KVKLk4wRfKADqmEu0kT5x1irLaZ7fo2"
+  email: "admin@email.com"
+  password: "$2a$10$38F63J4TNXipNUKohw6mV.KVKLk4wRfKADqmEu0kT5x1irLaZ7fo2" #Passw0rd
   enabled: 1
   registration_date_utc: "2015-09-30 19:20:02"
 
 - id: 2
-  login: "andrew95"
-  first_name: "Andrew"
-  last_name: "Anderson"
-  email: "andrew.anderson@mail.com"
+  login: "user2"
+  first_name: "User2 First Name"
+  last_name: "User2 Last Name"
+  email: "user2@email.com"
   password: "$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe"
   enabled: 1
   registration_date_utc: "2015-09-30 19:20:02"
 
 - id: 3
-  login: "1bob1678"
-  first_name: "Bob"
-  last_name: "Buerlson"
-  email: "bob.buerlson@mail.com"
-  password: "$2a$10$PRvF.IT/d24dzsrJrHIa7OoOv5DVk4V0fKp.WgxEobsnc1kTkNTcW"
+  login: "user3"
+  first_name: "User3 First Name"
+  last_name: "User3 Last Name"
+  email: "user3@email.com"
+  password: "$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe"
   enabled: 1
   registration_date_utc: "2015-09-30 19:20:02"
 
 - id: 4
-  login: "$$cindy445"
-  first_name: "Cindy"
-  last_name: "Cisco"
-  email: "cindy.cisco@mail.com"
-  password: "$2a$10$jren5Bhj0.UrT6sScLQGrO9u5IEyVgKMLxFGFfu9K93R/GwWRiM.e"
+  login: "user4"
+  first_name: "User4 First Name"
+  last_name: "User4 Last Name"
+  email: "user4@email.com"
+  password: "$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe"
   enabled: 1
   registration_date_utc: "2015-09-30 19:20:02"
 
 - id: 5
-  login: "daniel585ss"
-  first_name: "Deniel"
-  last_name: "Dempto"
-  email: "deniel.dempto@mail.com"
-  password: "$2a$10$eDVqEojK9uxaww/spvPfLO3ZbcVukhn0qZHNykxdG91WePgclvllC"
+  login: "user5"
+  first_name: "User5 First Name"
+  last_name: "User5 Last Name"
+  email: "user5@email.com"
+  password: "$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe"
   enabled: 1
   registration_date_utc: "2015-09-30 19:20:02"
 
 - id: 6
-  login: "antony1715for$"
-  first_name: "Antony"
-  last_name: "Jones"
-  email: "antony.jones@disabled.com"
-  password: "$2a$10$J5sPJJy8eSAvMEuZaiBDseM.Hmjp.Dy1AJKDzTemH5ZRg3sWx5A/C"
+  login: "user6"
+  first_name: "User6 First Name"
+  last_name: "User6 Last Name"
+  email: "user6@email.com"
+  password: "$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe"
   enabled: 0
+  registration_date_utc: "2015-09-30 19:20:02"
+
+- id: 7
+  login: "user7"
+  first_name: "User7 First Name"
+  last_name: "User7 Last Name"
+  email: "user7@email.com"
+  password: "$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe"
+  enabled: 1
   registration_date_utc: "2015-09-30 19:20:02"
 
 user_roles:

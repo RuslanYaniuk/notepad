@@ -17,27 +17,36 @@
             modules = [
                 'ui.router',
                 'ngMaterial',
+                'angular-loading-bar',
+                'ngMessages',
+                'ngAnimate',
                 AuthModule,
                 AppModule,
                 AdminModule
             ],
-            app = angular.module(appName, modules).config(RouteManager);
 
-        app.config(function ($mdThemingProvider) {
-            $mdThemingProvider.theme('default').primaryPalette('teal', {
-                'default': '600', // by default use shade 400 from the pink palette for primary intentions
-                'hue-1': '100',   // use shade 100 for the <code>md-hue-1</code> class
-                'hue-2': '600',   // use shade 600 for the <code>md-hue-2</code> class
-                'hue-3': 'A100'   // use shade A100 for the <code>md-hue-3</code> class
-            })
-                // If you specify less than all of the keys, it will inherit from the
-                // default shades
-                .accentPalette('purple', {
-                    'default': '200' // use shade 200 for default, and keep all other shades the same
-                });
-        });
+            app = angular.module(appName, modules)
+
+                .config(RouteManager)
+
+                .config(function ($mdThemingProvider) {
+                    $mdThemingProvider.theme('default')
+                        .accentPalette('orange')
+                        .primaryPalette('teal')
+
+                        .warnPalette('red');
+                })
+
+                .config(['$httpProvider', function ($httpProvider) {
+                    $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-TOKEN';
+                }])
+
+                .config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
+                    cfpLoadingBarProvider.includeSpinner = false;
+                }]);
 
         angular.bootstrap(document.getElementsByTagName("body")[0], [appName]);
+
         return app;
     });
 
