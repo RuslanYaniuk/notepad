@@ -1,6 +1,6 @@
 package com.mynote.test.integration.conf;
 
-import com.mynote.test.commons.TestPersistenceContext;
+import com.mynote.test.commons.TestPersistenceConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -14,7 +14,7 @@ import javax.sql.DataSource;
  * @date October 2015
  */
 @Configuration
-@Import({TestPersistenceContext.class})
+@Import({TestPersistenceConfig.class})
 @ComponentScan(basePackages = {
         "com.mynote.test.utils",
         "com.mynote.test.integration.conf",

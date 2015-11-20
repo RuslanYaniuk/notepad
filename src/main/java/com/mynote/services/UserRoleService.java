@@ -1,10 +1,10 @@
 package com.mynote.services;
 
-import com.mynote.dto.UserRoleDTO;
+import com.mynote.dto.user.UserRoleDTO;
 import com.mynote.exceptions.UserRoleAlreadyExists;
 import com.mynote.exceptions.UserRoleNotFoundException;
 import com.mynote.models.UserRole;
-import com.mynote.repositories.UserRoleRepository;
+import com.mynote.repositories.jpa.UserRoleRepository;
 import com.mynote.utils.RoleComparator;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;

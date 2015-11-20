@@ -1,4 +1,4 @@
-package com.mynote.config;
+package com.mynote.config.web;
 
 import org.springframework.web.servlet.view.AbstractUrlBasedView;
 import org.springframework.web.servlet.view.InternalResourceView;

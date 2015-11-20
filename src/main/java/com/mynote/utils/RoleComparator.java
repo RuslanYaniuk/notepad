@@ -14,8 +14,8 @@ public class RoleComparator implements Comparator<UserRole> {
 
     @Override
     public int compare(UserRole o1, UserRole o2) {
-        String role1 =  o1.getRole().replaceFirst(ROLE_PREFIX, "");
-        String role2 =  o2.getRole().replaceFirst(ROLE_PREFIX, "");
+        String role1 = o1.getRole().replaceFirst(ROLE_PREFIX, "");
+        String role2 = o2.getRole().replaceFirst(ROLE_PREFIX, "");
 
         if (role1.charAt(0) > role2.charAt(0)) {
             return 1;

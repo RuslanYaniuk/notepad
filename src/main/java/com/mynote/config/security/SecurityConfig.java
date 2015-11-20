@@ -21,7 +21,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mynote.config.Constants.APPLICATION_ENCODING;
+import static com.mynote.config.web.Constants.APPLICATION_ENCODING;
 
 /**
  * @author Ruslan Yaniuk
@@ -139,7 +139,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public CustomLogoutSuccessHandler customLogoutSuccessHandler(){
+    public CustomLogoutSuccessHandler customLogoutSuccessHandler() {
         return new CustomLogoutSuccessHandler();
     }
 }

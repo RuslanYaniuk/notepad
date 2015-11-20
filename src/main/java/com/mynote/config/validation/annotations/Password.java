@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Ruslan Yaniuk
  * @date October 2015
  */
-@Target({ METHOD, FIELD, ANNOTATION_TYPE })
+@Target({METHOD, FIELD, ANNOTATION_TYPE})
 @Retention(RUNTIME)
 @Constraint(validatedBy = PasswordValidator.class)
 @Documented

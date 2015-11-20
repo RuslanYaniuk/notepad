@@ -1,7 +1,7 @@
 package com.mynote.test.unit.controllers;
 
-import com.mynote.dto.UserDTO;
-import com.mynote.dto.UserRoleDTO;
+import com.mynote.dto.user.UserDTO;
+import com.mynote.dto.user.UserRoleDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 /**
  * @author Ruslan Yaniuk
  * @date September 2015

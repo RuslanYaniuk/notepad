@@ -2,9 +2,9 @@ package com.mynote.test.unit.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.mynote.config.ExtendedMessageSource;
+import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.MessageDTO;
-import com.mynote.dto.UserLoginDTO;
+import com.mynote.dto.user.UserLoginDTO;
 import com.mynote.test.unit.conf.TestWebConfig;
 import com.mynote.test.utils.db.DBUnitHelper;
 import org.hamcrest.Matchers;
@@ -25,7 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.io.IOException;
 
-import static com.mynote.config.Constants.APPLICATION_JSON_UTF8;
+import static com.mynote.config.web.Constants.APPLICATION_JSON_UTF8;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;

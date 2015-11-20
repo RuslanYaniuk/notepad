@@ -1,6 +1,6 @@
 package com.mynote.test.unit.services;
 
-import com.mynote.dto.UserRoleDTO;
+import com.mynote.dto.user.UserRoleDTO;
 import com.mynote.exceptions.UserRoleAlreadyExists;
 import com.mynote.exceptions.UserRoleNotFoundException;
 import com.mynote.models.UserRole;

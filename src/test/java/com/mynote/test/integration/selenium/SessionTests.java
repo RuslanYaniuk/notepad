@@ -11,8 +11,6 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Ruslan Yaniuk
  * @date October 2015
@@ -87,7 +85,7 @@ public class SessionTests extends AbstractFluentTest {
 
     /**
      * In case the backend has invalidated the user session it should create the anonymous session
-     * (logout the user) and show message 'Your session has been expired'
+     * (logout the user) and show the message 'Your session has been expired'
      * after next http call with returned 401 error
      */
     @Test

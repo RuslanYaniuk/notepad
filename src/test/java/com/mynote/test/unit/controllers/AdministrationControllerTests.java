@@ -1,6 +1,6 @@
 package com.mynote.test.unit.controllers;
 
-import com.mynote.dto.*;
+import com.mynote.dto.user.*;
 import com.mynote.test.utils.UserDtoUtil;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
-import static com.mynote.config.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
+import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;

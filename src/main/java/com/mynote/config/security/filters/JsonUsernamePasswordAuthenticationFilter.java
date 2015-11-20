@@ -1,7 +1,7 @@
 package com.mynote.config.security.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mynote.dto.UserLoginDTO;
+import com.mynote.dto.user.UserLoginDTO;
 import com.mynote.exceptions.ValidationException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import static com.mynote.config.Constants.APPLICATION_JSON_UTF8;
+import static com.mynote.config.web.Constants.APPLICATION_JSON_UTF8;
 
 /**
  * @author Ruslan Yaniuk

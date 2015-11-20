@@ -1,11 +1,11 @@
 package com.mynote.test.unit.security;
 
-import com.mynote.dto.UserRegistrationDTO;
+import com.mynote.dto.user.UserRegistrationDTO;
 import com.mynote.test.unit.controllers.AbstractSecuredControllerTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.mynote.config.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
+import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static com.mynote.test.utils.UserDtoUtil.createSimpleUserRegistrationDTO;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;

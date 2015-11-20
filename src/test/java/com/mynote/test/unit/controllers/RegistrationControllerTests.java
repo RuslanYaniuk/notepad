@@ -1,13 +1,13 @@
 package com.mynote.test.unit.controllers;
 
-import com.mynote.dto.UserFindDTO;
-import com.mynote.dto.UserRegistrationDTO;
+import com.mynote.dto.user.UserFindDTO;
+import com.mynote.dto.user.UserRegistrationDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static com.mynote.config.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
+import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static com.mynote.test.utils.UserDtoUtil.createSimpleUserRegistrationDTO;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;

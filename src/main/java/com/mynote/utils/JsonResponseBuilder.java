@@ -1,8 +1,8 @@
 package com.mynote.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mynote.config.Constants;
-import com.mynote.config.ExtendedMessageSource;
+import com.mynote.config.web.Constants;
+import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.MessageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.NoSuchMessageException;
@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Locale;
 
-import static com.mynote.config.Constants.APPLICATION_ENCODING;
-import static com.mynote.config.Constants.APPLICATION_JSON_UTF8;
+import static com.mynote.config.web.Constants.APPLICATION_ENCODING;
+import static com.mynote.config.web.Constants.APPLICATION_JSON_UTF8;
 
 /**
  * @author Ruslan Yaniuk

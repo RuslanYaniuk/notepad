@@ -1,7 +1,7 @@
 package com.mynote.test.unit.controllers;
 
 import com.mynote.dto.CsrfTokenDTO;
-import com.mynote.dto.UserLoginDTO;
+import com.mynote.dto.user.UserLoginDTO;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpSession;
@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import javax.servlet.Filter;
 
-import static com.mynote.config.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
+import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,16 +43,16 @@ public abstract class AbstractSecuredControllerTest extends AbstractControllerTe
         MvcResult result = mockMvc.perform(get("/api/login/get-token"))
                 .andExpect(status().isOk()).andReturn();
 
-        session = (MockHttpSession)result.getRequest().getSession();
+        session = (MockHttpSession) result.getRequest().getSession();
 
         return jacksonObjectMapper.readValue(result.getResponse().getContentAsString(), CsrfTokenDTO.class);
     }
 
     protected ResultActions loginUser(CsrfTokenDTO csrfTokenDTO, UserLoginDTO userLoginDTO) throws Exception {
         return mockMvc.perform(post("/api/login")
-                        .session(session)
-                        .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
-                        .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
-                        .content(jacksonObjectMapper.writeValueAsString(userLoginDTO)));
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
+                .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
+                .content(jacksonObjectMapper.writeValueAsString(userLoginDTO)));
     }
 }

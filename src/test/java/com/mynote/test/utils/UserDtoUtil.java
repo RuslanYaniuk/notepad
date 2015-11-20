@@ -1,9 +1,9 @@
 package com.mynote.test.utils;
 
-import com.mynote.dto.UserDTO;
-import com.mynote.dto.UserLoginDTO;
-import com.mynote.dto.UserRegistrationDTO;
-import com.mynote.dto.UserUpdateDTO;
+import com.mynote.dto.user.UserDTO;
+import com.mynote.dto.user.UserLoginDTO;
+import com.mynote.dto.user.UserRegistrationDTO;
+import com.mynote.dto.user.UserUpdateDTO;
 
 import java.util.ArrayList;
 import java.util.List;

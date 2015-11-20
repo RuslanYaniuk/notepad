@@ -45,7 +45,7 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
         private String password;
 
         public PasswordRule(String regex, String password) {
-            this.pattern  = Pattern.compile(regex);
+            this.pattern = Pattern.compile(regex);
             this.password = password;
         }
 

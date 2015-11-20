@@ -2,11 +2,14 @@ package com.mynote.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.mynote.config.db.DatabaseInitializer;
-import com.mynote.config.security.SecurityConfig;
 import com.mynote.config.validation.CustomValidator;
-import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.context.annotation.*;
+import com.mynote.config.web.ChainableUrlBasedViewResolver;
+import com.mynote.config.web.ExtendedMessageSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -19,23 +22,16 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import java.util.Arrays;
 import java.util.List;
 
-import static com.mynote.config.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
+import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 
 /**
  * @author Ruslan Yaniuk
  * @date Jun 2015
  */
-@ComponentScan(basePackages = {"com.mynote"})
 @Configuration
-@Import({SecurityConfig.class})
-public class WebConfig extends WebMvcConfigurationSupport {
+public abstract class WebConfig extends WebMvcConfigurationSupport {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -74,7 +70,7 @@ public class WebConfig extends WebMvcConfigurationSupport {
     public HttpMessageConverter<String> responseBodyConverter() {
         StringHttpMessageConverter converter = new StringHttpMessageConverter();
 
-        converter.setSupportedMediaTypes(Arrays.asList(MEDIA_TYPE_APPLICATION_JSON_UTF8));
+        converter.setSupportedMediaTypes(Lists.newArrayList(MEDIA_TYPE_APPLICATION_JSON_UTF8));
         return converter;
     }
 
@@ -91,8 +87,9 @@ public class WebConfig extends WebMvcConfigurationSupport {
         MappingJackson2HttpMessageConverter jacksonConverter = new
                 MappingJackson2HttpMessageConverter();
 
-        jacksonConverter.setSupportedMediaTypes(Arrays.asList(MEDIA_TYPE_APPLICATION_JSON_UTF8));
+        jacksonConverter.setSupportedMediaTypes(Lists.newArrayList(MEDIA_TYPE_APPLICATION_JSON_UTF8));
         jacksonConverter.setObjectMapper(jacksonObjectMapper());
+
         return jacksonConverter;
     }
 
@@ -115,26 +112,6 @@ public class WebConfig extends WebMvcConfigurationSupport {
     @Profile({"dev", "prod"})
     public DatabaseInitializer databaseInitializer() {
         return new DatabaseInitializer();
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        Context envContext;
-        DataSource dataSource;
-
-        try {
-            envContext = (Context) initialContext().lookup("java:/comp/env");
-            dataSource = (DataSource) envContext.lookup("jdbc/mynote_datasource");
-        } catch (NamingException e) {
-            throw new BeanCreationException("dataSource", e);
-        }
-
-        return dataSource;
-    }
-
-    @Bean
-    public InitialContext initialContext() throws NamingException {
-        return new InitialContext();
     }
 
     @Override

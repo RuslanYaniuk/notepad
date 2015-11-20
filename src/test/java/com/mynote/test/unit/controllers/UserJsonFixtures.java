@@ -21,7 +21,7 @@ public interface UserJsonFixtures {
             "\"userRoleDTOs\":[{\"id\":1,\"role\":\"ROLE_USER\"}],\"registrationDateUTC\":\"2015-09-30T19:20:02\"}," +
             "{\"firstName\":\"User7 First Name\",\"lastName\":\"User7 Last Name\",\"email\":\"user7@email.com\",\"id\":7,\"login\":\"user7\"," +
             "\"userRoleDTOs\":[{\"id\":1,\"role\":\"ROLE_USER\"}],\"registrationDateUTC\":\"2015-09-30T19:20:02\"}]";
-    
+
     String UPDATED_FIRST_NAME_USER_ID2 = "{\"firstName\":\"updated first Name\",\"lastName\":\"User2 Last Name\",\"email\":\"user2@email.com\",\"id\":2," +
             "\"userRoleDTOs\":[{\"id\":1,\"role\":\"ROLE_USER\"}],\"registrationDateUTC\":\"2015-09-30T19:20:02\"}";
 

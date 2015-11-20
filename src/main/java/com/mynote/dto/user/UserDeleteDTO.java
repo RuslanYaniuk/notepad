@@ -1,4 +1,4 @@
-package com.mynote.dto;
+package com.mynote.dto.user;
 
 import javax.validation.constraints.NotNull;
 

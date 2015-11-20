@@ -1,4 +1,4 @@
-package com.mynote.config;
+package com.mynote.config.web;
 
 import com.mynote.models.UserRole;
 import com.mynote.services.UserRoleService;
@@ -21,6 +21,8 @@ public interface Constants {
     MediaType MEDIA_TYPE_APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             StandardCharsets.UTF_8);
+
+    String PROPERTY_NAME_MONGO_URI = "mongo.uri";
 
     String SYSTEM_MESSAGE_CODE = "system-message-code";
 

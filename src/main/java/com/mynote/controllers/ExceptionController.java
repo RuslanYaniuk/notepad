@@ -1,6 +1,6 @@
 package com.mynote.controllers;
 
-import com.mynote.config.ExtendedMessageSource;
+import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.MessageDTO;
 import com.mynote.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;

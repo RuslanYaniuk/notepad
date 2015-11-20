@@ -1,7 +1,7 @@
 package com.mynote.utils;
 
-import com.mynote.dto.UserDeleteDTO;
-import com.mynote.dto.UserResetPasswordDTO;
+import com.mynote.dto.user.UserDeleteDTO;
+import com.mynote.dto.user.UserResetPasswordDTO;
 import com.mynote.models.User;
 
 /**

@@ -1,4 +1,4 @@
-package com.mynote.config;
+package com.mynote.config.web;
 
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;

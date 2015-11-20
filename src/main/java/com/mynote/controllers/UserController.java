@@ -1,7 +1,7 @@
 package com.mynote.controllers;
 
-import com.mynote.config.Constants;
-import com.mynote.dto.UserDTO;
+import com.mynote.config.web.Constants;
+import com.mynote.dto.user.UserDTO;
 import com.mynote.exceptions.UserNotFoundException;
 import com.mynote.models.User;
 import com.mynote.services.UserService;
@@ -31,7 +31,7 @@ public class UserController {
 
     @RequestMapping(value = "/get-user-info", method = GET, produces = "application/json;charset=UTF-8")
     public ResponseEntity getUserInfo(HttpSession httpSession) throws IOException, UserNotFoundException {
-        Long userId = (Long)httpSession.getAttribute(SESSION_ATTRIBUTE_USER_ID);
+        Long userId = (Long) httpSession.getAttribute(SESSION_ATTRIBUTE_USER_ID);
         User user = userService.findUserById(userId);
         UserDTO userDTO = new UserDTO(user);
 

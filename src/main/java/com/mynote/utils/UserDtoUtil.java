@@ -1,6 +1,6 @@
 package com.mynote.utils;
 
-import com.mynote.dto.UserDTO;
+import com.mynote.dto.user.UserDTO;
 import com.mynote.models.User;
 
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
 public class UserDtoUtil {
 
     public static UserDTO[] convert(List<User> userList) {
-        UserDTO [] userDTOArray = new UserDTO[userList.size()];
+        UserDTO[] userDTOArray = new UserDTO[userList.size()];
 
         for (int i = 0; i < userList.size(); i++) {
             userDTOArray[i] = convert(userList.get(i));

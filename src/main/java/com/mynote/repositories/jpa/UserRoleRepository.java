@@ -1,4 +1,4 @@
-package com.mynote.repositories;
+package com.mynote.repositories.jpa;
 
 import com.mynote.models.UserRole;
 import org.springframework.data.repository.CrudRepository;

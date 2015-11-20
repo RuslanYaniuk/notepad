@@ -1,9 +1,9 @@
 package com.mynote.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mynote.config.ExtendedMessageSource;
+import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.MessageDTO;
-import com.mynote.dto.UserLoginSuccessDTO;
+import com.mynote.dto.user.UserLoginSuccessDTO;
 import com.mynote.exceptions.UserNotFoundException;
 import com.mynote.models.User;
 import com.mynote.services.UserService;

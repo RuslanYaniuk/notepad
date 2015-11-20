@@ -1,4 +1,6 @@
-package com.mynote.dto;
+package com.mynote.dto.user;
+
+import com.mynote.dto.MessageDTO;
 
 /**
  * @author Ruslan Yaniuk

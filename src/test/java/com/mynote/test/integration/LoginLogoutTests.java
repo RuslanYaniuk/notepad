@@ -1,7 +1,7 @@
 package com.mynote.test.integration;
 
-import com.mynote.config.Constants;
-import com.mynote.dto.UserLoginDTO;
+import com.mynote.config.web.Constants;
+import com.mynote.dto.user.UserLoginDTO;
 import com.mynote.test.unit.controllers.AbstractSecuredControllerTest;
 import org.junit.Before;
 import org.junit.Test;

@@ -1,0 +1,16 @@
+{
+  "note": [
+    {
+      "_id" : { "$oid" : "564cb8d9559a2ce2600f3c1f"},
+      "_class": "com.mynote.models.Note",
+      "subject": "subject 1",
+      "text": "text1"
+    },
+    {
+      "_id" : { "$oid" : "564cb8d9559a2ce2600f3c20"},
+      "_class": "com.mynote.models.Note",
+      "subject": "subject 2",
+      "text": "text2"
+    }
+  ]
+}

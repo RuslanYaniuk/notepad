@@ -1,13 +1,13 @@
 package com.mynote.test.unit.db;
 
-import com.mynote.config.ApplicationProperties;
 import com.mynote.config.db.DatabaseInitializer;
+import com.mynote.config.web.ApplicationProperties;
 import com.mynote.exceptions.EmailAlreadyTakenException;
 import com.mynote.exceptions.LoginAlreadyTakenException;
 import com.mynote.models.User;
 import com.mynote.models.UserRole;
-import com.mynote.repositories.UserRepository;
-import com.mynote.repositories.UserRoleRepository;
+import com.mynote.repositories.jpa.UserRepository;
+import com.mynote.repositories.jpa.UserRoleRepository;
 import com.mynote.services.UserRoleService;
 import com.mynote.test.unit.services.AbstractServiceTest;
 import com.mynote.test.utils.db.DBUnitHelper;
@@ -29,7 +29,7 @@ public class DatabaseInitializerTests extends AbstractServiceTest {
 
     @Autowired
     private DatabaseInitializer databaseInitializerImpl;
-    
+
     @Autowired
     private ApplicationProperties applicationProperties;
 

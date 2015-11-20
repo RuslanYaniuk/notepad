@@ -1,8 +1,8 @@
 package com.mynote.test.unit.services;
 
 import com.google.common.collect.Lists;
-import com.mynote.config.ApplicationProperties;
-import com.mynote.dto.*;
+import com.mynote.config.web.ApplicationProperties;
+import com.mynote.dto.user.*;
 import com.mynote.exceptions.*;
 import com.mynote.models.User;
 import com.mynote.models.UserRole;

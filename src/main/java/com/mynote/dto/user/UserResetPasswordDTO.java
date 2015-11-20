@@ -1,4 +1,4 @@
-package com.mynote.dto;
+package com.mynote.dto.user;
 
 import com.mynote.config.validation.ValidationGroupB;
 import com.mynote.config.validation.ValidationGroupC;

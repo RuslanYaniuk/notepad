@@ -1,23 +1,27 @@
-package com.mynote.config;
+package com.mynote.config.persistence;
 
+import com.mynote.config.web.ApplicationProperties;
 import org.flywaydb.core.Flyway;
 import org.hibernate.cfg.ImprovedNamingStrategy;
 import org.hibernate.jpa.HibernatePersistenceProvider;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jndi.JndiTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.AbstractJpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-import static com.mynote.config.ApplicationProperties.*;
+import static com.mynote.config.web.ApplicationProperties.*;
 
 /**
  * @author Ruslan Yaniuk
@@ -25,13 +29,14 @@ import static com.mynote.config.ApplicationProperties.*;
  */
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories("com.mynote.repositories")
-public class PersistenceContext {
+@EnableJpaRepositories("com.mynote.repositories.jpa")
+public class PersistenceConfig {
 
     @Autowired
     private ApplicationProperties applicationProperties;
 
-    @Autowired DataSource dataSource;
+    @Autowired
+    DataSource dataSource;
 
     @Bean(initMethod = "migrate")
     public Flyway flyway() {
@@ -42,6 +47,20 @@ public class PersistenceContext {
         flyway.setDataSource(dataSource);
 
         return flyway;
+    }
+
+    @Bean
+    public DataSource dataSource() {
+        JndiTemplate jndi = new JndiTemplate();
+        DataSource dataSource;
+
+        try {
+            dataSource = (DataSource) jndi.lookup("java:/comp/env/jdbc/mynote_datasource");
+        } catch (NamingException e) {
+            throw new BeanCreationException("dataSource", e);
+        }
+
+        return dataSource;
     }
 
     @Bean

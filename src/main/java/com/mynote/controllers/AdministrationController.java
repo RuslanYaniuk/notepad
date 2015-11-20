@@ -1,7 +1,8 @@
 package com.mynote.controllers;
 
-import com.mynote.config.ExtendedMessageSource;
+import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.*;
+import com.mynote.dto.user.*;
 import com.mynote.exceptions.OperationNotPermitted;
 import com.mynote.exceptions.SearchFieldsAreEmpty;
 import com.mynote.exceptions.UserNotFoundException;

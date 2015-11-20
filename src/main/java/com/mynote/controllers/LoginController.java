@@ -1,10 +1,10 @@
 package com.mynote.controllers;
 
-import com.mynote.config.Constants;
-import com.mynote.config.ExtendedMessageSource;
+import com.mynote.config.web.Constants;
+import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.CsrfTokenDTO;
 import com.mynote.dto.MessageDTO;
-import com.mynote.dto.UserRoleDTO;
+import com.mynote.dto.user.UserRoleDTO;
 import com.mynote.utils.UserRoleDtoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;

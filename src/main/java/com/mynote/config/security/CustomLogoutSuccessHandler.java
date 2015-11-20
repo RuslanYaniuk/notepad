@@ -1,6 +1,6 @@
 package com.mynote.config.security;
 
-import com.mynote.config.ExtendedMessageSource;
+import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.MessageDTO;
 import com.mynote.utils.JsonResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,9 @@
 package com.mynote.test.unit.controllers;
 
-import com.mynote.config.Constants;
-import com.mynote.dto.*;
+import com.mynote.dto.CsrfTokenDTO;
+import com.mynote.dto.user.UserLoginDTO;
+import com.mynote.dto.user.UserLoginSuccessDTO;
+import com.mynote.dto.user.UserRoleDTO;
 import com.mynote.services.UserRoleService;
 import org.junit.Before;
 import org.junit.Test;

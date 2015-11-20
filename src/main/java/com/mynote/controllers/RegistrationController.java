@@ -1,10 +1,10 @@
 package com.mynote.controllers;
 
-import com.mynote.config.ApplicationProperties;
-import com.mynote.config.ExtendedMessageSource;
+import com.mynote.config.web.ApplicationProperties;
+import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.MessageDTO;
-import com.mynote.dto.UserFindDTO;
-import com.mynote.dto.UserRegistrationDTO;
+import com.mynote.dto.user.UserFindDTO;
+import com.mynote.dto.user.UserRegistrationDTO;
 import com.mynote.exceptions.EmailAlreadyTakenException;
 import com.mynote.exceptions.LoginAlreadyTakenException;
 import com.mynote.exceptions.SearchFieldsAreEmpty;

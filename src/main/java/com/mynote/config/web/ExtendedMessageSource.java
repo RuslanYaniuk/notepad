@@ -1,4 +1,4 @@
-package com.mynote.config;
+package com.mynote.config.web;
 
 import com.mynote.dto.MessageDTO;
 import org.springframework.context.MessageSource;

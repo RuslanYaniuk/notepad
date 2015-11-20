@@ -1,10 +1,10 @@
 package com.mynote.services;
 
-import com.mynote.config.ApplicationProperties;
-import com.mynote.dto.*;
+import com.mynote.config.web.ApplicationProperties;
+import com.mynote.dto.user.*;
 import com.mynote.exceptions.*;
 import com.mynote.models.User;
-import com.mynote.repositories.UserRepository;
+import com.mynote.repositories.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCrypt;
