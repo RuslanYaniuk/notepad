@@ -1,7 +1,5 @@
 package com.mynote.controllers;
 
-import com.mynote.config.web.ExtendedMessageSource;
-import com.mynote.dto.*;
 import com.mynote.dto.user.*;
 import com.mynote.exceptions.OperationNotPermitted;
 import com.mynote.exceptions.SearchFieldsAreEmpty;
@@ -21,9 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 /**
@@ -32,7 +28,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
  */
 @RestController
 @RequestMapping("/api/administration")
-public class AdministrationController {
+public class AdministrationController extends AbstractController {
 
     @Autowired
     private UserService userService;
@@ -40,65 +36,60 @@ public class AdministrationController {
     @Autowired
     private UserRoleService userRoleService;
 
-    @Autowired
-    private ExtendedMessageSource messageSource;
-
-    @RequestMapping(value = "/list-all-users", method = GET, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<UserDTO[]> listAllUsers() throws IOException {
+    @RequestMapping(value = "/list-all-users", method = GET)
+    public ResponseEntity listAllUsers() throws IOException {
         List<User> userList = userService.getAllUsersSortByLastNameDesc();
 
-        return new ResponseEntity<>(UserDtoUtil.convert(userList), OK);
+        return ok(UserDtoUtil.convert(userList));
     }
 
-    @RequestMapping(value = "/get-all-user-roles", method = GET, produces = "application/json;charset=UTF-8")
-    public UserRoleDTO[] getAllUserRoles() throws IOException {
-        return UserRoleDtoUtil.convert(userRoleService.getAllUserRoles());
+    @RequestMapping(value = "/get-all-user-roles", method = GET)
+    public ResponseEntity getAllUserRoles() throws IOException {
+        return ok(UserRoleDtoUtil.convert(userRoleService.getAllUserRoles()));
     }
 
-    @RequestMapping(value = "/update-user", method = POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/update-user", method = POST)
     public ResponseEntity updateUser(@Validated @RequestBody UserUpdateDTO userUpdateDTO) throws UserNotFoundException, UserRoleNotFoundException {
-        return new ResponseEntity<>(new UserUpdateDTO(userService.updateUser(userUpdateDTO)), OK);
+        UserUpdateDTO userUpdateDTOResponse = new UserUpdateDTO(userService.updateUser(userUpdateDTO));
+
+        return ok(userUpdateDTOResponse);
     }
 
-    @RequestMapping(value = "/delete-user", method = DELETE, produces = "application/json;charset=UTF-8")
-    public ResponseEntity deleteUser(@Validated @RequestBody UserDeleteDTO userDeleteDTO, Locale locale) throws UserNotFoundException, OperationNotPermitted {
+    @RequestMapping(value = "/delete-user", method = DELETE)
+    public ResponseEntity deleteUser(@Validated @RequestBody UserDeleteDTO userDeleteDTO) throws UserNotFoundException, OperationNotPermitted {
         userService.deleteUser(userDeleteDTO);
 
-        return new ResponseEntity<>(messageSource.getMessageDTO("user.account.deleted", locale), OK);
+        return messageOK("user.account.deleted");
     }
 
-    @RequestMapping(value = "/find-user", method = POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/find-user", method = POST)
     public ResponseEntity findUser(@RequestBody UserFindDTO userFindDTO) throws UserNotFoundException, SearchFieldsAreEmpty {
         Long userId = userFindDTO.getId();
 
         if (userFindDTO.getId() != null) {
             UserDTO userDTO = UserDtoUtil.convert(userService.findUserById(userId));
 
-            return new ResponseEntity<>(userDTO, OK);
+            return ok(userDTO);
         }
 
         throw new SearchFieldsAreEmpty();
     }
 
-    @RequestMapping(value = "/reset-user-password", method = POST, produces = "application/json;charset=UTF-8")
-    public ResponseEntity resetUserPassword(@Validated @RequestBody UserResetPasswordDTO resetPasswordDTO, Locale locale) throws UserNotFoundException {
+    @RequestMapping(value = "/reset-user-password", method = POST)
+    public ResponseEntity resetUserPassword(@Validated @RequestBody UserResetPasswordDTO resetPasswordDTO) throws UserNotFoundException {
         User user = userService.resetUserPassword(resetPasswordDTO);
 
-        return new ResponseEntity<>(messageSource.getMessageDTO("user.reset.password.success",
-                locale, user.getId().toString()), OK);
+        return messageOK("user.reset.password.success", user.getId().toString());
     }
 
-    @RequestMapping(value = "/enable-user-account", method = POST, produces = "application/json;charset=UTF-8")
-    public ResponseEntity enableUserAccount(@Validated @RequestBody UserEnableAccountDTO enableAccountDTO, Locale locale) throws OperationNotPermitted, UserNotFoundException {
+    @RequestMapping(value = "/enable-user-account", method = POST)
+    public ResponseEntity enableUserAccount(@Validated @RequestBody UserEnableAccountDTO enableAccountDTO) throws OperationNotPermitted, UserNotFoundException {
         User user = userService.enableUserAccount(enableAccountDTO);
-        MessageDTO messageDTO;
 
         if (user.isEnabled()) {
-            messageDTO = messageSource.getMessageDTO("user.account.enabled", locale);
+            return messageOK("user.account.enabled");
         } else {
-            messageDTO = messageSource.getMessageDTO("user.account.disabled", locale);
+            return messageOK("user.account.disabled");
         }
-
-        return new ResponseEntity<>(messageDTO, OK);
     }
 }

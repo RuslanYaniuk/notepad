@@ -15,7 +15,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 import static com.mynote.config.security.CustomAuthenticationSuccessHandler.SESSION_ATTRIBUTE_USER_ID;
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 /**
@@ -24,12 +23,12 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  */
 @RestController
 @RequestMapping(value = "/api/user/")
-public class UserController {
+public class UserController extends AbstractController {
 
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/get-user-info", method = GET, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/get-user-info", method = GET)
     public ResponseEntity getUserInfo(HttpSession httpSession) throws IOException, UserNotFoundException {
         Long userId = (Long) httpSession.getAttribute(SESSION_ATTRIBUTE_USER_ID);
         User user = userService.findUserById(userId);
@@ -39,6 +38,6 @@ public class UserController {
             userDTO.setUserRoleDTOs(UserRoleDtoUtil.convert(user.getRoles()));
         }
 
-        return new ResponseEntity<>(userDTO, OK);
+        return ok(userDTO);
     }
 }

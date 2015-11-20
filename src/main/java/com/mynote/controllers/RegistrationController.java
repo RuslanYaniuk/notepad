@@ -1,8 +1,6 @@
 package com.mynote.controllers;
 
 import com.mynote.config.web.ApplicationProperties;
-import com.mynote.config.web.ExtendedMessageSource;
-import com.mynote.dto.MessageDTO;
 import com.mynote.dto.user.UserFindDTO;
 import com.mynote.dto.user.UserRegistrationDTO;
 import com.mynote.exceptions.EmailAlreadyTakenException;
@@ -17,9 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Locale;
-
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
@@ -29,59 +24,51 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
  */
 @RestController
 @RequestMapping(value = "/api/registration/")
-public class RegistrationController {
+public class RegistrationController extends AbstractController {
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private ExtendedMessageSource messageSource;
-
-    @Autowired
     private ApplicationProperties appProperties;
 
-    @RequestMapping(value = "/register-new-user", method = PUT, produces = "application/json;charset=UTF-8")
-    public ResponseEntity<MessageDTO> registerNewUser(@Validated @RequestBody UserRegistrationDTO userRegistrationDTO,
-                                                      Locale locale) throws EmailAlreadyTakenException, LoginAlreadyTakenException, InterruptedException {
+    @RequestMapping(value = "/register-new-user", method = PUT)
+    public ResponseEntity registerNewUser(@Validated @RequestBody UserRegistrationDTO userRegistrationDTO) throws EmailAlreadyTakenException, LoginAlreadyTakenException, InterruptedException {
         if (appProperties.isBruteForceProtectionEnabled()) {
             Thread.sleep(appProperties.getBruteForceDelay());
         }
         userService.addNewUser(userRegistrationDTO);
 
-        return new ResponseEntity<>(messageSource.getMessageDTO("user.registration.success", locale), OK);
+        return messageOK("user.registration.success");
     }
 
-    @RequestMapping(value = "/check-available-email", method = POST, produces = "application/json;charset=UTF-8")
-    public ResponseEntity checkAvailableEmail(@RequestBody UserFindDTO userFindDTO, Locale locale) throws SearchFieldsAreEmpty {
+    @RequestMapping(value = "/check-available-email", method = POST)
+    public ResponseEntity checkAvailableEmail(@RequestBody UserFindDTO userFindDTO) throws SearchFieldsAreEmpty {
         String email = userFindDTO.getEmail();
-        MessageDTO messageDTO;
 
         if (email != null) {
             try {
                 userService.findUserByEmail(email);
-                messageDTO = messageSource.getMessageDTO("user.email.isNotAvailable", locale);
+                return messageOK("user.email.isNotAvailable");
             } catch (UserNotFoundException e) {
-                messageDTO = messageSource.getMessageDTO("user.email.isAvailable", locale);
+                return messageOK("user.email.isAvailable");
             }
-            return new ResponseEntity<>(messageDTO, OK);
         }
 
         throw new SearchFieldsAreEmpty();
     }
 
-    @RequestMapping(value = "/check-available-login", method = POST, produces = "application/json;charset=UTF-8")
-    public ResponseEntity checkAvailableLogin(@RequestBody UserFindDTO userFindDTO, Locale locale) throws SearchFieldsAreEmpty {
+    @RequestMapping(value = "/check-available-login", method = POST)
+    public ResponseEntity checkAvailableLogin(@RequestBody UserFindDTO userFindDTO) throws SearchFieldsAreEmpty {
         String login = userFindDTO.getLogin();
-        MessageDTO messageDTO;
 
         if (login != null) {
             try {
                 userService.findByLoginOrEmail(login, login);
-                messageDTO = messageSource.getMessageDTO("user.login.isNotAvailable", locale);
+                return messageOK("user.login.isNotAvailable");
             } catch (UserNotFoundException e) {
-                messageDTO = messageSource.getMessageDTO("user.login.isAvailable", locale);
+                return messageOK("user.login.isAvailable");
             }
-            return new ResponseEntity<>(messageDTO, OK);
         }
 
         throw new SearchFieldsAreEmpty();
