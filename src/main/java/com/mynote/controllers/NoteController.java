@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 /**
@@ -34,11 +36,11 @@ public class NoteController extends AbstractController {
         return ok(noteFindDTO);
     }
 
-    @RequestMapping(value = "/find-note", method = POST)
-    public ResponseEntity findNote(@RequestBody NoteFindDTO noteFindDTO) {
-        Note note = noteService.findNote(noteFindDTO);
+    @RequestMapping(value = "/find-notes", method = POST)
+    public ResponseEntity findNotes(@RequestBody NoteFindDTO noteFindDTO) {
+        List<Note> notes = noteService.findNotes(noteFindDTO);
 
-        return ok(note);
+        return ok(notes.toArray());
     }
 
     @RequestMapping(value = "/update-note", method = POST)

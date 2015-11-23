@@ -8,6 +8,8 @@ import com.mynote.repositories.mongo.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author Ruslan Yaniuk
  * @date November 2015
@@ -40,7 +42,7 @@ public class NoteService {
         return noteRepository.save(note);
     }
 
-    public Note findNote(NoteFindDTO noteFindDTO) {
-        return noteRepository.findOne(noteFindDTO.getId());
+    public List<Note> findNotes(NoteFindDTO noteFindDTO) {
+        return noteRepository.find(noteFindDTO);
     }
 }

@@ -13,8 +13,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -69,7 +69,7 @@ public class NoteControllerTests extends AbstractControllerTest {
     public void updateNote_CorrectNoteDTO_NoteUpdated_200() throws Exception {
         NoteUpdateDTO noteUpdateDTO = new NoteUpdateDTO();
 
-        noteUpdateDTO.setId("564cb8d9559a2ce2600f3c1f");
+        noteUpdateDTO.setId("564cb8d9559a2ce2600f3c24");
         noteUpdateDTO.setSubject("Updated subject");
         noteUpdateDTO.setText("Updated text");
 
@@ -83,21 +83,39 @@ public class NoteControllerTests extends AbstractControllerTest {
 
     @Test
     @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void findNote_CorrectNoteDTO_NoteUpdated_200() throws Exception {
+    public void findNotes_CorrectNoteId_NoteUpdated_200() throws Exception {
         NoteFindDTO note = new NoteFindDTO();
 
-        note.setId("564cb8d9559a2ce2600f3c1f");
+        note.setId("564cb8d9559a2ce2600f3c24");
 
-        MvcResult result = mockMvc.perform(post("/api/note/find-note")
+        MvcResult result = findNote(note);
+
+        NoteUpdateDTO[] noteUpdateDTOs = jacksonObjectMapper
+                .readValue(result.getResponse().getContentAsString(), NoteUpdateDTO[].class);
+
+        assertNotNull(noteUpdateDTOs[0].getId());
+        assertNotNull(noteUpdateDTOs[0].getSubject());
+        assertNotNull(noteUpdateDTOs[0].getText());
+    }
+
+    @Test
+    @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void findNotes_WordInSubject_OneNoteReturned_200() throws Exception {
+        NoteFindDTO noteFindDTO = new NoteFindDTO();
+
+        noteFindDTO.setSubject("1");
+
+        MvcResult result = findNote(noteFindDTO);
+
+        NoteUpdateDTO[] noteUpdateDTOs = jacksonObjectMapper
+                .readValue(result.getResponse().getContentAsString(), NoteUpdateDTO[].class);
+        assertThat(noteUpdateDTOs[0].getSubject(), is("subject 1 goes here. First"));
+    }
+
+    private MvcResult findNote(NoteFindDTO note) throws Exception {
+        return mockMvc.perform(post("/api/note/find-notes")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(note)))
                 .andExpect(status().isOk()).andReturn();
-
-        NoteUpdateDTO noteUpdateDTO = jacksonObjectMapper
-                .readValue(result.getResponse().getContentAsString(), NoteUpdateDTO.class);
-
-        assertNotNull(noteUpdateDTO.getId());
-        assertNotNull(noteUpdateDTO.getSubject());
-        assertNotNull(noteUpdateDTO.getText());
     }
 }

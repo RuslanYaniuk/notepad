@@ -12,6 +12,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -49,7 +51,7 @@ public class NoteServiceTests extends AbstractServiceTest {
     public void updateNote_CorrectDTO_UpdatedNoteReturned() {
         NoteUpdateDTO noteUpdateDTO = new NoteUpdateDTO();
 
-        noteUpdateDTO.setId("564cb8d9559a2ce2600f3c1f");
+        noteUpdateDTO.setId("564cb8d9559a2ce2600f3c21");
         noteUpdateDTO.setText("Updated text");
         noteUpdateDTO.setSubject("Updated subject");
 
@@ -62,12 +64,15 @@ public class NoteServiceTests extends AbstractServiceTest {
 
     @Test
     @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void findNote_CorrectDTO_NoteReturned() {
-        NoteFindDTO noteFindDTO = new NoteFindDTO("564cb8d9559a2ce2600f3c1f");
+    public void findNote_TextOrSubjectOrId_NoteReturned() {
+        NoteFindDTO noteFindDTO = new NoteFindDTO();
 
-        Note note = noteService.findNote(noteFindDTO);
+        noteFindDTO.setId("564cb8d9559a2ce2600f3c24");
+        noteFindDTO.setSubject("2");
+        noteFindDTO.setText("3");
 
-        assertThat(note.getSubject(), is("subject 1"));
-        assertThat(note.getText(), is("text1"));
+        List<Note> notes = noteService.findNotes(noteFindDTO);
+
+        assertThat(notes.size(), is(3));
     }
 }
