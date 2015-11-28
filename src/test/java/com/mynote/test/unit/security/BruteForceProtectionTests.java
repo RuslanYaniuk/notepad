@@ -13,7 +13,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
-import static com.mynote.test.utils.UserDtoUtil.createSimpleUserRegistrationDTO;
+import static com.mynote.test.utils.UserDtoTestUtil.createSimpleUserRegistrationDTO;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;

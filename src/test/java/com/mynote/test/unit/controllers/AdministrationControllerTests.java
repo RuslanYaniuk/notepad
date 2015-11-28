@@ -1,7 +1,7 @@
 package com.mynote.test.unit.controllers;
 
 import com.mynote.dto.user.*;
-import com.mynote.test.utils.UserDtoUtil;
+import com.mynote.test.utils.UserDtoTestUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.stereotype.Component;
@@ -42,7 +42,7 @@ public class AdministrationControllerTests extends AbstractControllerTest implem
 
     @Test
     public void updateUser_FirstNameChanged_UserUpdated() throws Exception {
-        List<UserUpdateDTO> allUsersBeforeUpdate = UserDtoUtil.convertToUpdateDTO(listAllUsers());
+        List<UserUpdateDTO> allUsersBeforeUpdate = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
         UserUpdateDTO user = allUsersBeforeUpdate.get(1);
 
         user.setFirstName("updated first Name");
@@ -52,7 +52,7 @@ public class AdministrationControllerTests extends AbstractControllerTest implem
         String updatedUser = result.getResponse().getContentAsString();
         assertThat(updatedUser, is(UPDATED_FIRST_NAME_USER_ID2));
 
-        allUsersBeforeUpdate = UserDtoUtil.convertToUpdateDTO(listAllUsers());
+        allUsersBeforeUpdate = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
         user = allUsersBeforeUpdate.get(1);
 
         assertThat(user.getFirstName(), is("updated first Name"));
@@ -60,7 +60,7 @@ public class AdministrationControllerTests extends AbstractControllerTest implem
 
     @Test
     public void updateUser_CorrectUserRoles_RolesUpdated() throws Exception {
-        List<UserUpdateDTO> allUsers = UserDtoUtil.convertToUpdateDTO(listAllUsers());
+        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
         UserUpdateDTO user = allUsers.get(1);
 
         user.setUserRoleDTOs(getAllUserRoleDTOs());
@@ -73,7 +73,7 @@ public class AdministrationControllerTests extends AbstractControllerTest implem
     @Test
     public void updateUser_NotExistentUserRoles_NotFoundReturned() throws Exception {
         UserRoleDTO[] newRoles = new UserRoleDTO[2];
-        List<UserUpdateDTO> allUsers = UserDtoUtil.convertToUpdateDTO(listAllUsers());
+        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
         UserUpdateDTO user = allUsers.get(1);
 
         newRoles[0] = new UserRoleDTO(1L, "ROLE_USER");
@@ -87,7 +87,7 @@ public class AdministrationControllerTests extends AbstractControllerTest implem
 
     @Test
     public void updateUser_UserRolesNull_BadRequestReturned() throws Exception {
-        List<UserUpdateDTO> allUsers = UserDtoUtil.convertToUpdateDTO(listAllUsers());
+        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
         UserUpdateDTO user = allUsers.get(1);
 
         user.setUserRoleDTOs(null);
@@ -98,7 +98,7 @@ public class AdministrationControllerTests extends AbstractControllerTest implem
 
     @Test
     public void updateUser_UserRolesIdNull_BadRequestReturned() throws Exception {
-        List<UserUpdateDTO> allUsers = UserDtoUtil.convertToUpdateDTO(listAllUsers());
+        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
         UserUpdateDTO user = allUsers.get(1);
         UserRoleDTO[] roles = new UserRoleDTO[1];
 
@@ -111,7 +111,7 @@ public class AdministrationControllerTests extends AbstractControllerTest implem
 
     @Test
     public void updateUser_EmptyId_BadRequestReturned() throws Exception {
-        List<UserUpdateDTO> allUsers = UserDtoUtil.convertToUpdateDTO(listAllUsers());
+        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
         UserUpdateDTO user = allUsers.get(1);
 
         user.setId(null);
@@ -120,7 +120,7 @@ public class AdministrationControllerTests extends AbstractControllerTest implem
         MvcResult result = updateUser(user).andExpect(status().isBadRequest()).andReturn();
         checkReturnedMessageCode(result, "NotNull.userUpdateDTO.id");
 
-        user = UserDtoUtil.convertToUpdateDTO(listAllUsers()).get(1);
+        user = UserDtoTestUtil.convertToUpdateDTO(listAllUsers()).get(1);
         assertThat(user.getEmail(), not("em@il.com"));
     }
 

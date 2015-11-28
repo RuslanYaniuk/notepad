@@ -4,13 +4,13 @@ import com.mynote.dto.CsrfTokenDTO;
 import com.mynote.dto.user.UserLoginDTO;
 import com.mynote.dto.user.UserRegistrationDTO;
 import com.mynote.test.unit.controllers.AbstractSecuredControllerTest;
-import com.mynote.test.utils.UserDtoUtil;
+import com.mynote.test.utils.UserDtoTestUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
-import static com.mynote.test.utils.UserDtoUtil.createSimpleUserRegistrationDTO;
+import static com.mynote.test.utils.UserDtoTestUtil.createSimpleUserRegistrationDTO;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,7 +37,7 @@ public class CustomerRegistrationAndLoggingTests extends AbstractSecuredControll
 
         registerNewUser(csrfTokenDTO, userRegistrationDTO).andExpect(status().isOk());
 
-        UserLoginDTO userLoginDTO = UserDtoUtil.convertToUserLoginDTO(userRegistrationDTO);
+        UserLoginDTO userLoginDTO = UserDtoTestUtil.convertToUserLoginDTO(userRegistrationDTO);
 
         loginUser(csrfTokenDTO, userLoginDTO).andExpect(status().isOk());
     }
@@ -49,7 +49,7 @@ public class CustomerRegistrationAndLoggingTests extends AbstractSecuredControll
 
         registerNewUser(csrfTokenDTO, userDTO).andExpect(status().isOk());
 
-        UserLoginDTO userLoginDTO = UserDtoUtil.convertToUserLoginDTO(userDTO);
+        UserLoginDTO userLoginDTO = UserDtoTestUtil.convertToUserLoginDTO(userDTO);
 
         loginUser(csrfTokenDTO, userLoginDTO).andExpect(status().isOk());
 
@@ -64,7 +64,7 @@ public class CustomerRegistrationAndLoggingTests extends AbstractSecuredControll
 
         registerNewUser(csrfTokenDTO, userDTO).andExpect(status().isOk());
 
-        UserLoginDTO userLoginDTO = UserDtoUtil.convertToUserLoginDTO(userDTO);
+        UserLoginDTO userLoginDTO = UserDtoTestUtil.convertToUserLoginDTO(userDTO);
 
         loginUser(csrfTokenDTO, userLoginDTO).andExpect(status().isOk());
 

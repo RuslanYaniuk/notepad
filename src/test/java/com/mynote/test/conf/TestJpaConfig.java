@@ -1,6 +1,6 @@
-package com.mynote.test.commons;
+package com.mynote.test.conf;
 
-import com.mynote.config.persistence.PersistenceConfig;
+import com.mynote.config.persistence.JpaConfig;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -13,7 +13,7 @@ import static com.mynote.config.web.ApplicationProperties.*;
  * @author Ruslan Yaniuk
  * @date October 2015
  */
-public class TestPersistenceConfig extends PersistenceConfig {
+public class TestJpaConfig extends JpaConfig {
 
     @Resource
     private Environment env;

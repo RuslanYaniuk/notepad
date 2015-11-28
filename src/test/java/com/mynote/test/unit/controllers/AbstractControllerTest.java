@@ -6,7 +6,7 @@ import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.MessageDTO;
 import com.mynote.dto.user.UserLoginDTO;
 import com.mynote.test.unit.conf.TestWebConfig;
-import com.mynote.test.utils.db.DBUnitHelper;
+import com.mynote.test.utils.DBUnitHelper;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.runner.RunWith;

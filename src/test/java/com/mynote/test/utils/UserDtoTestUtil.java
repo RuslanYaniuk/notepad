@@ -12,7 +12,7 @@ import java.util.List;
  * @author Ruslan Yaniuk
  * @date September 2015
  */
-public class UserDtoUtil {
+public class UserDtoTestUtil {
 
     public static List<UserUpdateDTO> convertToUpdateDTO(UserDTO[] userDTOArray) {
         List<UserUpdateDTO> userUpdateDTOList = new ArrayList<>(userDTOArray.length);
@@ -40,10 +40,10 @@ public class UserDtoUtil {
         UserRegistrationDTO userRegistrationDTO = new UserRegistrationDTO();
 
         userRegistrationDTO.setEmail("valid@email.com");
-        userRegistrationDTO.setFirstName("Jim");
-        userRegistrationDTO.setLastName("Morrison");
-        userRegistrationDTO.setPassword("the789Doors$");
-        userRegistrationDTO.setLogin("doorsAreInsane1967");
+        userRegistrationDTO.setFirstName("SimpleUserName");
+        userRegistrationDTO.setLastName("LastName");
+        userRegistrationDTO.setPassword("simpleUser$9");
+        userRegistrationDTO.setLogin("simpleuser999");
 
         return userRegistrationDTO;
     }

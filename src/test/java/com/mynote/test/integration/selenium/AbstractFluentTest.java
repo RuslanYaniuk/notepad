@@ -2,7 +2,7 @@ package com.mynote.test.integration.selenium;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.mynote.test.integration.conf.SeleniumTestCaseContext;
-import com.mynote.test.utils.db.DBUnitHelper;
+import com.mynote.test.utils.DBUnitHelper;
 import org.dbunit.DatabaseUnitException;
 import org.fluentlenium.adapter.FluentTest;
 import org.junit.Before;

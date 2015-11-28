@@ -12,6 +12,7 @@
         <spring.version>4.1.6.RELEASE</spring.version>
         <spring-security.version>4.0.1.RELEASE</spring-security.version>
         <flyway.version>3.2.1</flyway.version>
+        <jackson>2.5.4</jackson>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -81,12 +82,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-mongodb</artifactId>
-            <version>1.7.2.RELEASE</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>4.3.10.Final</version>
@@ -96,6 +91,12 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>${flyway.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-elasticsearch</artifactId>
+            <version>1.2.2.RELEASE</version>
         </dependency>
 
         <!-- MySQL database driver -->
@@ -132,12 +133,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.lordofthejars</groupId>
-            <artifactId>nosqlunit-mongodb</artifactId>
-            <version>0.8.1</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.fluentlenium</groupId>
             <artifactId>fluentlenium-core</artifactId>
             <version>0.10.3</version>
@@ -160,7 +155,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.6.0</version>
+            <version>${jackson}</version>
         </dependency>
 
         <dependency>

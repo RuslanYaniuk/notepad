@@ -1,4 +1,4 @@
-package com.mynote.test.utils.db;
+package com.mynote.test.utils;
 
 import com.mynote.test.utils.yaml.YamlDataSetLoader;
 import org.dbunit.DatabaseUnitException;

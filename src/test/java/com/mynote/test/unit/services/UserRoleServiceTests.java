@@ -5,7 +5,7 @@ import com.mynote.exceptions.UserRoleAlreadyExists;
 import com.mynote.exceptions.UserRoleNotFoundException;
 import com.mynote.models.UserRole;
 import com.mynote.services.UserRoleService;
-import com.mynote.test.utils.db.DBUnitHelper;
+import com.mynote.test.utils.DBUnitHelper;
 import org.dbunit.DatabaseUnitException;
 import org.junit.Before;
 import org.junit.Test;

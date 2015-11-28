@@ -2,8 +2,8 @@ package com.mynote.test.unit.conf;
 
 import com.mynote.config.WebConfig;
 import com.mynote.config.security.SecurityConfig;
-import com.mynote.test.commons.TestMongoConfig;
-import com.mynote.test.commons.TestPersistenceConfig;
+import com.mynote.test.conf.TestElasticSearchConfig;
+import com.mynote.test.conf.TestJpaConfig;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -25,8 +25,8 @@ import org.springframework.test.context.ActiveProfiles;
 })
 @Import({
         SecurityConfig.class,
-        TestPersistenceConfig.class,
-        TestMongoConfig.class
+        TestJpaConfig.class,
+        TestElasticSearchConfig.class
 })
 @Configuration
 @ActiveProfiles("test")

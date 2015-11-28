@@ -7,7 +7,7 @@ import com.mynote.exceptions.*;
 import com.mynote.models.User;
 import com.mynote.models.UserRole;
 import com.mynote.services.UserService;
-import com.mynote.test.utils.db.DBUnitHelper;
+import com.mynote.test.utils.DBUnitHelper;
 import org.dbunit.DatabaseUnitException;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.mynote.test.utils.UserDtoUtil.createSimpleUserRegistrationDTO;
+import static com.mynote.test.utils.UserDtoTestUtil.createSimpleUserRegistrationDTO;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 

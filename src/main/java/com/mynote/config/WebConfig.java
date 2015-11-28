@@ -7,6 +7,7 @@ import com.mynote.config.db.DatabaseInitializer;
 import com.mynote.config.validation.CustomValidator;
 import com.mynote.config.web.ChainableUrlBasedViewResolver;
 import com.mynote.config.web.ExtendedMessageSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -33,6 +34,15 @@ import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 @Configuration
 public abstract class WebConfig extends WebMvcConfigurationSupport {
 
+    @Autowired
+    private ObjectMapper jacksonObjectMapper;
+
+    @Autowired
+    private HttpMessageConverter jsonConverter;
+
+    @Autowired
+    private HttpMessageConverter<String> responseBodyConverter;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         /* Dev mode assets*/
@@ -53,8 +63,8 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         super.configureMessageConverters(converters);
 
-        converters.add(responseBodyConverter());
-        converters.add(jsonConverter());
+        converters.add(responseBodyConverter);
+        converters.add(jsonConverter);
     }
 
     @Bean
@@ -88,7 +98,7 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
                 MappingJackson2HttpMessageConverter();
 
         jacksonConverter.setSupportedMediaTypes(Lists.newArrayList(MEDIA_TYPE_APPLICATION_JSON_UTF8));
-        jacksonConverter.setObjectMapper(jacksonObjectMapper());
+        jacksonConverter.setObjectMapper(jacksonObjectMapper);
 
         return jacksonConverter;
     }

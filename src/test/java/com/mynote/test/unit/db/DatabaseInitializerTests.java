@@ -10,7 +10,7 @@ import com.mynote.repositories.jpa.UserRepository;
 import com.mynote.repositories.jpa.UserRoleRepository;
 import com.mynote.services.UserRoleService;
 import com.mynote.test.unit.services.AbstractServiceTest;
-import com.mynote.test.utils.db.DBUnitHelper;
+import com.mynote.test.utils.DBUnitHelper;
 import org.dbunit.DatabaseUnitException;
 import org.junit.Before;
 import org.junit.Test;

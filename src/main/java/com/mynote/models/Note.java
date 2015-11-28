@@ -1,24 +1,24 @@
 package com.mynote.models;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.NotNull;
+import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 /**
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-@Document
+@Document(indexName = "mynote", type = "note")
 public class Note {
 
     @Id
     private String id;
 
-    @NotNull
+    @Field(type = FieldType.String)
     private String subject;
 
-    @NotNull
+    @Field(type = FieldType.String)
     private String text;
 
     public Note() {

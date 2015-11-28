@@ -1,17 +1,18 @@
 package com.mynote.test.unit.controllers;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.note.NoteFindDTO;
 import com.mynote.dto.note.NoteUpdateDTO;
+import com.mynote.test.utils.ElasticSearchUnit;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
@@ -24,16 +25,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 public class NoteControllerTests extends AbstractControllerTest {
 
-    @Rule
-    public MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDb()
-            .username("mynote")
-            .password("mynote")
-            .host("localhost")
-            .databaseName("mynote_test")
-            .build());
+    @Autowired
+    private ElasticSearchUnit elasticSearchUnit;
+
+    @Before
+    public void loadFixtures() throws IOException, ExecutionException {
+        elasticSearchUnit.loadFixtures();
+    }
 
     @Test
-    @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void createNote_CorrectNoteDTO_NoteAdded_200() throws Exception {
         NoteCreateDTO noteCreateDTO = new NoteCreateDTO();
 
@@ -52,9 +52,8 @@ public class NoteControllerTests extends AbstractControllerTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void deleteNote_CorrectNoteFindDTO_NoteDeleted_200() throws Exception {
-        NoteFindDTO noteFindDTO = new NoteFindDTO("564cb8d9559a2ce2600f3c1f");
+        NoteFindDTO noteFindDTO = new NoteFindDTO("1");
 
         MvcResult result = mockMvc.perform(delete("/api/note/delete-note")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
@@ -65,11 +64,10 @@ public class NoteControllerTests extends AbstractControllerTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void updateNote_CorrectNoteDTO_NoteUpdated_200() throws Exception {
         NoteUpdateDTO noteUpdateDTO = new NoteUpdateDTO();
 
-        noteUpdateDTO.setId("564cb8d9559a2ce2600f3c24");
+        noteUpdateDTO.setId("2");
         noteUpdateDTO.setSubject("Updated subject");
         noteUpdateDTO.setText("Updated text");
 
@@ -82,11 +80,10 @@ public class NoteControllerTests extends AbstractControllerTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void findNotes_CorrectNoteId_NoteUpdated_200() throws Exception {
         NoteFindDTO note = new NoteFindDTO();
 
-        note.setId("564cb8d9559a2ce2600f3c24");
+        note.setId("3");
 
         MvcResult result = findNote(note);
 
@@ -99,17 +96,16 @@ public class NoteControllerTests extends AbstractControllerTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void findNotes_WordInSubject_OneNoteReturned_200() throws Exception {
         NoteFindDTO noteFindDTO = new NoteFindDTO();
 
-        noteFindDTO.setSubject("1");
+        noteFindDTO.setSubject("Third");
 
         MvcResult result = findNote(noteFindDTO);
 
         NoteUpdateDTO[] noteUpdateDTOs = jacksonObjectMapper
                 .readValue(result.getResponse().getContentAsString(), NoteUpdateDTO[].class);
-        assertThat(noteUpdateDTOs[0].getSubject(), is("subject 1 goes here. First"));
+        assertThat(noteUpdateDTOs[0].getSubject(), is("subject 3 goes here. Third"));
     }
 
     private MvcResult findNote(NoteFindDTO note) throws Exception {

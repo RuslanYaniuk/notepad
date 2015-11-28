@@ -1,23 +1,25 @@
 package com.mynote.test.unit.services;
 
-import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
-import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.note.NoteFindDTO;
 import com.mynote.dto.note.NoteUpdateDTO;
 import com.mynote.models.Note;
 import com.mynote.services.NoteService;
-import org.junit.Rule;
+import com.mynote.test.utils.ElasticSearchUnit;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
-import static com.lordofthejars.nosqlunit.mongodb.MongoDbConfigurationBuilder.mongoDb;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Ruslan Yaniuk
@@ -28,18 +30,20 @@ public class NoteServiceTests extends AbstractServiceTest {
     @Autowired
     private NoteService noteService;
 
-    @Rule
-    public MongoDbRule remoteMongoDbRule = new MongoDbRule(mongoDb()
-            .username("mynote")
-            .password("mynote")
-            .host("localhost")
-            .databaseName("mynote_test")
-            .build());
+    @Autowired
+    private ElasticSearchUnit elasticSearchUnit;
+
+    @Before
+    public void setupElasticSearch() throws IOException, ExecutionException, InterruptedException {
+        elasticSearchUnit.loadFixtures();
+    }
 
     @Test
-    @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void saveNote_CorrectDTO_NotedWithIdReturned() {
         NoteCreateDTO noteCreateDTO = new NoteCreateDTO();
+
+        noteCreateDTO.setText("asdasd");
+        noteCreateDTO.setSubject("qweqwe");
 
         Note note = noteService.saveNote(noteCreateDTO);
 
@@ -47,11 +51,10 @@ public class NoteServiceTests extends AbstractServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void updateNote_CorrectDTO_UpdatedNoteReturned() {
         NoteUpdateDTO noteUpdateDTO = new NoteUpdateDTO();
 
-        noteUpdateDTO.setId("564cb8d9559a2ce2600f3c21");
+        noteUpdateDTO.setId("1");
         noteUpdateDTO.setText("Updated text");
         noteUpdateDTO.setSubject("Updated subject");
 
@@ -63,16 +66,36 @@ public class NoteServiceTests extends AbstractServiceTest {
     }
 
     @Test
-    @UsingDataSet(locations = "/nosqlunit-datasets/notes.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void findNote_TextOrSubjectOrId_NoteReturned() {
+    public void deleteNote_NoteId_NoteDeleted() {
+        NoteFindDTO noteFindDTO = new NoteFindDTO("3");
+
+        noteService.deleteNote(noteFindDTO);
+
+        Page notes = noteService.findAll(new PageRequest(1, 10));
+
+        assertThat(notes.getTotalElements(), is(4L));
+    }
+
+    @Test
+    public void findNote_NoteId_NoteReturned() {
         NoteFindDTO noteFindDTO = new NoteFindDTO();
 
-        noteFindDTO.setId("564cb8d9559a2ce2600f3c24");
-        noteFindDTO.setSubject("2");
-        noteFindDTO.setText("3");
+        noteFindDTO.setId("3");
 
         List<Note> notes = noteService.findNotes(noteFindDTO);
 
-        assertThat(notes.size(), is(3));
+        assertThat(notes.get(0).getId(), is("3"));
+        assertThat(notes.get(0).getSubject(), is("subject 3 goes here. Third"));
+    }
+
+    @Test
+    public void findNote_WordInSubject_OneNoteReturned() {
+        NoteFindDTO noteFindDTO = new NoteFindDTO();
+
+        noteFindDTO.setSubject("Third");
+
+        List<Note> notes = noteService.findNotes(noteFindDTO);
+
+        assertTrue(notes.get(0).getSubject().contains(noteFindDTO.getSubject()));
     }
 }

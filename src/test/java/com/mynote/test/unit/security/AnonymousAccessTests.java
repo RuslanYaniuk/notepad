@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
-import static com.mynote.test.utils.UserDtoUtil.createSimpleUserRegistrationDTO;
+import static com.mynote.test.utils.UserDtoTestUtil.createSimpleUserRegistrationDTO;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

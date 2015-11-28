@@ -30,7 +30,7 @@ import static com.mynote.config.web.ApplicationProperties.*;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories("com.mynote.repositories.jpa")
-public class PersistenceConfig {
+public class JpaConfig {
 
     @Autowired
     private ApplicationProperties applicationProperties;
