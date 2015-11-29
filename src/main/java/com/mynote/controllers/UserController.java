@@ -28,7 +28,7 @@ public class UserController extends AbstractController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/get-user-info", method = GET)
+    @RequestMapping(value = "/get-info", method = GET)
     public ResponseEntity getUserInfo(HttpSession httpSession) throws IOException, UserNotFoundException {
         Long userId = (Long) httpSession.getAttribute(SESSION_ATTRIBUTE_USER_ID);
         User user = userService.findUserById(userId);

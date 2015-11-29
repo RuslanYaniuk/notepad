@@ -40,7 +40,7 @@ public class NoteControllerTests extends AbstractControllerTest {
         noteCreateDTO.setSubject("Test subject");
         noteCreateDTO.setText("test text......");
 
-        MvcResult result = mockMvc.perform(put("/api/note/create-note")
+        MvcResult result = mockMvc.perform(put("/api/note/create")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteCreateDTO)))
                 .andExpect(status().isOk()).andReturn();
@@ -55,7 +55,7 @@ public class NoteControllerTests extends AbstractControllerTest {
     public void deleteNote_CorrectNoteFindDTO_NoteDeleted_200() throws Exception {
         NoteFindDTO noteFindDTO = new NoteFindDTO("1");
 
-        MvcResult result = mockMvc.perform(delete("/api/note/delete-note")
+        MvcResult result = mockMvc.perform(delete("/api/note/delete")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteFindDTO)))
                 .andExpect(status().isOk()).andReturn();
@@ -71,7 +71,7 @@ public class NoteControllerTests extends AbstractControllerTest {
         noteUpdateDTO.setSubject("Updated subject");
         noteUpdateDTO.setText("Updated text");
 
-        MvcResult result = mockMvc.perform(post("/api/note/update-note")
+        MvcResult result = mockMvc.perform(post("/api/note/update")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteUpdateDTO)))
                 .andExpect(status().isOk()).andReturn();
@@ -109,7 +109,7 @@ public class NoteControllerTests extends AbstractControllerTest {
     }
 
     private MvcResult findNote(NoteFindDTO note) throws Exception {
-        return mockMvc.perform(post("/api/note/find-notes")
+        return mockMvc.perform(post("/api/note/find")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(note)))
                 .andExpect(status().isOk()).andReturn();

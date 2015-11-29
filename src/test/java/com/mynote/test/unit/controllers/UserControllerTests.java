@@ -32,10 +32,7 @@ public class UserControllerTests extends AbstractSecuredControllerTest {
     public void userInfo_AuthenticatedUser_UserDTOWithEmptyRolesReturned() throws Exception {
         loginUser(csrfTokenDTO, createUserLoginDTO());
 
-        MvcResult result = mockMvc.perform(get("/api/user/get-user-info")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult result = getUserInfo();
 
         UserDTO userInfo = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
                 UserDTO.class);
@@ -48,10 +45,7 @@ public class UserControllerTests extends AbstractSecuredControllerTest {
     public void userInfo_UserAdmin_UserDTOWithRolesReturned() throws Exception {
         loginUser(csrfTokenDTO, createUserLoginDTOForAdmin());
 
-        MvcResult result = mockMvc.perform(get("/api/user/get-user-info")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult result = getUserInfo();
 
         UserDTO userInfo = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
                 UserDTO.class);
@@ -59,5 +53,12 @@ public class UserControllerTests extends AbstractSecuredControllerTest {
         assertThat(userInfo.getEmail(), is("admin@email.com"));
 
         assertTrue(Arrays.asList(userInfo.getUserRoleDTOs()).contains(new UserRoleDTO("ROLE_ADMIN")));
+    }
+
+    private MvcResult getUserInfo() throws Exception {
+        return mockMvc.perform(get("/api/user/get-info")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
+                .andExpect(status().isOk()).andReturn();
     }
 }

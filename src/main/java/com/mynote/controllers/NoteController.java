@@ -26,7 +26,7 @@ public class NoteController extends AbstractController {
     @Autowired
     private NoteService noteService;
 
-    @RequestMapping(value = "/create-note", method = PUT)
+    @RequestMapping(value = "/create", method = PUT)
     public ResponseEntity createNote(@RequestBody NoteCreateDTO noteDTO) {
         Note note = noteService.saveNote(noteDTO);
         NoteFindDTO noteFindDTO = new NoteFindDTO();
@@ -36,21 +36,21 @@ public class NoteController extends AbstractController {
         return ok(noteFindDTO);
     }
 
-    @RequestMapping(value = "/find-notes", method = POST)
+    @RequestMapping(value = "/find", method = POST)
     public ResponseEntity findNotes(@RequestBody NoteFindDTO noteFindDTO) {
         List<Note> notes = noteService.findNotes(noteFindDTO);
 
         return ok(notes.toArray());
     }
 
-    @RequestMapping(value = "/update-note", method = POST)
+    @RequestMapping(value = "/update", method = POST)
     public ResponseEntity updateNote(@RequestBody NoteUpdateDTO noteUpdateDTO) {
         noteService.updateNote(noteUpdateDTO);
 
         return messageOK("note.update.success");
     }
 
-    @RequestMapping(value = "/delete-note", method = DELETE)
+    @RequestMapping(value = "/delete", method = DELETE)
     public ResponseEntity deleteNote(@RequestBody NoteFindDTO noteFindDTO) {
         noteService.deleteNote(noteFindDTO);
 
