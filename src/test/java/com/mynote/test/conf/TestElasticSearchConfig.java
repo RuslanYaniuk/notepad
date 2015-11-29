@@ -8,6 +8,7 @@ import org.elasticsearch.node.Node;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 
@@ -30,7 +31,7 @@ public class TestElasticSearchConfig extends ElasticSearchConfig {
     }
 
     @Override
-    public Client client() {
+    public Client client(ServletContext servletContext) {
         return embeddedElasticsearchServer.getClient();
     }
 

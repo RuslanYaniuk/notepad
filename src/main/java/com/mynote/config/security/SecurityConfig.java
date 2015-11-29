@@ -15,6 +15,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
@@ -35,7 +36,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String LOGOUT_URL = "/api/logout";
 
     @Autowired
-    private ProviderManager providerManager;
+    private AccessDeniedHandler customAccessDeniedHandler;
+
+    @Autowired
+    private AuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    @Autowired
+    private LogoutSuccessHandler customLogoutSuccessHandler;
 
     @Autowired
     private JsonUsernamePasswordAuthenticationFilter jsonAuthFilter;
@@ -63,8 +70,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(jsonAuthFilter, UsernamePasswordAuthenticationFilter.class)
 
                 .exceptionHandling()
-                .accessDeniedHandler(customAccessDeniedHandler())
-                .authenticationEntryPoint(customAuthenticationEntryPoint())
+                .accessDeniedHandler(customAccessDeniedHandler)
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()
 
                 .authorizeRequests()
@@ -80,7 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
                 .logout()
-                .logoutSuccessHandler(customLogoutSuccessHandler())
+                .logoutSuccessHandler(customLogoutSuccessHandler)
                 .logoutUrl(LOGOUT_URL)
                 .invalidateHttpSession(true)
                 .and()
@@ -89,57 +96,30 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JsonUsernamePasswordAuthenticationFilter jsonAuthFilter() {
+    public JsonUsernamePasswordAuthenticationFilter jsonAuthFilter(ProviderManager providerManager,
+            AuthenticationFailureHandler customAuthenticationFailureHandler,
+            AuthenticationSuccessHandler customAuthenticationSuccessHandler)
+    {
         JsonUsernamePasswordAuthenticationFilter jsonAuthFilter =
                 new JsonUsernamePasswordAuthenticationFilter(LOGIN_URL, "POST");
 
         jsonAuthFilter.setAuthenticationManager(providerManager);
-        jsonAuthFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler());
-        jsonAuthFilter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler());
+        jsonAuthFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
+        jsonAuthFilter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
 
         return jsonAuthFilter;
     }
 
     @Bean
-    public List<AuthenticationProvider> customAuthenticationProviders() {
+    public List<AuthenticationProvider> customAuthenticationProviders(AuthenticationProvider customAuthenticationProvider) {
         List<AuthenticationProvider> providers = new ArrayList<>();
 
-        providers.add(customAuthenticationProvider());
+        providers.add(customAuthenticationProvider);
         return providers;
     }
 
     @Bean
-    public ProviderManager providerManager() {
-        return new ProviderManager(customAuthenticationProviders());
-    }
-
-    @Bean
-    public AuthenticationEntryPoint customAuthenticationEntryPoint() {
-        return new CustomAuthenticationEntryPoint();
-    }
-
-    @Bean
-    public AccessDeniedHandler customAccessDeniedHandler() {
-        return new CustomAccessDeniedHandler();
-    }
-
-    @Bean
-    public AuthenticationFailureHandler customAuthenticationFailureHandler() {
-        return new CustomAuthenticationFailureHandler();
-    }
-
-    @Bean
-    public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler();
-    }
-
-    @Bean
-    public AuthenticationProvider customAuthenticationProvider() {
-        return new CustomAuthenticationProvider();
-    }
-
-    @Bean
-    public CustomLogoutSuccessHandler customLogoutSuccessHandler() {
-        return new CustomLogoutSuccessHandler();
+    public ProviderManager providerManager(List<AuthenticationProvider> customAuthenticationProviders) {
+        return new ProviderManager(customAuthenticationProviders);
     }
 }

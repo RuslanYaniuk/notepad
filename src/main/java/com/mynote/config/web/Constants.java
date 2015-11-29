@@ -22,8 +22,6 @@ public interface Constants {
             MediaType.APPLICATION_JSON.getSubtype(),
             StandardCharsets.UTF_8);
 
-    String PROPERTY_NAME_MONGO_URI = "mongo.uri";
-
     String SYSTEM_MESSAGE_CODE = "system-message-code";
 
     UserRole ROLE_ADMIN = new UserRole(UserRoleService.ROLE_ADMIN);

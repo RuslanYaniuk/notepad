@@ -5,7 +5,6 @@ import org.flywaydb.core.Flyway;
 import org.hibernate.cfg.ImprovedNamingStrategy;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -18,6 +17,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.naming.NamingException;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
@@ -32,22 +32,8 @@ import static com.mynote.config.web.ApplicationProperties.*;
 @EnableJpaRepositories("com.mynote.repositories.jpa")
 public class JpaConfig {
 
-    @Autowired
-    private ApplicationProperties applicationProperties;
-
-    @Autowired
-    private DataSource dataSource;
-
-    @Bean(initMethod = "migrate")
-    public Flyway flyway() {
-        Flyway flyway = new Flyway();
-
-        flyway.setBaselineOnMigrate(true);
-        flyway.setLocations("db/migration");
-        flyway.setDataSource(dataSource);
-
-        return flyway;
-    }
+    public static final String DB_MIGRATIONS = "db/migration";
+    public static final String DATASOURCE_NAME = "mynote_datasource";
 
     @Bean
     public DataSource dataSource() {
@@ -55,7 +41,7 @@ public class JpaConfig {
         DataSource dataSource;
 
         try {
-            dataSource = (DataSource) jndi.lookup("java:/comp/env/jdbc/mynote_datasource");
+            dataSource = (DataSource) jndi.lookup("java:/comp/env/jdbc/" + DATASOURCE_NAME);
         } catch (NamingException e) {
             throw new BeanCreationException("dataSource", e);
         }
@@ -63,26 +49,32 @@ public class JpaConfig {
         return dataSource;
     }
 
-    @Bean
-    @DependsOn("flyway")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+    @Bean(initMethod = "migrate")
+    public Flyway flyway(DataSource dataSource) {
+        Flyway flyway = new Flyway();
 
-        entityManagerFactoryBean.setDataSource(dataSource);
-        entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
-        entityManagerFactoryBean.setPackagesToScan(applicationProperties.getEntityManagerPackagesToScan());
-        entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter());
-        entityManagerFactoryBean.setJpaProperties(hibProperties());
+        flyway.setBaselineOnMigrate(true);
+        flyway.setLocations(DB_MIGRATIONS);
+        flyway.setDataSource(dataSource);
 
-        return entityManagerFactoryBean;
+        return flyway;
     }
 
     @Bean
-    public JpaTransactionManager transactionManager() {
-        JpaTransactionManager transactionManager = new JpaTransactionManager();
+    @DependsOn("flyway")
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(ApplicationProperties applicationProperties,
+                                                                       Properties hibProperties,
+                                                                       DataSource dataSource,
+                                                                       AbstractJpaVendorAdapter jpaVendorAdapter) {
+        LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
 
-        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
-        return transactionManager;
+        entityManagerFactory.setDataSource(dataSource);
+        entityManagerFactory.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+        entityManagerFactory.setPackagesToScan(applicationProperties.getEntityManagerPackagesToScan());
+        entityManagerFactory.setJpaVendorAdapter(jpaVendorAdapter);
+        entityManagerFactory.setJpaProperties(hibProperties);
+
+        return entityManagerFactory;
     }
 
     @Bean
@@ -93,7 +85,16 @@ public class JpaConfig {
         return jpaVendorAdapter;
     }
 
-    private Properties hibProperties() {
+    @Bean
+    public JpaTransactionManager transactionManager(EntityManagerFactory emf) {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+
+        transactionManager.setEntityManagerFactory(emf);
+        return transactionManager;
+    }
+
+    @Bean
+    public Properties hibProperties(ApplicationProperties applicationProperties) {
         Properties properties = new Properties();
 
         properties.put(PROPERTY_NAME_HIBERNATE_DIALECT, applicationProperties.getHibernateDialect());

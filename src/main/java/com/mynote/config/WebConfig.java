@@ -25,6 +25,7 @@ import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
 import java.util.List;
 
+import static com.mynote.config.web.Constants.APPLICATION_ENCODING;
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 
 /**
@@ -34,8 +35,10 @@ import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 @Configuration
 public abstract class WebConfig extends WebMvcConfigurationSupport {
 
-    @Autowired
-    private ObjectMapper jacksonObjectMapper;
+    public static final String MESSAGES_LOCATION = "messages/messages";
+
+    public static final String VIEWS_LOCATION = "/WEB-INF/app/client/";
+    public static final String VIEW_SUFFIX = ".html";
 
     @Autowired
     private HttpMessageConverter jsonConverter;
@@ -71,8 +74,8 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
     public ViewResolver getInternalResourceViewResolver() {
         UrlBasedViewResolver resolver = new ChainableUrlBasedViewResolver();
 
-        resolver.setPrefix("/WEB-INF/app/client/");
-        resolver.setSuffix(".html");
+        resolver.setPrefix(VIEWS_LOCATION);
+        resolver.setSuffix(VIEW_SUFFIX);
         return resolver;
     }
 
@@ -93,7 +96,7 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
     }
 
     @Bean
-    public HttpMessageConverter jsonConverter() {
+    public HttpMessageConverter jsonConverter(ObjectMapper jacksonObjectMapper) {
         MappingJackson2HttpMessageConverter jacksonConverter = new
                 MappingJackson2HttpMessageConverter();
 
@@ -112,8 +115,8 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
     public ExtendedMessageSource messageSource() {
         ExtendedMessageSource source = new ExtendedMessageSource();
 
-        source.setBasename("classpath:messages/messages");
-        source.setDefaultEncoding("UTF-8");
+        source.setBasename("classpath:" + MESSAGES_LOCATION);
+        source.setDefaultEncoding(APPLICATION_ENCODING);
 
         return source;
     }

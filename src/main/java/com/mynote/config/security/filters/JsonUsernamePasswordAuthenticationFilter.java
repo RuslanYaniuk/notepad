@@ -26,8 +26,7 @@ import static com.mynote.config.web.Constants.APPLICATION_JSON_UTF8;
  * @author Ruslan Yaniuk
  * @date July 2015
  */
-public class JsonUsernamePasswordAuthenticationFilter extends
-        AbstractAuthenticationProcessingFilter {
+public class JsonUsernamePasswordAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private boolean postOnly = true;
 
     @Autowired

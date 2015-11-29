@@ -4,7 +4,6 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.TransportAddress;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -21,16 +20,13 @@ import javax.servlet.ServletContext;
 @EnableElasticsearchRepositories(basePackages = "com.mynote.repositories.elastic")
 public class ElasticSearchConfig {
 
-    @Autowired
-    private ServletContext servletContext;
-
-    @Autowired
-    private Client client;
+    public static final String ELASTICSEARCH_HOST_PARAM_NAME = "mynote.elasticsearch.host";
+    public static final String ELASTICSEARCH_PORT_PARAM_NAME = "mynote.elasticsearch.port";
 
     @Bean
-    public Client client() {
-        String host = servletContext.getInitParameter("mynote.elasticsearch.host");
-        String port = servletContext.getInitParameter("mynote.elasticsearch.port");
+    public Client client(ServletContext servletContext) {
+        String host = servletContext.getInitParameter(ELASTICSEARCH_HOST_PARAM_NAME);
+        String port = servletContext.getInitParameter(ELASTICSEARCH_PORT_PARAM_NAME);
         TransportAddress address = new InetSocketTransportAddress(host, Integer.parseInt(port));
         TransportClient client = new TransportClient();
 
@@ -40,7 +36,7 @@ public class ElasticSearchConfig {
     }
 
     @Bean
-    public ElasticsearchOperations elasticsearchTemplate() {
+    public ElasticsearchOperations elasticsearchTemplate(Client client) {
         return new ElasticsearchTemplate(client);
     }
 }
