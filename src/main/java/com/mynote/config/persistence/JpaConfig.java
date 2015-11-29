@@ -36,7 +36,7 @@ public class JpaConfig {
     private ApplicationProperties applicationProperties;
 
     @Autowired
-    DataSource dataSource;
+    private DataSource dataSource;
 
     @Bean(initMethod = "migrate")
     public Flyway flyway() {
