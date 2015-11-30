@@ -9,14 +9,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -34,7 +36,7 @@ public class NoteControllerTests extends AbstractControllerTest {
     }
 
     @Test
-    public void createNote_CorrectNoteDTO_NoteAdded_200() throws Exception {
+    public void createNote_CorrectNoteDTO_NoteCreated_200() throws Exception {
         NoteCreateDTO noteCreateDTO = new NoteCreateDTO();
 
         noteCreateDTO.setSubject("Test subject");
@@ -85,33 +87,22 @@ public class NoteControllerTests extends AbstractControllerTest {
 
         note.setId("3");
 
-        MvcResult result = findNote(note);
-
-        NoteUpdateDTO[] noteUpdateDTOs = jacksonObjectMapper
-                .readValue(result.getResponse().getContentAsString(), NoteUpdateDTO[].class);
-
-        assertNotNull(noteUpdateDTOs[0].getId());
-        assertNotNull(noteUpdateDTOs[0].getSubject());
-        assertNotNull(noteUpdateDTOs[0].getText());
+        findNote(note).andExpect(jsonPath("$.content[0].subject", is("subject 3 goes here. Third")));
     }
 
     @Test
-    public void findNotes_WordInSubject_OneNoteReturned_200() throws Exception {
+    public void findNotes_WordsInSubject_OneNoteReturned_200() throws Exception {
         NoteFindDTO noteFindDTO = new NoteFindDTO();
 
-        noteFindDTO.setSubject("Third");
+        noteFindDTO.setSubject("Second 2");
 
-        MvcResult result = findNote(noteFindDTO);
-
-        NoteUpdateDTO[] noteUpdateDTOs = jacksonObjectMapper
-                .readValue(result.getResponse().getContentAsString(), NoteUpdateDTO[].class);
-        assertThat(noteUpdateDTOs[0].getSubject(), is("subject 3 goes here. Third"));
+        findNote(noteFindDTO).andExpect(jsonPath("$.content[0].subject", is("subject 2 goes here. Second")));
     }
 
-    private MvcResult findNote(NoteFindDTO note) throws Exception {
+    private ResultActions findNote(NoteFindDTO note) throws Exception {
         return mockMvc.perform(post("/api/note/find")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(note)))
-                .andExpect(status().isOk()).andReturn();
+                .andExpect(status().isOk());
     }
 }

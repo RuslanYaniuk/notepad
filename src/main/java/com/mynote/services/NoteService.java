@@ -8,10 +8,9 @@ import com.mynote.models.Note;
 import com.mynote.repositories.elastic.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author Ruslan Yaniuk
@@ -45,14 +44,14 @@ public class NoteService {
         return noteRepository.save(note);
     }
 
-    public List<Note> findNotes(NoteFindDTO noteFindDTO) {
+    public Page<Note> findNotes(NoteFindDTO noteFindDTO) {
         String id;
 
         if ((id = noteFindDTO.getId()) != null) {
-            return Lists.newArrayList(noteRepository.findOne(id));
+            return new PageImpl<>(Lists.newArrayList(noteRepository.findOne(id)));
         }
 
-        return noteRepository.findBySubjectLike(noteFindDTO.getSubject());
+        return noteRepository.find(noteFindDTO);
     }
 
     public Page findAll(Pageable pageable) {

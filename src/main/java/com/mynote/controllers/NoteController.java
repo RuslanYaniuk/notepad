@@ -6,12 +6,12 @@ import com.mynote.dto.note.NoteUpdateDTO;
 import com.mynote.models.Note;
 import com.mynote.services.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
@@ -38,9 +38,9 @@ public class NoteController extends AbstractController {
 
     @RequestMapping(value = "/find", method = POST)
     public ResponseEntity findNotes(@RequestBody NoteFindDTO noteFindDTO) {
-        List<Note> notes = noteService.findNotes(noteFindDTO);
+        Page<Note> notes = noteService.findNotes(noteFindDTO);
 
-        return ok(notes.toArray());
+        return ok(notes);
     }
 
     @RequestMapping(value = "/update", method = POST)

@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.hamcrest.Matchers.greaterThan;
@@ -82,20 +81,24 @@ public class NoteServiceTests extends AbstractServiceTest {
 
         noteFindDTO.setId("3");
 
-        List<Note> notes = noteService.findNotes(noteFindDTO);
+        Page<Note> page = noteService.findNotes(noteFindDTO);
+        Note note = page.getContent().get(0);
 
-        assertThat(notes.get(0).getId(), is("3"));
-        assertThat(notes.get(0).getSubject(), is("subject 3 goes here. Third"));
+        assertThat(note.getId(), is("3"));
+        assertThat(note.getSubject(), is("subject 3 goes here. Third"));
     }
 
     @Test
     public void findNote_WordInSubject_OneNoteReturned() {
         NoteFindDTO noteFindDTO = new NoteFindDTO();
 
-        noteFindDTO.setSubject("Third");
+        noteFindDTO.setSubject("Third 3");
 
-        List<Note> notes = noteService.findNotes(noteFindDTO);
+        Page<Note> page = noteService.findNotes(noteFindDTO);
+        Note note = page.getContent().get(0);
 
-        assertTrue(notes.get(0).getSubject().contains(noteFindDTO.getSubject()));
+        assertThat(page.getContent().size(), is(1));
+        assertTrue(note.getSubject().contains("Third"));
+        assertTrue(note.getSubject().contains("3"));
     }
 }

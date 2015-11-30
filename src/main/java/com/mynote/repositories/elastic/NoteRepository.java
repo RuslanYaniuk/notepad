@@ -9,7 +9,7 @@ import java.util.List;
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-public interface NoteRepository extends ElasticsearchCrudRepository<Note, String> {
+public interface NoteRepository extends ElasticsearchCrudRepository<Note, String>, NoteRepositoryCustom {
 
     List<Note> findBySubjectLike(String subject);
 }
