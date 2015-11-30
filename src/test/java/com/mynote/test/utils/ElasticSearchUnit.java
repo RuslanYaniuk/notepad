@@ -31,7 +31,7 @@ public class ElasticSearchUnit {
     @Autowired
     private Client client;
 
-    public void loadFixtures() throws IOException, ExecutionException {
+    public void cleanInsertNotes() throws IOException, ExecutionException {
         StringTokenizer st = new StringTokenizer(getBulkData(), "\n");
         BulkRequestBuilder bulkRequest = client.prepareBulk();
 

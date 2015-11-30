@@ -1,8 +1,8 @@
 package com.mynote.repositories.elastic;
 
-import com.mynote.dto.note.NoteFindDTO;
 import com.mynote.models.Note;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * @author Ruslan Yaniuk
@@ -10,5 +10,5 @@ import org.springframework.data.domain.Page;
  */
 public interface NoteRepositoryCustom {
 
-    Page<Note> find(NoteFindDTO noteFindDTO);
+    Page<Note> find(Note note, Pageable pageable);
 }

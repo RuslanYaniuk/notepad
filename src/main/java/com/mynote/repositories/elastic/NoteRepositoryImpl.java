@@ -1,6 +1,5 @@
 package com.mynote.repositories.elastic;
 
-import com.mynote.dto.note.NoteFindDTO;
 import com.mynote.models.Note;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +22,20 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
     private ElasticsearchOperations elasticsearchTemplate;
 
     @Override
-    public Page<Note> find(NoteFindDTO noteFindDTO) {
+    public Page<Note> find(Note note, Pageable pageable) {
         BoolQueryBuilder boolQueryBuilder = boolQuery();
         NativeSearchQuery searchQuery;
 
-        if (noteFindDTO.getSubject() != null) {
-            boolQueryBuilder.must(matchQuery("subject", noteFindDTO.getSubject()));
+        if (note.getSubject() != null) {
+            boolQueryBuilder.must(matchQuery("subject", note.getSubject()));
         }
-        if (noteFindDTO.getText() != null) {
-            boolQueryBuilder.must(matchQuery("text", noteFindDTO.getText()));
+        if (note.getText() != null) {
+            boolQueryBuilder.must(matchQuery("text", note.getText()));
         }
 
         searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(boolQueryBuilder)
-                .withPageable((Pageable) noteFindDTO.getPage())
+                .withPageable(pageable)
                 .build();
 
         return elasticsearchTemplate.queryForPage(searchQuery, Note.class);

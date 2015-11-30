@@ -1,51 +1,40 @@
 package com.mynote.dto.note;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mynote.models.Note;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.PageImpl;
 
 /**
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-public class NoteFindDTO {
-
-    private String id;
-
-    private String subject;
-
-    private String text;
+public class NoteFindDTO extends AbstractNoteDTO {
 
     private PageImpl<Note> page;
 
-    public NoteFindDTO() {
-    }
-
-    public NoteFindDTO(String id) {
-        this.id = id;
-    }
-
     public String getId() {
-        return id;
+        return note.getId();
     }
 
     public void setId(String id) {
-        this.id = id;
+        note.setId(id);
     }
 
     public String getSubject() {
-        return subject;
+        return note.getSubject();
     }
 
     public void setSubject(String subject) {
-        this.subject = subject;
+        note.setSubject(subject);
     }
 
     public String getText() {
-        return text;
+        return note.getText();
     }
 
     public void setText(String text) {
-        this.text = text;
+        note.setText(text);
     }
 
     public PageImpl<Note> getPage() {
@@ -56,25 +45,25 @@ public class NoteFindDTO {
         this.page = page;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        NoteFindDTO that = (NoteFindDTO) o;
-
-        return !(id != null ? !id.equals(that.id) : that.id != null);
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+    @NotBlank
+    @JsonIgnore
+    public String getIdOrSubjectOrText() {
+        if (getId() != null) {
+            return getId();
+        }
+        if (getSubject() != null) {
+            return getSubject();
+        }
+        if (getText() != null) {
+            return getText();
+        }
+        return null;
     }
 
     @Override
     public String toString() {
         return "NoteFindDTO{" +
-                "id='" + id + '\'' +
-                '}';
+                "page=" + page +
+                "} " + note.toString();
     }
 }

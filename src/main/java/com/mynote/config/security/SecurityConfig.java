@@ -97,9 +97,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public JsonUsernamePasswordAuthenticationFilter jsonAuthFilter(ProviderManager providerManager,
-            AuthenticationFailureHandler customAuthenticationFailureHandler,
-            AuthenticationSuccessHandler customAuthenticationSuccessHandler)
-    {
+                                                                   AuthenticationFailureHandler customAuthenticationFailureHandler,
+                                                                   AuthenticationSuccessHandler customAuthenticationSuccessHandler) {
         JsonUsernamePasswordAuthenticationFilter jsonAuthFilter =
                 new JsonUsernamePasswordAuthenticationFilter(LOGIN_URL, "POST");
 

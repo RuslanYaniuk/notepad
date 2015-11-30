@@ -1,70 +1,40 @@
 package com.mynote.dto.note;
 
+import org.hibernate.validator.constraints.NotBlank;
+
 /**
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-public class NoteUpdateDTO {
+public class NoteUpdateDTO extends AbstractNoteDTO {
 
-    private String id;
-    private String subject;
-    private String text;
-
-    public NoteUpdateDTO() {
-    }
-
-    public NoteUpdateDTO(String id, String subject, String text) {
-        this.id = id;
-        this.subject = subject;
-        this.text = text;
-    }
-
+    @NotBlank
     public String getId() {
-        return id;
+        return note.getId();
     }
 
     public void setId(String id) {
-        this.id = id;
+        note.setId(id);
     }
 
     public String getSubject() {
-        return subject;
+        return note.getSubject();
     }
 
     public void setSubject(String subject) {
-        this.subject = subject;
+        note.setSubject(subject);
     }
 
     public String getText() {
-        return text;
+        return note.getText();
     }
 
     public void setText(String text) {
-        this.text = text;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        NoteUpdateDTO that = (NoteUpdateDTO) o;
-
-        return !(id != null ? !id.equals(that.id) : that.id != null);
-
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        note.setText(text);
     }
 
     @Override
     public String toString() {
-        return "NoteUpdateDTO{" +
-                "id='" + id + '\'' +
-                ", subject='" + subject + '\'' +
-                ", text='" + text + '\'' +
-                '}';
+        return "NoteUpdateDTO{} " + note.toString();
     }
 }

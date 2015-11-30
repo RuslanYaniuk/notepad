@@ -1,61 +1,44 @@
 package com.mynote.dto.note;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.validator.constraints.NotBlank;
+
 /**
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-public class NoteCreateDTO {
-
-    private String subject;
-    private String text;
-
-    public NoteCreateDTO() {
-    }
-
-    public NoteCreateDTO(String subject, String text) {
-        this.subject = subject;
-        this.text = text;
-    }
+public class NoteCreateDTO extends AbstractNoteDTO {
 
     public String getSubject() {
-        return subject;
+        return note.getSubject();
     }
 
     public void setSubject(String subject) {
-        this.subject = subject;
+        note.setSubject(subject);
     }
 
     public String getText() {
-        return text;
+        return note.getText();
     }
 
     public void setText(String text) {
-        this.text = text;
+        note.setText(text);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        NoteCreateDTO that = (NoteCreateDTO) o;
-
-        if (subject != null ? !subject.equals(that.subject) : that.subject != null) return false;
-        return !(text != null ? !text.equals(that.text) : that.text != null);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = subject != null ? subject.hashCode() : 0;
-        result = 31 * result + (text != null ? text.hashCode() : 0);
-        return result;
+    @NotBlank
+    @JsonIgnore
+    public String getTextOrSubject() {
+        if (getSubject() != null) {
+            return getSubject();
+        }
+        if (getText() != null) {
+            return getText();
+        }
+        return null;
     }
 
     @Override
     public String toString() {
-        return "NoteCreateDTO{" +
-                "subject='" + subject + '\'' +
-                ", text='" + text + '\'' +
-                '}';
+        return "NoteCreateDTO{} " + note.toString();
     }
 }

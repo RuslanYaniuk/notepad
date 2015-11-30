@@ -1,8 +1,5 @@
 package com.mynote.test.unit.services;
 
-import com.mynote.dto.note.NoteCreateDTO;
-import com.mynote.dto.note.NoteFindDTO;
-import com.mynote.dto.note.NoteUpdateDTO;
 import com.mynote.models.Note;
 import com.mynote.services.NoteService;
 import com.mynote.test.utils.ElasticSearchUnit;
@@ -13,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 
 import static org.hamcrest.Matchers.greaterThan;
@@ -34,41 +32,55 @@ public class NoteServiceTests extends AbstractServiceTest {
 
     @Before
     public void setupElasticSearch() throws IOException, ExecutionException, InterruptedException {
-        elasticSearchUnit.loadFixtures();
+        elasticSearchUnit.cleanInsertNotes();
     }
 
     @Test
     public void saveNote_CorrectDTO_NotedWithIdReturned() {
-        NoteCreateDTO noteCreateDTO = new NoteCreateDTO();
+        Note note = new Note();
 
-        noteCreateDTO.setText("asdasd");
-        noteCreateDTO.setSubject("qweqwe");
+        note.setText("asdasd");
+        note.setSubject("qweqwe");
 
-        Note note = noteService.saveNote(noteCreateDTO);
+        note = noteService.saveNote(note);
 
         assertThat(note.getId().length(), greaterThan(0));
     }
 
     @Test
     public void updateNote_CorrectDTO_UpdatedNoteReturned() {
-        NoteUpdateDTO noteUpdateDTO = new NoteUpdateDTO();
+        Note note = new Note();
 
-        noteUpdateDTO.setId("1");
-        noteUpdateDTO.setText("Updated text");
-        noteUpdateDTO.setSubject("Updated subject");
+        note.setId("1");
+        note.setText("Updated text");
+        note.setSubject("Updated subject");
 
-        Note note = noteService.updateNote(noteUpdateDTO);
+        note = noteService.updateNote(note);
 
-        assertThat(note.getId(), is(noteUpdateDTO.getId()));
-        assertThat(note.getSubject(), is(noteUpdateDTO.getSubject()));
-        assertThat(note.getText(), is(noteUpdateDTO.getText()));
+        assertThat(note.getId(), is(note.getId()));
+        assertThat(note.getSubject(), is(note.getSubject()));
+        assertThat(note.getText(), is(note.getText()));
+    }
+
+
+    @Test(expected = NoSuchElementException.class)
+    public void updateNote_NotExistentId_ExceptionThrown() {
+        Note note = new Note();
+
+        note.setId("8888");
+        note.setText("Updated text");
+        note.setSubject("Updated subject");
+
+        noteService.updateNote(note);
     }
 
     @Test
     public void deleteNote_NoteId_NoteDeleted() {
-        NoteFindDTO noteFindDTO = new NoteFindDTO("3");
+        Note note = new Note();
 
-        noteService.deleteNote(noteFindDTO);
+        note.setId("3");
+
+        noteService.deleteNote(note);
 
         Page notes = noteService.findAll(new PageRequest(1, 10));
 
@@ -77,12 +89,12 @@ public class NoteServiceTests extends AbstractServiceTest {
 
     @Test
     public void findNote_NoteId_NoteReturned() {
-        NoteFindDTO noteFindDTO = new NoteFindDTO();
+        Note note = new Note();
 
-        noteFindDTO.setId("3");
+        note.setId("3");
 
-        Page<Note> page = noteService.findNotes(noteFindDTO);
-        Note note = page.getContent().get(0);
+        Page<Note> page = noteService.findNotes(note, null);
+        note = page.getContent().get(0);
 
         assertThat(note.getId(), is("3"));
         assertThat(note.getSubject(), is("subject 3 goes here. Third"));
@@ -90,12 +102,12 @@ public class NoteServiceTests extends AbstractServiceTest {
 
     @Test
     public void findNote_WordInSubject_OneNoteReturned() {
-        NoteFindDTO noteFindDTO = new NoteFindDTO();
+        Note note = new Note();
 
-        noteFindDTO.setSubject("Third 3");
+        note.setSubject("Third 3");
 
-        Page<Note> page = noteService.findNotes(noteFindDTO);
-        Note note = page.getContent().get(0);
+        Page<Note> page = noteService.findNotes(note, null);
+        note = page.getContent().get(0);
 
         assertThat(page.getContent().size(), is(1));
         assertTrue(note.getSubject().contains("Third"));
