@@ -35,6 +35,8 @@ public class JpaConfig {
     public static final String DB_MIGRATIONS = "db/migration";
     public static final String DATASOURCE_NAME = "mynote_datasource";
 
+    public static final String PACKAGES_TO_SCAN = "com.mynote.models";
+
     @Bean
     public DataSource dataSource() {
         JndiTemplate jndi = new JndiTemplate();
@@ -62,15 +64,14 @@ public class JpaConfig {
 
     @Bean
     @DependsOn("flyway")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(ApplicationProperties applicationProperties,
-                                                                       Properties hibProperties,
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(Properties hibProperties,
                                                                        DataSource dataSource,
                                                                        AbstractJpaVendorAdapter jpaVendorAdapter) {
         LocalContainerEntityManagerFactoryBean entityManagerFactory = new LocalContainerEntityManagerFactoryBean();
 
         entityManagerFactory.setDataSource(dataSource);
         entityManagerFactory.setPersistenceProviderClass(HibernatePersistenceProvider.class);
-        entityManagerFactory.setPackagesToScan(applicationProperties.getEntityManagerPackagesToScan());
+        entityManagerFactory.setPackagesToScan(PACKAGES_TO_SCAN);
         entityManagerFactory.setJpaVendorAdapter(jpaVendorAdapter);
         entityManagerFactory.setJpaProperties(hibProperties);
 

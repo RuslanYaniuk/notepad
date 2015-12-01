@@ -27,7 +27,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(value = "/api/login")
 public class LoginController extends AbstractController {
 
-    public static final String XSRF_TOKEN = "XSRF-TOKEN";
+    public static final String XSRF_TOKEN_NAME = "XSRF-TOKEN";
 
     @RequestMapping(value = "/get-token", method = GET)
     public ResponseEntity getToken(HttpServletRequest httpServletRequest) throws IOException {
@@ -42,7 +42,7 @@ public class LoginController extends AbstractController {
         UserRoleDTO[] roleDTOs;
         Collection authorities;
 
-        applyCsrfCookies(httpServletRequest, httpServletResponse);
+        setCsrfCookies(httpServletRequest, httpServletResponse);
 
         if (authentication != null && authentication.isAuthenticated()) {
             authorities = authentication.getAuthorities();
@@ -59,9 +59,9 @@ public class LoginController extends AbstractController {
         return messageNotFound("user.authentication.status.notLoggedIn");
     }
 
-    public static void applyCsrfCookies(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public static void setCsrfCookies(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         CsrfToken csrfToken = (CsrfToken) httpServletRequest.getAttribute(CsrfToken.class.getName());
-        Cookie cookie = new Cookie(XSRF_TOKEN, csrfToken.getToken());
+        Cookie cookie = new Cookie(XSRF_TOKEN_NAME, csrfToken.getToken());
 
         cookie.setPath("/");
         httpServletResponse.addCookie(cookie);

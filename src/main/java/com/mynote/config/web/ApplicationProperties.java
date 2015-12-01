@@ -26,8 +26,6 @@ public class ApplicationProperties {
 
     public static final String PROPERTY_NAME_HIBERNATE_EJB_NAMING_STRATEGY = "hibernate.ejb.naming_strategy";
 
-    public static final String PROPERTY_NAME_ENTITY_MANAGER_PACKAGES_TO_SCAN = "entitymanager.packages.to.scan";
-
     public static final String PROPERTY_NAME_ADMIN_EMAIL = "admin.email";
     public static final String PROPERTY_NAME_ADMIN_LOGIN = "admin.login";
     public static final String PROPERTY_NAME_ADMIN_PASSWORD = "admin.password";
@@ -38,8 +36,6 @@ public class ApplicationProperties {
     private String hibernateDialect;
     private String hibernateShowSql;
     private String hibernateHbm2ddlAuto;
-
-    private String entitymanagerPackagesToScan;
 
     private String adminEmail;
     private String adminLogin;
@@ -53,8 +49,6 @@ public class ApplicationProperties {
         this.hibernateDialect = env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_DIALECT);
         this.hibernateShowSql = env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_SHOW_SQL);
         this.hibernateHbm2ddlAuto = env.getRequiredProperty(PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO);
-
-        this.entitymanagerPackagesToScan = env.getRequiredProperty(PROPERTY_NAME_ENTITY_MANAGER_PACKAGES_TO_SCAN);
 
         this.adminEmail = env.getRequiredProperty(PROPERTY_NAME_ADMIN_EMAIL);
         this.adminLogin = env.getRequiredProperty(PROPERTY_NAME_ADMIN_LOGIN);
@@ -71,10 +65,6 @@ public class ApplicationProperties {
 
     public String getHibernateHbm2ddlAuto() {
         return hibernateHbm2ddlAuto;
-    }
-
-    public String getEntityManagerPackagesToScan() {
-        return entitymanagerPackagesToScan;
     }
 
     public String getAdminEmail() {
