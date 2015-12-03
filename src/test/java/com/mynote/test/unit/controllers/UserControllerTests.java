@@ -1,16 +1,16 @@
 package com.mynote.test.unit.controllers;
 
-import com.mynote.dto.user.UserDTO;
-import com.mynote.dto.user.UserRoleDTO;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Arrays;
-
+import static com.mynote.test.utils.UserLoginDTOTestUtils.createAdminLoginDTO;
+import static com.mynote.test.utils.UserLoginDTOTestUtils.createUserLoginDTO;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -20,45 +20,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserControllerTests extends AbstractSecuredControllerTest {
 
     @Before
-    @Override
     public void setup() throws Exception {
-        super.setup();
-
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
     }
 
     @Test
-    public void userInfo_AuthenticatedUser_UserDTOWithEmptyRolesReturned() throws Exception {
+    public void getInfo_AuthenticatedUser_UserDTOWithRolesReturned() throws Exception {
         loginUser(csrfTokenDTO, createUserLoginDTO());
 
-        MvcResult result = getUserInfo();
-
-        UserDTO userInfo = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
-                UserDTO.class);
-
-        assertThat(userInfo.getEmail(), is("user2@email.com"));
-        assertNull(userInfo.getUserRoleDTOs());
+        getInfo()
+                .andExpect(jsonPath("$.userRoles[0].role", not(StringUtils.EMPTY)))
+                .andExpect(jsonPath("$.email", is("user2@email.com")));
     }
 
     @Test
-    public void userInfo_UserAdmin_UserDTOWithRolesReturned() throws Exception {
-        loginUser(csrfTokenDTO, createUserLoginDTOForAdmin());
+    public void getInfo_UserAdmin_UserDTOWithRolesReturned() throws Exception {
+        loginUser(csrfTokenDTO, createAdminLoginDTO());
 
-        MvcResult result = getUserInfo();
-
-        UserDTO userInfo = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
-                UserDTO.class);
-
-        assertThat(userInfo.getEmail(), is("admin@email.com"));
-
-        assertTrue(Arrays.asList(userInfo.getUserRoleDTOs()).contains(new UserRoleDTO("ROLE_ADMIN")));
+        getInfo()
+                .andExpect(jsonPath("$.email", is("admin@email.com")))
+                .andExpect(jsonPath("$.userRoles[0].role", not(StringUtils.EMPTY)));
     }
 
-    private MvcResult getUserInfo() throws Exception {
+    private ResultActions getInfo() throws Exception {
         return mockMvc.perform(get("/api/user/get-info")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
-                .andExpect(status().isOk()).andReturn();
+                .andExpect(status().isOk());
     }
 }

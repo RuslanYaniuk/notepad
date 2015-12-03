@@ -31,7 +31,7 @@ public abstract class AbstractSecuredControllerTest extends AbstractControllerTe
 
     @Before
     @Override
-    public void setup() throws Exception {
+    public void buildWebAppContext() throws Exception {
         this.mockMvc = webAppContextSetup(this.wac)
                 .addFilters(springSecurityFilterChain)
                 .build();

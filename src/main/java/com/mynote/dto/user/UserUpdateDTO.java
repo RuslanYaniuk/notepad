@@ -1,110 +1,82 @@
 package com.mynote.dto.user;
 
-import com.mynote.models.User;
-import com.mynote.utils.UserRoleDtoUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mynote.dto.user.constraints.EmailConstraint;
+import com.mynote.dto.user.constraints.FirstNameConstraint;
+import com.mynote.dto.user.constraints.IdConstraint;
+import com.mynote.dto.user.constraints.LastNameConstraint;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import java.util.Arrays;
 
 /**
  * @author Ruslan Yaniuk
  * @date September 2015
  */
-public class UserUpdateDTO extends CommonUserDetails {
-
-    @NotNull
-    private Long id;
+public class UserUpdateDTO extends AbstractUserDTO {
 
     @Valid
-    @NotNull
-    private UserRoleDTO[] userRoleDTOs;
+    @JsonIgnore
+    private IdConstraint idConstraint = new IdConstraint(this.user);
 
-    private String registrationDateUTC;
+    @Valid
+    @JsonIgnore
+    private EmailConstraint emailConstraint = new EmailConstraint(this.user);
 
-    public UserUpdateDTO() {
-    }
+    @Valid
+    @JsonIgnore
+    private FirstNameConstraint firstNameConstraint = new FirstNameConstraint(this.user);
 
-    public UserUpdateDTO(User user) {
-        this.id = user.getId();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
-        this.email = user.getEmail();
-        this.userRoleDTOs = UserRoleDtoUtil.convert(user.getRoles());
-        this.registrationDateUTC = user.getRegistrationDateUTC().toString();
-    }
+    @Valid
+    @JsonIgnore
+    private LastNameConstraint lastNameConstraint = new LastNameConstraint(this.user);
 
+    // Json building getters and setters
     public Long getId() {
-        return id;
+        return user.getId();
     }
 
     public void setId(Long id) {
-        this.id = id;
+        user.setId(id);
     }
 
     public String getFirstName() {
-        return firstName;
+        return user.getFirstName();
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        user.setFirstName(firstName);
     }
 
     public String getLastName() {
-        return lastName;
+        return user.getLastName();
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        user.setLastName(lastName);
     }
 
     public String getEmail() {
-        return email;
+        return user.getEmail();
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        user.setEmail(email);
     }
 
-    public UserRoleDTO[] getUserRoleDTOs() {
-        return userRoleDTOs;
+    // Validation getters
+    public IdConstraint getIdConstraint() {
+        return idConstraint;
     }
 
-    public void setUserRoleDTOs(UserRoleDTO[] userRoleDTOs) {
-        this.userRoleDTOs = userRoleDTOs;
+    public EmailConstraint getEmailConstraint() {
+        return emailConstraint;
     }
 
-    public String getRegistrationDateUTC() {
-        return registrationDateUTC;
+    public FirstNameConstraint getFirstNameConstraint() {
+        return firstNameConstraint;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        UserUpdateDTO that = (UserUpdateDTO) o;
-
-        return !(id != null ? !id.equals(that.id) : that.id != null);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (id != null ? id.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "UserUpdateDTO{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", userRoleDTOs=" + Arrays.toString(userRoleDTOs) + '\'' +
-                ", registrationDateUTC='" + registrationDateUTC +
-                '}';
+    public LastNameConstraint getLastNameConstraint() {
+        return lastNameConstraint;
     }
 }

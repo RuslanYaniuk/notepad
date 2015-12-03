@@ -1,50 +1,31 @@
 package com.mynote.dto.user;
 
-import javax.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mynote.dto.user.constraints.IdConstraint;
+
+import javax.validation.Valid;
 
 /**
  * @author Ruslan Yaniuk
  * @date September 2015
  */
-public class UserDeleteDTO {
+public class UserDeleteDTO extends AbstractUserDTO {
 
-    @NotNull
-    private Long id;
+    @Valid
+    @JsonIgnore
+    private IdConstraint idConstraint = new IdConstraint(this.user);
 
-    public UserDeleteDTO() {
-    }
-
-    public UserDeleteDTO(Long id) {
-        this.id = id;
-    }
-
+    // Json building getters and setters
     public Long getId() {
-        return id;
+        return user.getId();
     }
 
     public void setId(Long id) {
-        this.id = id;
+        user.setId(id);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserDeleteDTO that = (UserDeleteDTO) o;
-
-        return !(id != null ? !id.equals(that.id) : that.id != null);
-    }
-
-    @Override
-    public int hashCode() {
-        return id != null ? id.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "UserDeleteDTO{" +
-                "id=" + id +
-                '}';
+    // Validation getters
+    public IdConstraint getIdConstraint() {
+        return idConstraint;
     }
 }

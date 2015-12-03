@@ -1,11 +1,11 @@
 package com.mynote.config.db;
 
 import com.mynote.config.web.ApplicationProperties;
-import com.mynote.dto.user.UserRegistrationDTO;
-import com.mynote.dto.user.UserRoleDTO;
 import com.mynote.exceptions.EmailAlreadyTakenException;
 import com.mynote.exceptions.LoginAlreadyTakenException;
 import com.mynote.exceptions.UserRoleAlreadyExists;
+import com.mynote.models.User;
+import com.mynote.models.UserRole;
 import com.mynote.services.UserRoleService;
 import com.mynote.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class DatabaseInitializer {
     private void persistRoles() {
         if (userRoleService.getRoleAdmin() == null) {
             try {
-                userRoleService.addRole(new UserRoleDTO(ROLE_ADMIN));
+                userRoleService.addRole(new UserRole(ROLE_ADMIN));
             } catch (UserRoleAlreadyExists e) {
                 e.printStackTrace();
             }
@@ -46,7 +46,7 @@ public class DatabaseInitializer {
 
         if (userRoleService.getRoleUser() == null) {
             try {
-                userRoleService.addRole(new UserRoleDTO(ROLE_USER));
+                userRoleService.addRole(new UserRole(ROLE_USER));
             } catch (UserRoleAlreadyExists e) {
                 e.printStackTrace();
             }
@@ -55,12 +55,10 @@ public class DatabaseInitializer {
 
     private void persistAdministrator() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
         if (userService.getSystemAdministrator() == null) {
-            UserRegistrationDTO admin = new UserRegistrationDTO();
+            User admin = new User(appProperties.getAdminLogin(), appProperties.getAdminEmail());
 
             admin.setFirstName("System");
             admin.setLastName("Administrator");
-            admin.setEmail(appProperties.getAdminEmail());
-            admin.setLogin(appProperties.getAdminLogin());
             admin.setPassword(appProperties.getAdminPassword());
 
             userService.addAdministrator(admin);

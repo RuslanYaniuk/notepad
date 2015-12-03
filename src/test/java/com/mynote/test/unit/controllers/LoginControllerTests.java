@@ -1,19 +1,24 @@
 package com.mynote.test.unit.controllers;
 
-import com.mynote.dto.CsrfTokenDTO;
+import com.google.common.collect.Lists;
 import com.mynote.dto.user.UserLoginDTO;
-import com.mynote.dto.user.UserLoginSuccessDTO;
-import com.mynote.dto.user.UserRoleDTO;
+import com.mynote.models.UserRole;
 import com.mynote.services.UserRoleService;
+import org.apache.commons.lang3.StringUtils;
+import org.hamcrest.core.Is;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.Arrays;
-
+import static com.mynote.test.utils.UserLoginDTOTestUtils.*;
+import static com.mynote.test.utils.UserRoleTestUtils.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsNot.not;
+import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -22,29 +27,53 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 public class LoginControllerTests extends AbstractSecuredControllerTest {
 
-    @Before
-    @Override
-    public void setup() throws Exception {
-        super.setup();
+    public static final String USER_LOGIN_SUCCESS_CODE = "user.login.success";
 
+    @Before
+    public void setup() throws Exception {
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
     }
 
     @Test
     public void getToken_NotAuthenticatedUsers_TokenReturned() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/login/get-token"))
-                .andExpect(status().isOk()).andReturn();
+        mockMvc.perform(get("/api/login/get-token"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.headerName", is("X-CSRF-TOKEN")))
+                .andExpect(jsonPath("$.headerValue", not(StringUtils.EMPTY)));
+    }
+
+    @Test
+    public void getAuthorities_AnonymousRequest_AnonymousRoleReturned() throws Exception {
+        assertThatHasRole(getAuthorities(), getRoleAnonymous());
+    }
+
+    @Test
+    public void getAuthorities_UsersRequest_UserRoleReturned() throws Exception {
+        loginUser(csrfTokenDTO, createUserLoginDTO());
+
+        assertThatHasRole(getAuthorities(), getRoleUser());
+    }
+
+    @Test
+    public void getAuthorities_AdminsRequest_AdminRoleReturned() throws Exception {
+        loginUser(csrfTokenDTO, createAdminLoginDTO());
+
+        assertThatHasRole(getAuthorities(), getRoleAdmin());
+    }
+
+    @Test
+    public void login_CorrectEmailAndPassword_LoginSuccessMessageDTOReturned() throws Exception {
+        UserLoginDTO userLoginDTO = createUserLoginDTO();
+
+        MvcResult result = loginUser(csrfTokenDTO, userLoginDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)))
+                .andExpect(jsonPath("$.userDTO.userRoles[0].role", is(UserRoleService.ROLE_USER)))
+                .andExpect(jsonPath("$.userDTO.login", is(userLoginDTO.getLogin())))
+                .andReturn();
 
         isResponseMediaTypeJson(result);
-
-        CsrfTokenDTO csrfTokenDTO = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
-                CsrfTokenDTO.class);
-
-        isResponseMediaTypeJson(result);
-
-        assertNotNull(csrfTokenDTO.getHeaderName());
-        assertNotNull(csrfTokenDTO.getHeaderValue());
     }
 
     @Test
@@ -53,67 +82,41 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
         csrfTokenDTO.setHeaderValue("incorrect");
 
-        MvcResult result = loginUser(csrfTokenDTO, userLoginDTO).andExpect(status().isUnauthorized()).andReturn();
-
-        checkReturnedMessageCode(result, "csrf.error.invalidToken");
-    }
-
-    @Test
-    public void login_CorrectEmailAndPassword_LoginSuccessMessageDTOReturned() throws Exception {
-        UserLoginDTO userLoginDTO = createUserLoginDTO();
-        UserLoginSuccessDTO successLoginDTO;
-
-        MvcResult result = loginUser(csrfTokenDTO, userLoginDTO).andExpect(status().isOk()).andReturn();
-
-        isResponseMediaTypeJson(result);
-
-        successLoginDTO = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
-                UserLoginSuccessDTO.class);
-
-        assertNotNull(successLoginDTO.getUserDTO());
-
-        assertThat(successLoginDTO.getUserDTO().getUserRoleDTOs()[0], is(new UserRoleDTO("ROLE_USER")));
+        loginUser(csrfTokenDTO, userLoginDTO)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath(MESSAGE_CODE, is("csrf.error.invalidToken")));
     }
 
     @Test
     public void login_LoginInMixedCase_LoggedIn() throws Exception {
         UserLoginDTO userLoginDTO = createUserLoginDTO();
-        UserLoginSuccessDTO successLoginDTO;
 
         userLoginDTO.setLogin("usER3");
 
-        MvcResult result = loginUser(csrfTokenDTO, userLoginDTO).andExpect(status().isOk()).andReturn();
-
-        successLoginDTO = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
-                UserLoginSuccessDTO.class);
-
-        assertThat(successLoginDTO.getMessageCode(), is("user.login.success"));
+        loginUser(csrfTokenDTO, userLoginDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)));
     }
 
     @Test
     public void login_EmailInMixedCase_LoggedIn() throws Exception {
-        UserLoginDTO userLoginDTO = new UserLoginDTO("usEr2@emAil.cOM", "Passw0rd");
-        UserLoginSuccessDTO successLoginDTO;
+        UserLoginDTO userLoginDTO = new UserLoginDTO();
 
-        MvcResult result = loginUser(csrfTokenDTO, userLoginDTO).andExpect(status().isOk()).andReturn();
+        userLoginDTO.setLogin("usEr2@emAil.cOM");
+        userLoginDTO.setPassword("Passw0rd");
 
-        successLoginDTO = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
-                UserLoginSuccessDTO.class);
-
-        assertThat(successLoginDTO.getMessageCode(), is("user.login.success"));
+        loginUser(csrfTokenDTO, userLoginDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)));
     }
 
     @Test
     public void login_CorrectLoginAndPassword_LoggedIn() throws Exception {
         UserLoginDTO user = createUserLoginDTO();
-        UserLoginSuccessDTO successLoginDTO;
 
-        MvcResult result = loginUser(csrfTokenDTO, user).andExpect(status().isOk()).andReturn();
-
-        successLoginDTO = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
-                UserLoginSuccessDTO.class);
-
-        assertThat(successLoginDTO.getMessageCode(), is("user.login.success"));
+        loginUser(csrfTokenDTO, user)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)));
     }
 
     @Test
@@ -122,16 +125,18 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
         user.setLogin("incorrect@email");
 
-        MvcResult result = loginUser(csrfTokenDTO, user).andExpect(status().isUnauthorized()).andReturn();
-        checkReturnedMessageCode(result, "user.login.error.incorrectLoginPassword");
+        loginUser(csrfTokenDTO, user)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.error.incorrectLoginPassword")));
     }
 
     @Test
     public void login_EmptyCredentials_UnauthorizedReturned() throws Exception {
-        UserLoginDTO user = new UserLoginDTO();
+        UserLoginDTO loginDTO = new UserLoginDTO();
 
-        MvcResult result = loginUser(csrfTokenDTO, user).andExpect(status().isUnauthorized()).andReturn();
-        checkReturnedMessageCode(result, "user.login.validation.error.emptyCredentials");
+        loginUser(csrfTokenDTO, loginDTO)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.validation.error.emptyCredentials")));
     }
 
     @Test
@@ -140,65 +145,30 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
         user.setPassword("notValidPassword");
 
-        MvcResult result = loginUser(csrfTokenDTO, user).andExpect(status().isUnauthorized()).andReturn();
-        checkReturnedMessageCode(result, "user.login.error.incorrectLoginPassword");
+        loginUser(csrfTokenDTO, user)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.error.incorrectLoginPassword")));
     }
 
     @Test
     public void login_DisabledAccount_UnauthorizedReturned() throws Exception {
         UserLoginDTO user = createDisabledUserLoginDTO();
 
-        MvcResult result = loginUser(csrfTokenDTO, user).andExpect(status().isUnauthorized()).andReturn();
-        checkReturnedMessageCode(result, "user.login.error.accountIsDisabled");
+        loginUser(csrfTokenDTO, user)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.error.accountIsDisabled")));
     }
 
-    @Test
-    public void login_NotValidCsrfToken_UnauthorizedReturned() throws Exception {
-        UserLoginDTO user = createUserLoginDTO();
-
-        csrfTokenDTO.setHeaderValue("not-valid-token");
-
-        MvcResult result = loginUser(csrfTokenDTO, user).andExpect(status().isUnauthorized()).andReturn();
-        checkReturnedMessageCode(result, "csrf.error.invalidToken");
-    }
-
-    @Test
-    public void authenticationStatus_AdminRole_AdminRoleReturned() throws Exception {
-        loginUser(csrfTokenDTO, createUserLoginDTOForAdmin());
-
-        MvcResult result = mockMvc.perform(get("/api/login/get-authorities")
+    private MvcResult getAuthorities() throws Exception {
+        return mockMvc.perform(get("/api/login/get-authorities")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
                 .andExpect(status().isOk()).andReturn();
-
-        checkRole(result, UserRoleService.ROLE_ADMIN);
     }
 
-    @Test
-    public void authenticationStatus_UserRole_UserRoleReturned() throws Exception {
-        loginUser(csrfTokenDTO, createUserLoginDTO());
+    private void assertThatHasRole(MvcResult result, GrantedAuthority role) throws java.io.IOException {
+        UserRole[] roles = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(), UserRole[].class);
 
-        MvcResult result = mockMvc.perform(get("/api/login/get-authorities")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
-                .andExpect(status().isOk()).andReturn();
-
-        checkRole(result, UserRoleService.ROLE_USER);
-    }
-
-    @Test
-    public void getAuthentication_Anonymous_AnonymousRoleReturned() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/login/get-authorities")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
-                .andExpect(status().isOk()).andReturn();
-
-        checkRole(result, "ROLE_ANONYMOUS");
-    }
-
-    private void checkRole(MvcResult result, String role) throws java.io.IOException {
-        UserRoleDTO[] roles = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(), UserRoleDTO[].class);
-
-        assertTrue(Arrays.asList(roles).contains(new UserRoleDTO(role)));
+        assertThat(Lists.newArrayList(roles), hasItem(new UserRole(role.getAuthority())));
     }
 }

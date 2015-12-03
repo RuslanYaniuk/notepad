@@ -1,6 +1,5 @@
 package com.mynote.services;
 
-import com.mynote.dto.user.UserRoleDTO;
 import com.mynote.exceptions.UserRoleAlreadyExists;
 import com.mynote.exceptions.UserRoleNotFoundException;
 import com.mynote.models.UserRole;
@@ -47,13 +46,11 @@ public class UserRoleService {
         return userRoleRepository.findAll();
     }
 
-    public Set<UserRole> findRoles(UserRoleDTO[] userRoleDTOs) throws UserRoleNotFoundException {
+    public Set<UserRole> findRoles(Iterable<UserRole> userRoles) throws UserRoleNotFoundException {
         Set<UserRole> userRoleList = new TreeSet<>(new RoleComparator());
 
-        for (UserRoleDTO userRoleDTO : userRoleDTOs) {
-            UserRole userRole = userRoleRepository.findOne(userRoleDTO.getId());
-
-            if (userRole == null) {
+        for (UserRole userRole : userRoles) {
+            if ((userRole = userRoleRepository.findByRole(userRole.getRole())) == null) {
                 throw new UserRoleNotFoundException();
             }
             userRoleList.add(userRole);
@@ -61,14 +58,10 @@ public class UserRoleService {
         return userRoleList;
     }
 
-    public UserRole addRole(UserRoleDTO userRoleDTO) throws UserRoleAlreadyExists {
-        UserRole userRole;
-
-        if (userRoleRepository.findByRole(userRoleDTO.getRole()) != null) {
+    public UserRole addRole(UserRole userRole) throws UserRoleAlreadyExists {
+        if (userRoleRepository.findByRole(userRole.getRole()) != null) {
             throw new UserRoleAlreadyExists();
         }
-        userRole = new UserRole();
-        userRole.setRole(userRoleDTO.getRole());
 
         return userRoleRepository.save(userRole);
     }

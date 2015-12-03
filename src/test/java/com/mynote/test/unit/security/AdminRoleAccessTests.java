@@ -4,6 +4,7 @@ import com.mynote.test.unit.controllers.AbstractSecuredControllerTest;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.mynote.test.utils.UserLoginDTOTestUtils.createAdminLoginDTO;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -15,18 +16,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AdminRoleAccessTests extends AbstractSecuredControllerTest {
 
     @Before
-    @Override
     public void setup() throws Exception {
-        super.setup();
-
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
 
-        loginUser(csrfTokenDTO, createUserLoginDTOForAdmin());
+        loginUser(csrfTokenDTO, createAdminLoginDTO());
     }
 
     @Test
-    public void root_AdminRole_AccessGranted() throws Exception {
+    public void getIndex_AdminRole_AccessGranted() throws Exception {
         mockMvc.perform(get("/")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))

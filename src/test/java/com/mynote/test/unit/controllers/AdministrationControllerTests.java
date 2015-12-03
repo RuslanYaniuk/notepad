@@ -1,20 +1,19 @@
 package com.mynote.test.unit.controllers;
 
 import com.mynote.dto.user.*;
-import com.mynote.test.utils.UserDtoTestUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.stereotype.Component;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.List;
-
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertThat;
+import static com.mynote.test.utils.UserRoleTestUtils.getNotExistentRole;
+import static com.mynote.test.utils.UserRoleTestUtils.getRoleAdmin;
+import static com.mynote.test.utils.UserTestUtils.*;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -22,258 +21,272 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @date September 2015
  */
 @Component
-public class AdministrationControllerTests extends AbstractControllerTest implements UserJsonFixtures {
+public class AdministrationControllerTests extends AbstractControllerTest {
 
     @Before
-    @Override
     public void setup() throws Exception {
-        super.setup();
-
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
     }
 
     @Test
     public void listAllUsers_AllUsersListReturned() throws Exception {
-        String allUsers = listAllUsersAsJson();
-
-        assertThat(allUsers, is(ALL_USERS_IN_DB));
-    }
-
-    @Test
-    public void updateUser_FirstNameChanged_UserUpdated() throws Exception {
-        List<UserUpdateDTO> allUsersBeforeUpdate = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
-        UserUpdateDTO user = allUsersBeforeUpdate.get(1);
-
-        user.setFirstName("updated first Name");
-
-        MvcResult result = updateUser(user).andExpect(status().isOk()).andReturn();
-
-        String updatedUser = result.getResponse().getContentAsString();
-        assertThat(updatedUser, is(UPDATED_FIRST_NAME_USER_ID2));
-
-        allUsersBeforeUpdate = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
-        user = allUsersBeforeUpdate.get(1);
-
-        assertThat(user.getFirstName(), is("updated first Name"));
-    }
-
-    @Test
-    public void updateUser_CorrectUserRoles_RolesUpdated() throws Exception {
-        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
-        UserUpdateDTO user = allUsers.get(1);
-
-        user.setUserRoleDTOs(getAllUserRoleDTOs());
-        MvcResult result = updateUser(user).andExpect(status().isOk()).andReturn();
-
-        String userWithUpdatedRoles = result.getResponse().getContentAsString();
-        assertThat(userWithUpdatedRoles, is(UPDATED_ROLES_USER_ID2));
-    }
-
-    @Test
-    public void updateUser_NotExistentUserRoles_NotFoundReturned() throws Exception {
-        UserRoleDTO[] newRoles = new UserRoleDTO[2];
-        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
-        UserUpdateDTO user = allUsers.get(1);
-
-        newRoles[0] = new UserRoleDTO(1L, "ROLE_USER");
-        newRoles[1] = new UserRoleDTO(-456L, "ROLE_NOT_EXISTENT");
-
-        user.setUserRoleDTOs(newRoles);
-
-        MvcResult result = updateUser(user).andExpect(status().isNotFound()).andReturn();
-        checkReturnedMessageCode(result, "user.role.notFound");
-    }
-
-    @Test
-    public void updateUser_UserRolesNull_BadRequestReturned() throws Exception {
-        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
-        UserUpdateDTO user = allUsers.get(1);
-
-        user.setUserRoleDTOs(null);
-
-        MvcResult result = updateUser(user).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotNull.userUpdateDTO.userRoleDTOs");
-    }
-
-    @Test
-    public void updateUser_UserRolesIdNull_BadRequestReturned() throws Exception {
-        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
-        UserUpdateDTO user = allUsers.get(1);
-        UserRoleDTO[] roles = new UserRoleDTO[1];
-
-        roles[0] = new UserRoleDTO(null, "ROLE_USER");
-        user.setUserRoleDTOs(roles);
-
-        MvcResult result = updateUser(user).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotNull.userUpdateDTO.userRoleDTOs[0].id");
-    }
-
-    @Test
-    public void updateUser_EmptyId_BadRequestReturned() throws Exception {
-        List<UserUpdateDTO> allUsers = UserDtoTestUtil.convertToUpdateDTO(listAllUsers());
-        UserUpdateDTO user = allUsers.get(1);
-
-        user.setId(null);
-        user.setEmail("em@ail.com");
-
-        MvcResult result = updateUser(user).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotNull.userUpdateDTO.id");
-
-        user = UserDtoTestUtil.convertToUpdateDTO(listAllUsers()).get(1);
-        assertThat(user.getEmail(), not("em@il.com"));
-    }
-
-    @Test
-    public void getUserRoles_RolesReturned() throws Exception {
-        String roles = getUserRolesAsString();
-
-        assertThat(roles, is(ALL_USER_ROLES_IN_DB));
-    }
-
-    @Test
-    public void deleteUser_ValidUserDeleteDTO_UserDeleted() throws Exception {
-        UserDeleteDTO userDeleteDTO = new UserDeleteDTO();
-
-        userDeleteDTO.setId(2L);
-        MvcResult result = deleteUser(userDeleteDTO).andExpect(status().isOk()).andReturn();
-        checkReturnedMessageCode(result, "user.account.deleted");
-
-        assertThat(listAllUsersAsJson(), is(ALL_USERS_IN_DB_AFTER_DELETION_ID2));
-    }
-
-    @Test
-    public void deleteUser_NotExistentUserID_NotFoundReturned() throws Exception {
-        UserDeleteDTO userDeleteDTO = new UserDeleteDTO();
-
-        userDeleteDTO.setId(-456L);
-
-        MvcResult result = deleteUser(userDeleteDTO).andExpect(status().isNotFound()).andReturn();
-        checkReturnedMessageCode(result, "user.lookup.notFound");
-
-        assertThat(listAllUsersAsJson(), is(ALL_USERS_IN_DB));
-    }
-
-    @Test
-    public void deleteUser_SystemAdministratorID_BadRequestReturned() throws Exception {
-        UserDeleteDTO userDeleteDTO = new UserDeleteDTO();
-
-        userDeleteDTO.setId(1L);
-
-        MvcResult result = deleteUser(userDeleteDTO).andExpect(status().isForbidden()).andReturn();
-        checkReturnedMessageCode(result, "action.notPermitted");
-
-        assertThat(listAllUsersAsJson(), is(ALL_USERS_IN_DB));
-    }
-
-    @Test
-    public void deleteUser_NullUserID_BadRequestReturned() throws Exception {
-        UserDeleteDTO userDeleteDTO = new UserDeleteDTO();
-
-        userDeleteDTO.setId(null);
-
-        MvcResult result = deleteUser(userDeleteDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotNull.userDeleteDTO.id");
-
-        assertThat(listAllUsersAsJson(), is(ALL_USERS_IN_DB));
+        mockMvc.perform(get("/api/administration/list-all-users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(7)));
     }
 
     @Test
     public void findUser_CorrectUserId_UserDTOReturned() throws Exception {
         UserFindDTO userFindDTO = new UserFindDTO();
 
-        userFindDTO.setId(4L);
+        userFindDTO.setUser(getUser2());
 
-        MvcResult result = findUser(userFindDTO).andExpect(status().isOk()).andReturn();
-
-        assertThat(result.getResponse().getContentAsString(), is(USER_DTO_ID4));
+        findUser(userFindDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(2)))
+                .andExpect(jsonPath("$.login", is("user2")));
     }
 
     @Test
     public void findUser_NotExistentUserId_NotFoundErrorReturned() throws Exception {
         UserFindDTO userFindDTO = new UserFindDTO();
 
-        userFindDTO.setId(-456L);
+        userFindDTO.setUser(createNonExistentUser());
 
-        MvcResult result = findUser(userFindDTO).andExpect(status().isNotFound()).andReturn();
-        checkReturnedMessageCode(result, "user.lookup.notFound");
+        findUser(userFindDTO)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.lookup.notFound")));
     }
 
     @Test
     public void findUser_EmptyJson_NotAcceptableErrorReturned() throws Exception {
         UserFindDTO userFindDTO = new UserFindDTO();
 
-        MvcResult result = findUser(userFindDTO).andExpect(status().isNotAcceptable()).andReturn();
-        checkReturnedMessageCode(result, "user.lookup.fieldsAreEmpty");
+        findUser(userFindDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotBlank.userFindDTO.idOrEmailOrLogin")));
+    }
+
+    @Test
+    public void getUserRoles_RolesReturned() throws Exception {
+        mockMvc.perform(get("/api/administration/get-all-user-roles"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].role", not(StringUtils.EMPTY)))
+                .andExpect(jsonPath("$.[1].role", not(StringUtils.EMPTY)));
+    }
+
+    @Test
+    public void updateUser_FirstNameChanged_UserUpdated() throws Exception {
+        UserUpdateDTO user = createUserUpdateDTO();
+
+        user.setFirstName("updated first Name");
+
+        updateUser(user)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.update.success")));
+    }
+
+    @Test
+    public void updateUser_EmptyEmail_BadRequestReturned() throws Exception {
+        UserUpdateDTO updateDTO = createUserUpdateDTO();
+
+        updateDTO.setEmail("");
+
+        updateUser(updateDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotBlank.userUpdateDTO.emailConstraint.email")));
+    }
+
+    @Test
+    public void updateUser_EmptyId_BadRequestReturned() throws Exception {
+        UserUpdateDTO user = createUserUpdateDTO();
+
+        user.setId(null);
+
+        updateUser(user)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotNull.userUpdateDTO.idConstraint.id")));
+    }
+
+    @Test
+    public void updateUserRoles_CorrectUserRoles_RolesUpdated() throws Exception {
+        UserUpdateRolesDTO updateRolesDTO = new UserUpdateRolesDTO();
+
+        updateRolesDTO.setUser(getUser2());
+        updateRolesDTO.getUserRoles().add(getRoleAdmin());
+
+        updateUserRoles(updateRolesDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.roles.updated")));
+    }
+
+    @Test
+    public void updateUserRoles_NotExistentUserRoles_NotFoundReturned() throws Exception {
+        UserUpdateRolesDTO updateRolesDTO = new UserUpdateRolesDTO();
+
+        updateRolesDTO.setUser(getUser2());
+        updateRolesDTO.getUserRoles().add(getNotExistentRole());
+
+        updateUserRoles(updateRolesDTO)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.role.notFound")));
+    }
+
+    @Test
+    public void updateUserRoles_UserRolesNull_BadRequestReturned() throws Exception {
+        UserUpdateRolesDTO updateRolesDTO = new UserUpdateRolesDTO();
+
+        updateRolesDTO.setUser(getUser2());
+        updateRolesDTO.setUserRoles(null);
+
+        updateUserRoles(updateRolesDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotEmpty.userUpdateRolesDTO.userRoles")));
+    }
+
+    @Test
+    public void deleteUser_ValidUserDeleteDTO_UserDeleted() throws Exception {
+        UserDeleteDTO userDeleteDTO = new UserDeleteDTO();
+
+        userDeleteDTO.setUser(getUser2());
+
+        deleteUser(userDeleteDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.account.deleted")));
+    }
+
+    @Test
+    public void deleteUser_NotExistentUserID_NotFoundReturned() throws Exception {
+        UserDeleteDTO userDeleteDTO = new UserDeleteDTO();
+
+        userDeleteDTO.setUser(createNonExistentUser());
+
+        deleteUser(userDeleteDTO)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.lookup.notFound")));
+    }
+
+    @Test
+    public void deleteUser_SystemAdministratorID_BadRequestReturned() throws Exception {
+        UserDeleteDTO deleteDTO = new UserDeleteDTO();
+
+        deleteDTO.setUser(getUserAdmin());
+
+        deleteUser(deleteDTO)
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath(MESSAGE_CODE, is("action.notPermitted")));
+    }
+
+    @Test
+    public void deleteUser_NullUserId_BadRequestReturned() throws Exception {
+        UserDeleteDTO deleteDTO = new UserDeleteDTO();
+
+        deleteDTO.setUser(getUser2());
+        deleteDTO.setId(null);
+
+        deleteUser(deleteDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotNull.userDeleteDTO.idConstraint.id")));
     }
 
     @Test
     public void resetUserPassword_CorrectUserResetPasswordDTO_PasswordChanged() throws Exception {
-        UserResetPasswordDTO resetPasswordDTO = new UserResetPasswordDTO(4L, "NewPassw0rd@#");
+        UserResetPasswordDTO resetPasswordDTO = new UserResetPasswordDTO();
 
-        MvcResult result = resetUserPassword(resetPasswordDTO).andExpect(status().isOk()).andReturn();
+        resetPasswordDTO.setUser(getUser2());
+        resetPasswordDTO.setPassword("NewPassw0rd@#");
 
-        checkReturnedMessageCode(result, "user.reset.password.success");
+        resetUserPassword(resetPasswordDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.reset.password.success")));
     }
 
     @Test
     public void resetUserPassword_NotExistentID_NotFoundReturned() throws Exception {
-        UserResetPasswordDTO resetPasswordDTO = new UserResetPasswordDTO(-456L, "NewPassw0rd@!");
+        UserResetPasswordDTO resetPasswordDTO = new UserResetPasswordDTO();
 
-        MvcResult result = resetUserPassword(resetPasswordDTO).andExpect(status().isNotFound()).andReturn();
+        resetPasswordDTO.setId(null);
+        resetPasswordDTO.setPassword("NewPassw0rd@#");
 
-        checkReturnedMessageCode(result, "user.lookup.notFound");
+        resetUserPassword(resetPasswordDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotNull.userResetPasswordDTO.idConstraint.id")));
     }
 
     @Test
     public void enableUserAccount_ParameterTrue_AccountEnabled() throws Exception {
-        UserEnableAccountDTO disableEnableDTO = new UserEnableAccountDTO(6L, true);
+        UserEnableDTO enableDTO = new UserEnableDTO();
 
-        MvcResult result = enableUserAccount(disableEnableDTO).andExpect(status().isOk()).andReturn();
-        checkReturnedMessageCode(result, "user.account.enabled");
+        enableDTO.setUser(getUser2());
+        enableDTO.setEnabled(true);
+
+        enableUserAccount(enableDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.account.enabled")));
     }
 
     @Test
     public void enableUserAccount_ParameterFalse_AccountDisabled() throws Exception {
-        UserEnableAccountDTO disableEnableDTO = new UserEnableAccountDTO(4L, false);
+        UserEnableDTO enableDTO = new UserEnableDTO();
 
-        MvcResult result = enableUserAccount(disableEnableDTO).andExpect(status().isOk()).andReturn();
-        checkReturnedMessageCode(result, "user.account.disabled");
+        enableDTO.setUser(getUser2());
+        enableDTO.setEnabled(false);
+
+        enableUserAccount(enableDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.account.disabled")));
     }
 
     @Test
     public void enableUserAccount_NotExistentUserID_UserNotFoundReturned() throws Exception {
-        UserEnableAccountDTO disableEnableDTO = new UserEnableAccountDTO(-456L, true);
+        UserEnableDTO enableDTO = new UserEnableDTO();
 
-        MvcResult result = enableUserAccount(disableEnableDTO).andExpect(status().isNotFound()).andReturn();
-        checkReturnedMessageCode(result, "user.lookup.notFound");
+        enableDTO.setUser(createNonExistentUser());
+        enableDTO.setEnabled(true);
+
+        enableUserAccount(enableDTO)
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.lookup.notFound")));
     }
 
     @Test
     public void enableUserAccount_SystemAdministratorID_BadRequestReturned() throws Exception {
-        UserEnableAccountDTO disableEnableDTO = new UserEnableAccountDTO(1L, true);
+        UserEnableDTO enableDTO = new UserEnableDTO();
 
-        MvcResult result = enableUserAccount(disableEnableDTO).andExpect(status().isForbidden()).andReturn();
-        checkReturnedMessageCode(result, "action.notPermitted");
+        enableDTO.setUser(getUserAdmin());
+        enableDTO.setEnabled(true);
+
+        enableUserAccount(enableDTO)
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath(MESSAGE_CODE, is("action.notPermitted")));
     }
 
     @Test
     public void enableUserAccount_NullIDAndNullEnabled_BadRequestReturned() throws Exception {
-        UserEnableAccountDTO disableEnableDTO = new UserEnableAccountDTO();
+        UserEnableDTO enableDTO = new UserEnableDTO();
 
-        MvcResult result = enableUserAccount(disableEnableDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotNull.userEnableAccountDTO.id");
+        enableDTO.setId(null);
+        enableDTO.setEnabled(null);
+
+        enableUserAccount(enableDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotNull.userEnableDTO.idConstraint.id")));
     }
 
     @Test
     public void enableUserAccount_NullEnabled_BadRequestReturned() throws Exception {
-        UserEnableAccountDTO disableEnableDTO = new UserEnableAccountDTO(4L, null);
+        UserEnableDTO enableDTO = new UserEnableDTO();
 
-        MvcResult result = enableUserAccount(disableEnableDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotNull.userEnableAccountDTO.enabled");
+        enableDTO.setUser(getUser2());
+        enableDTO.setEnabled(null);
+
+        enableUserAccount(enableDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotNull.userEnableDTO.enableConstraint.enabled")));
     }
 
-    private ResultActions enableUserAccount(UserEnableAccountDTO disableEnableDTO) throws Exception {
+    private ResultActions enableUserAccount(UserEnableDTO disableEnableDTO) throws Exception {
         return mockMvc.perform(post("/api/administration/enable-user-account")
                         .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                         .content(jacksonObjectMapper.writeValueAsString(disableEnableDTO))
@@ -301,39 +314,24 @@ public class AdministrationControllerTests extends AbstractControllerTest implem
         );
     }
 
-    private UserDTO[] listAllUsers() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/administration/list-all-users"))
-                .andExpect(status().isOk()).andReturn();
-
-        return jacksonObjectMapper.readValue(result.getResponse().getContentAsString(), UserDTO[].class);
-    }
-
-    private String listAllUsersAsJson() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/administration/list-all-users"))
-                .andExpect(status().isOk()).andReturn();
-
-        return result.getResponse().getContentAsString();
-    }
-
-    private UserRoleDTO[] getAllUserRoleDTOs() throws Exception {
-        MvcResult result = getUserRoles();
-
-        return jacksonObjectMapper.readValue(result.getResponse().getContentAsString(), UserRoleDTO[].class);
-    }
-
-    private String getUserRolesAsString() throws Exception {
-        return getUserRoles().getResponse().getContentAsString();
-    }
-
-    private MvcResult getUserRoles() throws Exception {
-        return mockMvc.perform(get("/api/administration/get-all-user-roles"))
-                .andExpect(status().isOk()).andReturn();
-    }
-
     private ResultActions findUser(UserFindDTO userFindDTO) throws Exception {
         return mockMvc.perform(post("/api/administration/find-user")
                         .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                         .content(jacksonObjectMapper.writeValueAsString(userFindDTO))
         );
+    }
+
+    private ResultActions updateUserRoles(UserUpdateRolesDTO userUpdateRolesDTO) throws Exception {
+        return mockMvc.perform(post("/api/administration/update-user-roles")
+                        .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
+                        .content(jacksonObjectMapper.writeValueAsString(userUpdateRolesDTO))
+        );
+    }
+
+    private UserUpdateDTO createUserUpdateDTO() {
+        UserUpdateDTO updateDTO = new UserUpdateDTO();
+
+        updateDTO.setUser(getUser2());
+        return updateDTO;
     }
 }

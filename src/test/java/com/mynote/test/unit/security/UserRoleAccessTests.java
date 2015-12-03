@@ -4,6 +4,7 @@ import com.mynote.test.unit.controllers.AbstractSecuredControllerTest;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.mynote.test.utils.UserLoginDTOTestUtils.createUserLoginDTO;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -14,10 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserRoleAccessTests extends AbstractSecuredControllerTest {
 
     @Before
-    @Override
     public void setup() throws Exception {
-        super.setup();
-
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
 

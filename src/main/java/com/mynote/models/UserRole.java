@@ -1,5 +1,6 @@
 package com.mynote.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -24,6 +25,7 @@ public class UserRole implements Serializable, GrantedAuthority {
     @Column(nullable = false, length = 191)
     private String role;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Set<User> users = new HashSet<>();
 
@@ -59,6 +61,7 @@ public class UserRole implements Serializable, GrantedAuthority {
     }
 
     @Override
+    @JsonIgnore
     public String getAuthority() {
         return this.role;
     }

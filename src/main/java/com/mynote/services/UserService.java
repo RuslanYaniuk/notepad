@@ -1,17 +1,17 @@
 package com.mynote.services;
 
 import com.mynote.config.web.ApplicationProperties;
-import com.mynote.dto.user.*;
 import com.mynote.exceptions.*;
 import com.mynote.models.User;
+import com.mynote.models.UserRole;
 import com.mynote.repositories.jpa.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ruslan Yaniuk
@@ -19,6 +19,7 @@ import java.util.List;
  */
 @Service
 public class UserService {
+
     private static final int BCRYPT_GENSALT_LOG2_ROUNDS = 12;
 
     @Autowired
@@ -30,89 +31,24 @@ public class UserService {
     @Autowired
     private UserRoleService userRoleService;
 
-    public User getSystemAdministrator() {
-        return userRepository.findByLoginOrEmail(appProperties.getAdminLogin(), appProperties.getAdminEmail());
+    public User addUser(User user) throws LoginAlreadyTakenException, EmailAlreadyTakenException {
+        return userRepository.save(createUser(user));
     }
 
-    public User addNewUser(UserRegistrationDTO userRegistrationDTO) throws EmailAlreadyTakenException, LoginAlreadyTakenException {
-        User user = createUser(userRegistrationDTO);
-
-        return saveUser(user);
-    }
-
-    public User addAdministrator(UserRegistrationDTO userRegistrationDTO) throws EmailAlreadyTakenException, LoginAlreadyTakenException {
-        User user = createUser(userRegistrationDTO);
-
+    public User addAdministrator(User user) throws LoginAlreadyTakenException, EmailAlreadyTakenException {
+        user = createUser(user);
         user.addRole(userRoleService.getRoleAdmin());
-        return saveUser(user);
-    }
-
-    private User createUser(UserRegistrationDTO userRegistrationDTO) throws EmailAlreadyTakenException, LoginAlreadyTakenException {
-        String login = userRegistrationDTO.getLogin().toLowerCase().trim();
-        String email = userRegistrationDTO.getEmail().toLowerCase().trim();
-        User user;
-        User existentUser;
-
-        if ((existentUser = userRepository.findByLoginOrEmail(login, email)) != null) {
-            if (existentUser.getLogin().equals(login)) {
-                throw new LoginAlreadyTakenException(login);
-            } else {
-                throw new EmailAlreadyTakenException(email);
-            }
-        }
-
-        user = new User(login, email);
-        user.setFirstName(userRegistrationDTO.getFirstName().trim());
-        user.setLastName(userRegistrationDTO.getLastName().trim());
-
-        user.setPassword(getBCryptHash(userRegistrationDTO.getPassword()));
-        user.setEnabled(true);
-        user.addRole(userRoleService.getRoleUser());
-
-        return user;
+        return userRepository.save(user);
     }
 
     public List<User> getAllUsersSortByLastNameDesc() {
         return userRepository.findAll(new Sort(Sort.Direction.ASC, "lastName"));
     }
 
-    @Transactional
-    public User updateUser(UserUpdateDTO userUpdateDTO) throws UserNotFoundException, UserRoleNotFoundException {
-        User user = findUserById(userUpdateDTO.getId());
-
-        userUpdateDTO.setEmail(userUpdateDTO.getEmail().toLowerCase().trim());
-        userUpdateDTO.setFirstName(userUpdateDTO.getFirstName().trim());
-        userUpdateDTO.setLastName(userUpdateDTO.getLastName().trim());
-
-        user.setFirstName(userUpdateDTO.getFirstName());
-        user.setLastName(userUpdateDTO.getLastName());
-        user.setEmail(userUpdateDTO.getEmail());
-        user.setRoles(userRoleService.findRoles(userUpdateDTO.getUserRoleDTOs()));
-
-        return saveUser(user);
-    }
-
-    public User resetUserPassword(UserResetPasswordDTO resetPasswordDTO) throws UserNotFoundException {
-        User user = findUserById(resetPasswordDTO.getId());
-
-        user.setPassword(getBCryptHash(resetPasswordDTO.getPassword()));
-
-        return saveUser(user);
-    }
-
-    public void deleteUser(UserDeleteDTO userDeleteDTO) throws UserNotFoundException, OperationNotPermitted {
-        User userToDelete = findUserById(userDeleteDTO.getId());
-
-        if (userToDelete.equals(getSystemAdministrator())) {
-            throw new OperationNotPermitted();
-        }
-        userRepository.delete(userToDelete);
-    }
-
     public User findUserById(Long id) throws UserNotFoundException {
-        User user = userRepository.findOne(id);
+        User user;
 
-        if (user == null) {
+        if ((user = userRepository.findOne(id)) == null) {
             throw new UserNotFoundException("id: " + id.toString());
         }
         return user;
@@ -127,6 +63,15 @@ public class UserService {
         return user;
     }
 
+    public User findUserByLogin(String login) throws UserNotFoundException {
+        User user = userRepository.findByLogin(login);
+
+        if (user == null) {
+            throw new UserNotFoundException("login: " + login);
+        }
+        return user;
+    }
+
     public User findByLoginOrEmail(String login, String email) throws UserNotFoundException {
         User user = userRepository.findByLoginOrEmail(login, email);
 
@@ -136,19 +81,86 @@ public class UserService {
         return user;
     }
 
-    public User enableUserAccount(UserEnableAccountDTO enableAccountDTO) throws UserNotFoundException, OperationNotPermitted {
-        User user = findUserById(enableAccountDTO.getId());
+    public User updateUser(User user) throws UserNotFoundException, UserRoleNotFoundException {
+        Long id = user.getId();
+        User existentUser = userRepository.findOne(id);
+
+        if (existentUser == null) {
+            throw new UserNotFoundException("id: " + id.toString());
+        }
+
+        existentUser.setEmail(user.getEmail().toLowerCase().trim());
+        existentUser.setFirstName(user.getFirstName().trim());
+        existentUser.setLastName(user.getLastName().trim());
+
+        return userRepository.save(existentUser);
+    }
+
+    public User updateUserRoles(User user) throws UserRoleNotFoundException, UserNotFoundException {
+        Set<UserRole> userRoles = userRoleService.findRoles(user.getRoles());
+
+        user = findUserById(user.getId());
+        user.setRoles(userRoles);
+
+        return userRepository.save(user);
+    }
+
+    public void deleteUser(User user) throws OperationNotPermitted, UserNotFoundException {
+        user = findUserById(user.getId());
 
         if (user.equals(getSystemAdministrator())) {
             throw new OperationNotPermitted();
         }
-        user.setEnabled(enableAccountDTO.getEnabled());
-
-        return saveUser(user);
+        userRepository.delete(user);
     }
 
-    private User saveUser(User user) {
+    public User resetUserPassword(User user) throws UserNotFoundException {
+        String newPassword = user.getPassword();
+
+        user = findUserById(user.getId());
+        user.setPassword(getBCryptHash(newPassword));
+
         return userRepository.save(user);
+    }
+
+    public User enableUserAccount(User user) throws UserNotFoundException, OperationNotPermitted {
+        Boolean enabled = user.isEnabled();
+
+        user = findUserById(user.getId());
+        if (user.equals(getSystemAdministrator())) {
+            throw new OperationNotPermitted();
+        }
+        user.setEnabled(enabled);
+
+        return userRepository.save(user);
+    }
+
+    public User getSystemAdministrator() {
+        return userRepository.findByLoginOrEmail(appProperties.getAdminLogin(), appProperties.getAdminEmail());
+    }
+
+    private User createUser(User user) throws LoginAlreadyTakenException, EmailAlreadyTakenException {
+        String login = user.getLogin().toLowerCase().trim();
+        String email = user.getEmail().toLowerCase().trim();
+        User existentUser;
+
+        if ((existentUser = userRepository.findByLoginOrEmail(login, email)) != null) {
+            if (existentUser.getLogin().equals(login)) {
+                throw new LoginAlreadyTakenException(login);
+            } else {
+                throw new EmailAlreadyTakenException(email);
+            }
+        }
+
+        user.setLogin(login);
+        user.setEmail(email);
+        user.setFirstName(user.getFirstName().trim());
+        user.setLastName(user.getLastName().trim());
+        user.setPassword(getBCryptHash(user.getPassword()));
+        user.addRole(userRoleService.getRoleUser());
+        user.setEnabled(true);
+
+        return user;
     }
 
     private String getBCryptHash(String password) {

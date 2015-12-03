@@ -73,7 +73,7 @@ public class User implements Serializable {
         return login;
     }
 
-    void setLogin(String login) {
+    public void setLogin(String login) {
         this.login = login;
     }
 

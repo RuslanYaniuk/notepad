@@ -1,6 +1,6 @@
 package com.mynote.test.unit.services;
 
-import com.mynote.dto.user.UserRoleDTO;
+import com.google.common.collect.Lists;
 import com.mynote.exceptions.UserRoleAlreadyExists;
 import com.mynote.exceptions.UserRoleNotFoundException;
 import com.mynote.models.UserRole;
@@ -16,8 +16,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.*;
+import static com.mynote.test.utils.UserRoleTestUtils.*;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Ruslan Yaniuk
@@ -38,62 +42,52 @@ public class UserRoleServiceTests extends AbstractServiceTest {
     }
 
     @Test
+    public void addUserRole_NotExistentRole_RoleSavedInDB() throws UserRoleAlreadyExists {
+        UserRole userRole = getNotExistentRole();
+
+        userRole = userRoleService.addRole(userRole);
+
+        assertNotNull(userRole.getId());
+    }
+
+    @Test(expected = UserRoleAlreadyExists.class)
+    public void addUserRole_ExistentRole_ExceptionThrown() throws UserRoleAlreadyExists {
+        UserRole userRole = getRoleUser();
+
+        userRoleService.addRole(userRole);
+    }
+
+    @Test
     public void getAdminRole_AdminRoleReturned() {
         UserRole userRole = userRoleService.getRoleAdmin();
 
-        assertThat(userRole.getRole(), is(UserRoleService.ROLE_ADMIN));
-
-        userRole = userRoleService.getRoleUser();
-        assertThat(userRole.getRole(), is(UserRoleService.ROLE_USER));
+        assertThat(userRole, is(getRoleAdmin()));
     }
 
     @Test
     public void getAllUserRoles_ListOfRolesReturned() {
         List<UserRole> userRoleList = userRoleService.getAllUserRoles();
 
-        assertThat(userRoleList.size(), is(2));
+        assertThat(userRoleList, hasSize(2));
 
-        assertTrue(userRoleList.contains(new UserRole("ROLE_USER")));
-        assertTrue(userRoleList.contains(new UserRole("ROLE_ADMIN")));
+        assertThat(userRoleList, hasItem(getRoleAdmin()));
+        assertThat(userRoleList, hasItem(getRoleUser()));
     }
 
     @Test
-    public void findRoles_CorrectUserRolesDTOArray_UserRolesUpdated() throws UserRoleNotFoundException {
-        UserRoleDTO[] userRoleDTOs = new UserRoleDTO[2];
+    public void findRoles_RoleWithIdNull_UserRolesUpdated() throws UserRoleNotFoundException {
+        List<UserRole> noIdRoles = Lists.newArrayList(getRoleUser(), getRoleAdmin());
 
-        userRoleDTOs[0] = new UserRoleDTO(1L, "ROLE_USER");
-        userRoleDTOs[1] = new UserRoleDTO(2L, "ROLE_ADMIN");
+        Set<UserRole> userRoles = userRoleService.findRoles(noIdRoles);
 
-        Set<UserRole> userRoles = userRoleService.findRoles(userRoleDTOs);
-
-        assertThat(userRoles.size(), is(userRoleDTOs.length));
+        assertThat(userRoles, hasSize(2));
     }
 
     @Test(expected = UserRoleNotFoundException.class)
     public void findRoles_NotExistentRole_ExceptionThrown() throws UserRoleNotFoundException {
-        UserRoleDTO[] userRoleDTOs = new UserRoleDTO[2];
+        List<UserRole> noIdRoles = Lists.newArrayList(getNotExistentRole());
 
-        userRoleDTOs[0] = new UserRoleDTO(1L, "ROLE_USER");
-        userRoleDTOs[1] = new UserRoleDTO(2L, "ROLE_ADMIN");
-        userRoleDTOs[1] = new UserRoleDTO(-456L, "ROLE_WHO");
-
-        userRoleService.findRoles(userRoleDTOs);
-    }
-
-    @Test
-    public void addUserRole_NotExistentRole_RoleSavedInDB() throws UserRoleAlreadyExists {
-        UserRoleDTO userRoleDTO = new UserRoleDTO();
-
-        userRoleDTO.setRole("ROLE_MANAGER");
-        assertNotNull(userRoleService.addRole(userRoleDTO));
-    }
-
-    @Test(expected = UserRoleAlreadyExists.class)
-    public void addUserRole_ExistentRole_ExceptionThrown() throws UserRoleAlreadyExists {
-        UserRoleDTO userRoleDTO = new UserRoleDTO();
-
-        userRoleDTO.setRole("ROLE_USER");
-        userRoleService.addRole(userRoleDTO);
+        userRoleService.findRoles(noIdRoles);
     }
 
     @Test

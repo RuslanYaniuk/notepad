@@ -9,7 +9,6 @@ import com.mynote.models.User;
 import com.mynote.services.UserRoleService;
 import com.mynote.services.UserService;
 import com.mynote.utils.UserDtoUtil;
-import com.mynote.utils.UserRoleDtoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -45,29 +44,29 @@ public class AdministrationController extends AbstractController {
 
     @RequestMapping(value = "/get-all-user-roles", method = GET)
     public ResponseEntity getAllUserRoles() throws IOException {
-        return ok(UserRoleDtoUtil.convert(userRoleService.getAllUserRoles()));
+        return ok(userRoleService.getAllUserRoles());
     }
 
     @RequestMapping(value = "/update-user", method = POST)
     public ResponseEntity updateUser(@Validated @RequestBody UserUpdateDTO userUpdateDTO) throws UserNotFoundException, UserRoleNotFoundException {
-        UserUpdateDTO userUpdateDTOResponse = new UserUpdateDTO(userService.updateUser(userUpdateDTO));
+        userService.updateUser(userUpdateDTO.getUser());
 
-        return ok(userUpdateDTOResponse);
+        return messageOK("user.update.success");
     }
 
     @RequestMapping(value = "/delete-user", method = DELETE)
     public ResponseEntity deleteUser(@Validated @RequestBody UserDeleteDTO userDeleteDTO) throws UserNotFoundException, OperationNotPermitted {
-        userService.deleteUser(userDeleteDTO);
+        userService.deleteUser(userDeleteDTO.getUser());
 
         return messageOK("user.account.deleted");
     }
 
     @RequestMapping(value = "/find-user", method = POST)
-    public ResponseEntity findUser(@RequestBody UserFindDTO userFindDTO) throws UserNotFoundException, SearchFieldsAreEmpty {
+    public ResponseEntity findUser(@Validated @RequestBody UserFindDTO userFindDTO) throws UserNotFoundException, SearchFieldsAreEmpty {
         Long userId = userFindDTO.getId();
 
         if (userFindDTO.getId() != null) {
-            UserDTO userDTO = UserDtoUtil.convert(userService.findUserById(userId));
+            UserInfoDTO userDTO = new UserInfoDTO(userService.findUserById(userId));
 
             return ok(userDTO);
         }
@@ -77,19 +76,26 @@ public class AdministrationController extends AbstractController {
 
     @RequestMapping(value = "/reset-user-password", method = POST)
     public ResponseEntity resetUserPassword(@Validated @RequestBody UserResetPasswordDTO resetPasswordDTO) throws UserNotFoundException {
-        User user = userService.resetUserPassword(resetPasswordDTO);
+        User user = userService.resetUserPassword(resetPasswordDTO.getUser());
 
         return messageOK("user.reset.password.success", user.getId().toString());
     }
 
     @RequestMapping(value = "/enable-user-account", method = POST)
-    public ResponseEntity enableUserAccount(@Validated @RequestBody UserEnableAccountDTO enableAccountDTO) throws OperationNotPermitted, UserNotFoundException {
-        User user = userService.enableUserAccount(enableAccountDTO);
+    public ResponseEntity enableUserAccount(@Validated @RequestBody UserEnableDTO enableAccountDTO) throws OperationNotPermitted, UserNotFoundException {
+        User user = userService.enableUserAccount(enableAccountDTO.getUser());
 
         if (user.isEnabled()) {
             return messageOK("user.account.enabled");
         } else {
             return messageOK("user.account.disabled");
         }
+    }
+
+    @RequestMapping(value = "/update-user-roles", method = POST)
+    public ResponseEntity updateUserRoles(@Validated @RequestBody UserUpdateRolesDTO userUpdateRolesDTO) throws UserRoleNotFoundException, UserNotFoundException {
+        userService.updateUserRoles(userUpdateRolesDTO.getUser());
+
+        return messageOK("user.roles.updated");
     }
 }

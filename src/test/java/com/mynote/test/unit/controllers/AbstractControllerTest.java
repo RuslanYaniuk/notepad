@@ -3,11 +3,8 @@ package com.mynote.test.unit.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.mynote.config.web.ExtendedMessageSource;
-import com.mynote.dto.MessageDTO;
-import com.mynote.dto.user.UserLoginDTO;
 import com.mynote.test.unit.conf.TestWebConfig;
 import com.mynote.test.utils.DBUnitHelper;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +19,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.io.IOException;
 
 import static com.mynote.config.web.Constants.APPLICATION_JSON_UTF8;
 import static org.hamcrest.core.Is.is;
@@ -46,6 +41,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 })
 public abstract class AbstractControllerTest {
 
+    public static final String MESSAGE_CODE = "$.messageCode";
+
     @SuppressWarnings("SpringJavaAutowiringInspection")
     @Autowired
     protected WebApplicationContext wac;
@@ -62,32 +59,12 @@ public abstract class AbstractControllerTest {
     protected DBUnitHelper dbUnitHelper;
 
     @Before
-    public void setup() throws Exception {
+    public void buildWebAppContext() throws Exception {
         this.mockMvc = webAppContextSetup(this.wac)
                 .build();
     }
 
     protected void isResponseMediaTypeJson(MvcResult result) {
         assertThat(result.getResponse().getContentType(), is(APPLICATION_JSON_UTF8));
-    }
-
-    protected void checkReturnedMessageCode(MvcResult result, String messageCode) throws IOException {
-        MessageDTO responseMessage = jacksonObjectMapper.readValue(result.getResponse().getContentAsString(),
-                MessageDTO.class);
-        String actualMessage = responseMessage.getMessageCode();
-
-        assertThat(actualMessage, Matchers.is(messageCode));
-    }
-
-    protected UserLoginDTO createUserLoginDTOForAdmin() {
-        return new UserLoginDTO("admin", "Passw0rd");
-    }
-
-    protected UserLoginDTO createUserLoginDTO() {
-        return new UserLoginDTO("user2@email.com", "Passw0rd");
-    }
-
-    protected UserLoginDTO createDisabledUserLoginDTO() {
-        return new UserLoginDTO("user6@email.com", "Passw0rd");
     }
 }

@@ -2,13 +2,13 @@ package com.mynote.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mynote.config.web.ExtendedMessageSource;
+import com.mynote.dto.LoginSuccessMessageDTO;
 import com.mynote.dto.MessageDTO;
-import com.mynote.dto.user.UserLoginSuccessDTO;
+import com.mynote.dto.user.UserInfoDTO;
 import com.mynote.exceptions.UserNotFoundException;
 import com.mynote.models.User;
 import com.mynote.services.UserService;
 import com.mynote.utils.JsonResponseBuilder;
-import com.mynote.utils.UserDtoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
@@ -51,7 +51,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         HttpSession session = request.getSession();
         Locale locale = LocaleContextHolder.getLocale();
         MessageDTO messageDTO = messageSource.getMessageDTO("user.login.success", locale);
-        UserLoginSuccessDTO successDTO = new UserLoginSuccessDTO();
+        LoginSuccessMessageDTO successDTO = new LoginSuccessMessageDTO();
         User user;
 
         try {
@@ -63,7 +63,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         successDTO.setMessage(messageDTO.getMessage());
         successDTO.setMessageCode(messageDTO.getMessageCode());
-        successDTO.setUserDTO(UserDtoUtil.convert(user));
+        successDTO.setUserDTO(new UserInfoDTO(user));
 
         session.setAttribute(SESSION_ATTRIBUTE_USER_ID, authentication.getDetails());
 

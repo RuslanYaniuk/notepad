@@ -1,8 +1,6 @@
 package com.mynote.test.unit.services;
 
-import com.google.common.collect.Lists;
 import com.mynote.config.web.ApplicationProperties;
-import com.mynote.dto.user.*;
 import com.mynote.exceptions.*;
 import com.mynote.models.User;
 import com.mynote.models.UserRole;
@@ -13,13 +11,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.mynote.test.utils.UserDtoTestUtil.createSimpleUserRegistrationDTO;
+import static com.mynote.test.utils.UserRoleTestUtils.getRoleAdmin;
+import static com.mynote.test.utils.UserTestUtils.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -38,9 +36,6 @@ public class UserServiceTests extends AbstractServiceTest {
     @Autowired
     private DBUnitHelper dbUnitHelper;
 
-    @Autowired
-    private PasswordEncoder bCryptPasswordEncoder;
-
     @Before
     public void setup() throws DatabaseUnitException, SQLException, FileNotFoundException {
         dbUnitHelper.deleteUsersFromDb();
@@ -48,113 +43,115 @@ public class UserServiceTests extends AbstractServiceTest {
     }
 
     @Test
-    public void getSystemAdministrator_SystemAdministratorReturned() {
-        User admin = userService.getSystemAdministrator();
+    public void addUser_NewLoginAndEmail_UserSavedIntoDB() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
+        User user = createNonExistentUser();
 
-        assertThat(admin.getEmail(), is(applicationProperties.getAdminEmail()));
+        user = userService.addUser(user);
+
+        assertNotNull(user.getId());
     }
 
     @Test
-    public void addNewUser_ValidRegistrationUserDTO_UserSavedIntoDB() throws EmailAlreadyTakenException, LoginAlreadyTakenException, UserNotFoundException {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
+    public void addUser_EmailInMixedCase_EmailSavedInLowerCase() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
+        User user = createNonExistentUser();
 
-        User user = userService.addNewUser(userRegistrationDTO);
-        assertNotNull(user);
-        verifyUser(userRegistrationDTO, user);
+        user.setEmail("MixedCase@Email.COM");
 
-        user = userService.findUserByEmail(userRegistrationDTO.getEmail());
-        verifyUser(userRegistrationDTO, user);
+        user = userService.addUser(user);
+
+        assertThat(user.getEmail().toLowerCase(), is(user.getEmail()));
     }
 
     @Test
-    public void addNewUser_PasswordAsPlainText_BCryptHashSaved() throws EmailAlreadyTakenException, LoginAlreadyTakenException, UserNotFoundException {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        User user = userService.addNewUser(userRegistrationDTO);
-        User savedUser = userService.findUserByEmail(user.getEmail());
+    public void addUser_LoginInMixedCase_LoginSavedInLowerCase() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
+        User user = createNonExistentUser("miXedcASElog@4in");
 
-        assertNotNull(savedUser.getPassword());
-        assertThat(savedUser.getPassword(), not(userRegistrationDTO.getPassword()));
+        user = userService.addUser(user);
 
-        assertTrue(BCrypt.checkpw(userRegistrationDTO.getPassword(), savedUser.getPassword()));
+        assertThat(user.getLogin().toLowerCase(), is(user.getLogin()));
     }
 
     @Test
-    public void addNewUser_EmailInMixedCase_EmailSavedInLowerCase() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
+    public void addUser_EmailAndLoginWithTrailingSpaces_SavedTrim() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
+        String login = "      miXedcASElog@4in                    ";
+        String email = "             MixedCase@Email.COM   ";
+        User user = createNonExistentUser(login, email);
 
-        userRegistrationDTO.setEmail("MixedCase@Email.COM");
+        user = userService.addUser(user);
 
-        User user = userService.addNewUser(userRegistrationDTO);
-        assertNotNull(user);
-
-        assertThat(userRegistrationDTO.getEmail().toLowerCase(), is(user.getEmail()));
-
-        verifyUser(userRegistrationDTO, user);
+        assertThat(user.getLogin(), is(login.toLowerCase().trim()));
+        assertThat(user.getEmail(), is(email.toLowerCase().trim()));
     }
 
     @Test
-    public void addNewUser_LoginInMixedCase_LoginSavedInLowerCase() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
+    public void addUser_FirstAndLastNamesWithTrailingSpaces_SavedTrim() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
+        String firstName = "      First   name                    ";
+        String lastName = "           lasT Name   ";
+        User user = createNonExistentUser();
 
-        userRegistrationDTO.setLogin("miXedcASElog@4in");
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
 
-        User user = userService.addNewUser(userRegistrationDTO);
-        assertNotNull(user);
+        user = userService.addUser(user);
 
-        assertThat(userRegistrationDTO.getLogin().toLowerCase(), is(user.getLogin()));
-
-        verifyUser(userRegistrationDTO, user);
-    }
-
-    @Test
-    public void addNewUser_EmailAndLoginWithTrailingSpaces_SavedWithoutSpaces() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-
-        userRegistrationDTO.setLogin("      miXedcASElog@4in                    ");
-        userRegistrationDTO.setEmail("             MixedCase@Email.COM   ");
-
-        User user = userService.addNewUser(userRegistrationDTO);
-        assertNotNull(user);
-
-        assertThat(userRegistrationDTO.getLogin().toLowerCase().trim(), is(user.getLogin()));
-        assertThat(userRegistrationDTO.getEmail().toLowerCase().trim(), is(user.getEmail()));
-    }
-
-    @Test
-    public void addNewUser_FirstAndLastNamesWithTrailingSpaces_SavedWithoutSpaces() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-
-        userRegistrationDTO.setFirstName("      First   name                    ");
-        userRegistrationDTO.setLastName("           lasT Name   ");
-
-        User user = userService.addNewUser(userRegistrationDTO);
-        assertNotNull(user);
-
-        assertThat(userRegistrationDTO.getFirstName().trim(), is(user.getFirstName()));
-        assertThat(userRegistrationDTO.getLastName().trim(), is(user.getLastName()));
+        assertThat(user.getFirstName(), is(firstName.trim()));
+        assertThat(user.getLastName(), is(lastName.trim()));
     }
 
     @Test(expected = EmailAlreadyTakenException.class)
-    public void addNewUser_AlreadyRegisteredEmail_ExceptionThrown() throws EmailAlreadyTakenException, LoginAlreadyTakenException, UserNotFoundException {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
+    public void addUser_AlreadyRegisteredEmail_ExceptionThrown() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
+        User user = createNonExistentUser();
 
-        User user = userService.addNewUser(userRegistrationDTO);
-        assertNotNull(user);
-        verifyUser(userRegistrationDTO, user);
+        user = userService.addUser(user);
 
-        userRegistrationDTO.setLogin("differentLogin");
+        user = createNonExistentUser("differentLogin", user.getEmail());
 
-        user = userService.addNewUser(userRegistrationDTO);
-        assertNull(user);
+        userService.addUser(user);
+    }
+
+    @Test(expected = LoginAlreadyTakenException.class)
+    public void addUser_AlreadyRegisteredLogin_ExceptionThrown() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
+        User user = createNonExistentUser();
+
+        user = userService.addUser(user);
+
+        user = createNonExistentUser(user.getLogin(), "different@email.com");
+
+        userService.addUser(user);
     }
 
     @Test
-    public void getAllUsersSortByLastNameDesc_ReturnedUsersListInNaturalOrder() throws DatabaseUnitException, FileNotFoundException, SQLException {
-        int usersAmountInDb = dbUnitHelper.getUserDataSet().getTable("users").getRowCount();
-        List<User> allUsers = userService.getAllUsersSortByLastNameDesc();
-        List<User> users = Lists.newArrayList(allUsers);
+    public void addUser_NotEncryptedPassword_BCryptHashSaved() throws UserNotFoundException, EmailAlreadyTakenException, LoginAlreadyTakenException {
+        String notEncryptedPass = "Pa$$w0rd";
+        User user = createNonExistentUser();
 
-        assertThat(users.size(), is(usersAmountInDb));
+        user.setPassword(notEncryptedPass);
+
+        user = userService.addUser(user);
+
+        assertThat(user.getPassword(), not(notEncryptedPass));
+        assertTrue(BCrypt.checkpw(notEncryptedPass, user.getPassword()));
+    }
+
+    @Test
+    public void addAdministrator_NewLoginAndEmail_AdministratorAdded() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
+        User admin = createNonExistentUser("newAdmin", "newadmin@mail.com");
+
+        admin.setEmail("newadmin@mail.com");
+        admin.setFirstName("Admin First Name");
+        admin.setLastName("Admin Last Name");
+        admin.setPassword("Passw0rd");
+
+        admin = userService.addAdministrator(admin);
+
+        assertTrue(admin.getRoles().contains(new UserRole("ROLE_ADMIN")));
+    }
+
+    @Test
+    public void getAllUsersSortByLastNameDesc__ReturnedUsersListInNaturalOrder() {
+        List<User> users = userService.getAllUsersSortByLastNameDesc();
+
+        assertThat(users, hasSize(7));
 
         for (int i = 0; i < users.size() - 1; i++) {
             char firstElement = users.get(i).getLastName().toLowerCase().charAt(0);
@@ -165,205 +162,190 @@ public class UserServiceTests extends AbstractServiceTest {
     }
 
     @Test
-    public void updateUser_ValidUserID_UserUpdated() throws UserNotFoundException, UserRoleNotFoundException {
-        UserUpdateDTO originalUser = getUserUpdateDTO();
+    public void getSystemAdministrator_SystemAdministratorReturned() {
+        User admin = userService.getSystemAdministrator();
 
-        originalUser.setFirstName("updated first name");
-        originalUser.setLastName("updated last name");
-
-        User user = userService.updateUser(originalUser);
-
-        verifyUser(originalUser, user);
+        assertThat(admin.getEmail(), is(applicationProperties.getAdminEmail()));
     }
 
     @Test
-    public void updateUser_EmailWithTrailingSpaces_SavedWithoutSpaces() throws EmailAlreadyTakenException, LoginAlreadyTakenException, UserNotFoundException, UserRoleNotFoundException {
-        UserUpdateDTO userUpdateDTO = getUserUpdateDTO();
+    public void findById_ValidUserId_UserReturned() throws UserNotFoundException {
+        User user = userService.findUserById(getUser2().getId());
 
-        userUpdateDTO.setEmail("             MixedCase@Email.COM   ");
-
-        User savedUser = userService.updateUser(userUpdateDTO);
-        assertNotNull(savedUser);
-
-        assertThat(userUpdateDTO.getEmail().toLowerCase().trim(), is(savedUser.getEmail()));
-    }
-
-    @Test
-    public void updateUser_FirstAndLastNamesWithTrailingSpaces_SavedWithoutSpaces() throws EmailAlreadyTakenException, LoginAlreadyTakenException, UserNotFoundException, UserRoleNotFoundException {
-        UserUpdateDTO userUpdateDTO = getUserUpdateDTO();
-
-        userUpdateDTO.setFirstName("      First   naMe                    ");
-        userUpdateDTO.setLastName("           lasT Name   ");
-
-        User user = userService.updateUser(userUpdateDTO);
-        assertNotNull(user);
-
-        assertThat(userUpdateDTO.getFirstName().trim(), is(user.getFirstName()));
-        assertThat(userUpdateDTO.getLastName().trim(), is(user.getLastName()));
-
+        assertThat(user.getLogin(), is("user2"));
     }
 
     @Test(expected = UserNotFoundException.class)
-    public void updateUser_NotExistentID_ExceptionThrown() throws UserNotFoundException, UserRoleNotFoundException {
-        UserUpdateDTO userDTO = new UserUpdateDTO(userService.findUserByEmail("andrew.anderson@mail.com"));
-
-        userDTO.setId(999999999L);
-
-        userDTO.setFirstName("updated first name");
-        userDTO.setLastName("updated last name");
-
-        userService.updateUser(userDTO);
-    }
-
-    @Test
-    public void resetUserPassword_CorrectUserResetPasswordDTO_PasswordUpdated() throws UserNotFoundException {
-        UserResetPasswordDTO resetPasswordDTO = new UserResetPasswordDTO(2L, "NewPassword");
-        User user = userService.resetUserPassword(resetPasswordDTO);
-
-        assertTrue(bCryptPasswordEncoder.matches(resetPasswordDTO.getPassword(), user.getPassword()));
-    }
-
-    @Test
-    public void findById_ValidUserID_UserReturned() throws UserNotFoundException {
-        User admin = userService.findUserById(1L);
-
-        assertNotNull(admin);
-        assertThat(admin.getLastName(), is("Administrator"));
-    }
-
-    @Test(expected = UserNotFoundException.class)
-    public void deleteUser_ValidUserID_UserDeleted() throws UserNotFoundException, OperationNotPermitted {
-        userService.deleteUser(new UserDeleteDTO(2L));
-
-        assertNull(userService.findUserById(2L));
-    }
-
-    @Test(expected = OperationNotPermitted.class)
-    public void deleteUser_SystemAdministratorID_ExceptionThrown() throws UserNotFoundException, OperationNotPermitted {
-        userService.deleteUser(new UserDeleteDTO(1L));
-    }
-
-    @Test(expected = UserNotFoundException.class)
-    public void deleteUser_NotExistentUserID_ExceptionThrown() throws UserNotFoundException, OperationNotPermitted {
-        userService.deleteUser(new UserDeleteDTO(-456L));
-    }
-
-    @Test(expected = UserNotFoundException.class)
-    public void findById_NotExistentUserID_ExceptionThrown() throws UserNotFoundException {
-        userService.findUserById(-456L);
-    }
-
-    @Test
-    public void addAdministrator_CorrectUserDTO_AdministratorAdded() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
-        UserRegistrationDTO registrationDTO = new UserRegistrationDTO();
-
-        registrationDTO.setLogin("newAdmin");
-        registrationDTO.setEmail("newadmin@mail.com");
-        registrationDTO.setFirstName("Admin First Name");
-        registrationDTO.setLastName("Admin Last Name");
-        registrationDTO.setPassword("Passw0rd");
-
-        User admin = userService.addAdministrator(registrationDTO);
-
-        assertTrue(admin.getRoles().contains(new UserRole("ROLE_ADMIN")));
-    }
-
-    @Test
-    public void enableUserAccount_EnabledIsTRUE_AccountEnabled() throws UserNotFoundException, OperationNotPermitted {
-        UserEnableAccountDTO enableAccountDTO = new UserEnableAccountDTO(6L, true);
-
-        User user = userService.enableUserAccount(enableAccountDTO);
-
-        assertThat(user.isEnabled(), is(enableAccountDTO.getEnabled()));
-    }
-
-    @Test
-    public void enableUserAccount_EnabledIsFLSE_AccountDisabled() throws UserNotFoundException, OperationNotPermitted {
-        UserEnableAccountDTO enableAccountDTO = new UserEnableAccountDTO(6L, true);
-
-        User user = userService.enableUserAccount(enableAccountDTO);
-
-        assertThat(user.isEnabled(), is(enableAccountDTO.getEnabled()));
-    }
-
-    @Test(expected = UserNotFoundException.class)
-    public void enableUserAccount_NotExistentUserID_ExceptionThrown() throws UserNotFoundException, OperationNotPermitted {
-        UserEnableAccountDTO enableAccountDTO = new UserEnableAccountDTO(-456L, true);
-
-        userService.enableUserAccount(enableAccountDTO);
-    }
-
-    @Test(expected = OperationNotPermitted.class)
-    public void enableUserAccount_DisableSystemAdministrator_ExceptionThrown() throws UserNotFoundException, OperationNotPermitted {
-        UserEnableAccountDTO enableAccountDTO = new UserEnableAccountDTO(1L, false);
-
-        userService.enableUserAccount(enableAccountDTO);
+    public void findById_NotExistentUserId_ExceptionThrown() throws UserNotFoundException {
+        userService.findUserById(createNonExistentUser().getId());
     }
 
     @Test
     public void findUserByEmail_CorrectEmail_UserReturned() throws UserNotFoundException {
         User user = userService.findUserByEmail("user3@email.com");
 
-        assertNotNull(user);
         assertThat(user.getEmail(), is("user3@email.com"));
         assertThat(user.getLogin(), is("user3"));
     }
 
     @Test(expected = UserNotFoundException.class)
     public void findUserByEmail_NotExistentEmail_ExceptionThrown() throws UserNotFoundException {
-        userService.findUserByEmail("jonnyjo@mail.com");
+        userService.findUserByEmail(createNonExistentUser().getEmail());
     }
 
     @Test
-    public void findByLoginOrEmail_CorrectParameters_UserReturned() throws UserNotFoundException {
+    public void findUserByLogin_CorrectLogin_UserReturned() throws UserNotFoundException {
+        User user = userService.findUserByLogin("user3");
+
+        assertThat(user.getEmail(), is("user3@email.com"));
+        assertThat(user.getLogin(), is("user3"));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void findUserByLogin_NotExistentLogin_ExceptionThrown() throws UserNotFoundException {
+        userService.findUserByLogin(createNonExistentUser().getLogin());
+    }
+
+    @Test
+    public void findByLoginOrEmail_ValidLoginOrEmail_UserReturned() throws UserNotFoundException {
         User user = userService.findByLoginOrEmail("user2", "user2@email.com");
 
         assertNotNull(user);
 
         user = userService.findByLoginOrEmail("user2", "not@correct.com");
 
-        assertNotNull(user);
         assertThat(user.getEmail(), is("user2@email.com"));
 
         user = userService.findByLoginOrEmail("notExist", "user2@email.com");
 
-        assertNotNull(user);
         assertThat(user.getLogin(), is("user2"));
     }
 
     @Test(expected = UserNotFoundException.class)
     public void findByLoginOrEmail_NotExistentEmailAndLogin_ExceptionThrown() throws UserNotFoundException {
-        userService.findByLoginOrEmail("notValid", "no.name@mail.com");
+        User user = createNonExistentUser();
+
+        userService.findByLoginOrEmail(user.getLogin(), user.getLogin());
     }
 
-    private void verifyUser(UserRegistrationDTO userRegistrationDTO, User user) {
-        assertThat(userRegistrationDTO.getEmail().toLowerCase().trim(), is(user.getEmail()));
-        assertThat(userRegistrationDTO.getLogin().toLowerCase().trim(), is(user.getLogin()));
+    @Test
+    public void updateUser_NewFirstNameAndLastName_UserUpdated() throws UserNotFoundException, UserRoleNotFoundException {
+        String firstName = "updated first name";
+        String lastName = "updated last name";
+        User user = getUser2();
 
-        assertThat(userRegistrationDTO.getFirstName().trim(), is(user.getFirstName()));
-        assertThat(userRegistrationDTO.getLastName().trim(), is(user.getLastName()));
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+
+        user = userService.updateUser(user);
+
+        assertThat(user.getFirstName(), is(firstName));
+        assertThat(user.getLastName(), is(lastName));
+    }
+
+    @Test
+    public void updateUser_EmailWithTrailingSpaces_SavedLowercaseTrim() throws UserNotFoundException, UserRoleNotFoundException {
+        String email = "             MixedCase@Email.COM   ";
+        User user = getUser2();
+
+        user.setEmail(email);
+
+        user = userService.updateUser(user);
+
+        assertThat(user.getEmail(), is(email.toLowerCase().trim()));
+    }
+
+    @Test
+    public void updateUser_FirstAndLastNamesWithTrailingSpaces_SavedTrim() throws UserNotFoundException, UserRoleNotFoundException {
+        String firstName = "      First   naMe                    ";
+        String lastName = "           lasT Name   ";
+        User user = getUser2();
+
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+
+        user = userService.updateUser(user);
+
+        assertThat(user.getFirstName(), is(firstName.trim()));
+        assertThat(user.getLastName(), is(lastName.trim()));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void updateUser_NotExistentUser_ExceptionThrown() throws UserNotFoundException, UserRoleNotFoundException {
+        User user = createNonExistentUser();
+
+        user.setFirstName("updated first name");
+        user.setLastName("updated last name");
+
+        userService.updateUser(user);
+    }
+
+    @Test
+    public void updateUserRoles_UserWithNewRolesSet_RolesUpdated() throws UserRoleNotFoundException, UserNotFoundException {
+        User user = getUser2();
+
+        user.addRole(getRoleAdmin());
+
+        user = userService.updateUserRoles(user);
+
+        assertThat(user.getRoles(), hasItem(getRoleAdmin()));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void deleteUser_ValidUserId_UserDeleted() throws OperationNotPermitted, UserNotFoundException {
+        userService.deleteUser(getUser2());
+
+        userService.findUserById(2L);
+    }
+
+    @Test(expected = OperationNotPermitted.class)
+    public void deleteUser_UserTypeSysAdmin_ExceptionThrown() throws OperationNotPermitted, UserNotFoundException {
+        userService.deleteUser(getUserAdmin());
+    }
+
+    @Test
+    public void resetUserPassword_ValidNewPassword_PasswordUpdated() throws UserNotFoundException {
+        String newPassword = "newPa$$w0rd";
+        User user = getUser2();
+
+        user.setPassword(newPassword);
+
+        user = userService.resetUserPassword(user);
+
+        assertTrue(BCrypt.checkpw(newPassword, user.getPassword()));
+    }
+
+    @Test
+    public void enableUserAccount_EnabledIsTRUE_AccountEnabled() throws UserNotFoundException, OperationNotPermitted {
+        User user = getUser2();
+
+        user.setEnabled(true);
+
+        user = userService.enableUserAccount(user);
+
         assertTrue(user.isEnabled());
     }
 
-    private void verifyUser(UserUpdateDTO userUpdateDTO, User user) {
-        assertThat(userUpdateDTO.getEmail().toLowerCase().trim(), is(user.getEmail()));
+    @Test
+    public void enableUserAccount_EnabledIsFLSE_AccountDisabled() throws UserNotFoundException, OperationNotPermitted {
+        User user = getUser2();
 
-        assertThat(userUpdateDTO.getFirstName().trim(), is(user.getFirstName()));
-        assertThat(userUpdateDTO.getLastName().trim(), is(user.getLastName()));
+        user.setEnabled(false);
+
+        user = userService.enableUserAccount(user);
+
+        assertFalse(user.isEnabled());
     }
 
-    private UserUpdateDTO getUserUpdateDTO() throws UserNotFoundException {
-        UserUpdateDTO originalUser = new UserUpdateDTO();
-        UserRoleDTO[] roleDTOs = new UserRoleDTO[1];
+    @Test(expected = UserNotFoundException.class)
+    public void enableUserAccount_NotExistentUserID_ExceptionThrown() throws UserNotFoundException, OperationNotPermitted {
+        User user = createNonExistentUser();
 
-        roleDTOs[0] = new UserRoleDTO(1L, "ROLE_USER");
+        userService.enableUserAccount(user);
+    }
 
-        originalUser.setId(2L);
-        originalUser.setEmail("andrew.anderson@mail.com");
-        originalUser.setFirstName("Andrew");
-        originalUser.setLastName("Anderson");
-
-        originalUser.setUserRoleDTOs(roleDTOs);
-        return originalUser;
+    @Test(expected = OperationNotPermitted.class)
+    public void enableUserAccount_DisableSystemAdministrator_ExceptionThrown() throws UserNotFoundException, OperationNotPermitted {
+        userService.enableUserAccount(getUserAdmin());
     }
 }

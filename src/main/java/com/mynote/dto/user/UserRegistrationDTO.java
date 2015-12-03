@@ -1,95 +1,95 @@
 package com.mynote.dto.user;
 
-import com.mynote.config.validation.ValidationGroupB;
-import com.mynote.config.validation.ValidationGroupC;
-import com.mynote.config.validation.annotations.Password;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mynote.dto.user.constraints.*;
 
-import javax.validation.constraints.Pattern;
+import javax.validation.Valid;
 
 /**
  * @author Ruslan Yaniuk
  * @date September 2015
  */
-public class UserRegistrationDTO extends CommonUserDetails {
+public class UserRegistrationDTO extends AbstractUserDTO {
 
-    @NotBlank
-    @Length(min = 8, max = 191, groups = ValidationGroupB.class)
-    @Pattern(regexp = "(?i)^[a-z0-9_-]{8,}$", groups = ValidationGroupC.class)
-    private String login;
+    @Valid
+    @JsonIgnore
+    private LoginConstraint loginConstraint = new LoginConstraint(this.user);
 
-    @NotBlank
-    @Length(min = 8, max = 100, groups = ValidationGroupB.class)
-    @Password(groups = ValidationGroupC.class)
-    private String password;
+    @Valid
+    @JsonIgnore
+    private EmailConstraint emailConstraint = new EmailConstraint(this.user);
 
+    @Valid
+    @JsonIgnore
+    private FirstNameConstraint firstNameConstraint = new FirstNameConstraint(this.user);
+
+    @Valid
+    @JsonIgnore
+    private LastNameConstraint lastNameConstraint = new LastNameConstraint(this.user);
+
+    @Valid
+    @JsonIgnore
+    private PasswordConstraint passwordConstraint = new PasswordConstraint(this.user);
+
+    // Json building getters and setters
     public String getLogin() {
-        return login;
+        return user.getLogin();
     }
 
     public void setLogin(String login) {
-        this.login = login;
+        user.setLogin(login);
     }
 
     public String getFirstName() {
-        return firstName;
+        return user.getFirstName();
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        user.setFirstName(firstName);
     }
 
     public String getLastName() {
-        return lastName;
+        return user.getLastName();
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        user.setLastName(lastName);
     }
 
     public String getEmail() {
-        return email;
+        return user.getEmail();
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        user.setEmail(email);
     }
 
     public String getPassword() {
-        return password;
+        return user.getPassword();
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        user.setPassword(password);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        UserRegistrationDTO that = (UserRegistrationDTO) o;
-
-        return !(login != null ? !login.equals(that.login) : that.login != null);
+    // Validation getters
+    public LoginConstraint getLoginConstraint() {
+        return loginConstraint;
     }
 
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (login != null ? login.hashCode() : 0);
-        return result;
+    public EmailConstraint getEmailConstraint() {
+        return emailConstraint;
     }
 
-    @Override
-    public String toString() {
-        return "UserRegistrationDTO{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", login='" + login + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+    public FirstNameConstraint getFirstNameConstraint() {
+        return firstNameConstraint;
+    }
+
+    public LastNameConstraint getLastNameConstraint() {
+        return lastNameConstraint;
+    }
+
+    public PasswordConstraint getPasswordConstraint() {
+        return passwordConstraint;
     }
 }

@@ -37,37 +37,30 @@ public class RegistrationController extends AbstractController {
         if (appProperties.isBruteForceProtectionEnabled()) {
             Thread.sleep(appProperties.getBruteForceDelay());
         }
-        userService.addNewUser(userRegistrationDTO);
+        userService.addUser(userRegistrationDTO.getUser());
 
         return messageOK("user.registration.success");
     }
 
-    @RequestMapping(value = "/check-available-email", method = POST)
-    public ResponseEntity checkAvailableEmail(@RequestBody UserFindDTO userFindDTO) throws SearchFieldsAreEmpty {
+    @RequestMapping(value = "/check-available", method = POST)
+    public ResponseEntity checkAvailable(@Validated @RequestBody UserFindDTO userFindDTO) throws SearchFieldsAreEmpty {
+        String login = userFindDTO.getLogin();
         String email = userFindDTO.getEmail();
 
+        if (login != null) {
+            try {
+                userService.findUserByLogin(login);
+                return messageOK("user.login.isNotAvailable");
+            } catch (UserNotFoundException e) {
+                return messageOK("user.login.isAvailable");
+            }
+        }
         if (email != null) {
             try {
                 userService.findUserByEmail(email);
                 return messageOK("user.email.isNotAvailable");
             } catch (UserNotFoundException e) {
                 return messageOK("user.email.isAvailable");
-            }
-        }
-
-        throw new SearchFieldsAreEmpty();
-    }
-
-    @RequestMapping(value = "/check-available-login", method = POST)
-    public ResponseEntity checkAvailableLogin(@RequestBody UserFindDTO userFindDTO) throws SearchFieldsAreEmpty {
-        String login = userFindDTO.getLogin();
-
-        if (login != null) {
-            try {
-                userService.findByLoginOrEmail(login, login);
-                return messageOK("user.login.isNotAvailable");
-            } catch (UserNotFoundException e) {
-                return messageOK("user.login.isAvailable");
             }
         }
 

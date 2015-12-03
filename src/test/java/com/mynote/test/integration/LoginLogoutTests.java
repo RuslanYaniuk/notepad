@@ -5,10 +5,12 @@ import com.mynote.dto.user.UserLoginDTO;
 import com.mynote.test.unit.controllers.AbstractSecuredControllerTest;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.web.servlet.MvcResult;
 
+import static com.mynote.test.utils.UserLoginDTOTestUtils.createAdminLoginDTO;
+import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -18,26 +20,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class LoginLogoutTests extends AbstractSecuredControllerTest {
 
     @Before
-    @Override
     public void setup() throws Exception {
-        super.setup();
-
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
     }
 
     @Test
     public void logout_LoggedInUser_LoggedOutSuccess() throws Exception {
-        UserLoginDTO admin = createUserLoginDTOForAdmin();
+        UserLoginDTO admin = createAdminLoginDTO();
 
         loginUser(csrfTokenDTO, admin).andExpect(status().isOk()).andReturn();
 
-        MvcResult result = mockMvc.perform(post("/api/logout")
+        mockMvc.perform(post("/api/logout")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
-                .andExpect(status().isOk()).andReturn();
-
-        checkReturnedMessageCode(result, "user.logout.success");
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.logout.success")));
 
         mockMvc.perform(get("/api/administration/list-all-users")
                 .session(session)
@@ -47,7 +45,7 @@ public class LoginLogoutTests extends AbstractSecuredControllerTest {
 
     @Test
     public void logout_LoggedOutUser_AccessDenied() throws Exception {
-        UserLoginDTO admin = createUserLoginDTOForAdmin();
+        UserLoginDTO admin = createAdminLoginDTO();
 
         loginUser(csrfTokenDTO, admin).andExpect(status().isOk()).andReturn();
 
@@ -56,17 +54,16 @@ public class LoginLogoutTests extends AbstractSecuredControllerTest {
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
                 .andExpect(status().isOk());
 
-        MvcResult result = mockMvc.perform(get("/api/administration/list-all-users")
+        mockMvc.perform(get("/api/administration/list-all-users")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
-                .andExpect(status().isUnauthorized()).andReturn();
-
-        checkReturnedMessageCode(result, Constants.SYSTEM_MESSAGE_CODE);
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath(MESSAGE_CODE, is(Constants.SYSTEM_MESSAGE_CODE)));
     }
 
     @Test
     public void logout_Anonymous_UserLoggedOut() throws Exception {
-        UserLoginDTO admin = createUserLoginDTOForAdmin();
+        UserLoginDTO admin = createAdminLoginDTO();
 
         loginUser(csrfTokenDTO, admin).andExpect(status().isOk()).andReturn();
 

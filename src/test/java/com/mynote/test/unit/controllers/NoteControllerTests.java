@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.io.IOException;
@@ -17,7 +16,7 @@ import java.util.concurrent.ExecutionException;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,24 +42,18 @@ public class NoteControllerTests extends AbstractControllerTest {
         noteCreateDTO.setSubject("Test subject");
         noteCreateDTO.setText("test text......");
 
-        MvcResult result = createNote(noteCreateDTO).andExpect(status().isOk()).andReturn();
-
-        NoteFindDTO noteFindDTO = jacksonObjectMapper
-                .readValue(result.getResponse().getContentAsString(), NoteFindDTO.class);
-
-        assertFalse(StringUtils.isBlank(noteFindDTO.getId()));
-
-        noteCreateDTO.setText(null);
-
-        createNote(noteCreateDTO).andExpect(status().isOk());
+        createNote(noteCreateDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", not(StringUtils.EMPTY)))
+                .andExpect(jsonPath("$.subject", is("Test subject")))
+                .andExpect(jsonPath("$.text", is("test text......")));
     }
 
     @Test
     public void createNote_BlankFieldsDTO_ExceptionThrown_400() throws Exception {
-        MvcResult result = createNote(new NoteCreateDTO())
-                .andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "NotBlank.noteCreateDTO.textOrSubject");
+        createNote(new NoteCreateDTO())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotBlank.noteCreateDTO.textOrSubject")));
     }
 
     @Test
@@ -69,24 +62,22 @@ public class NoteControllerTests extends AbstractControllerTest {
 
         noteFindDTO.setId("1");
 
-        MvcResult result = mockMvc.perform(delete("/api/note/delete")
+        mockMvc.perform(delete("/api/note/delete")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteFindDTO)))
-                .andExpect(status().isOk()).andReturn();
-
-        checkReturnedMessageCode(result, "note.delete.success");
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("note.delete.success")));
     }
 
     @Test
     public void deleteNote_NotExistentNoteId_ErrorReturned_400() throws Exception {
         NoteDeleteDTO noteDeleteDTO = new NoteDeleteDTO();
 
-        MvcResult result = mockMvc.perform(delete("/api/note/delete")
+        mockMvc.perform(delete("/api/note/delete")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteDeleteDTO)))
-                .andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "NotBlank.noteDeleteDTO.id");
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotBlank.noteDeleteDTO.id")));
     }
 
     @Test
@@ -97,12 +88,11 @@ public class NoteControllerTests extends AbstractControllerTest {
         noteUpdateDTO.setSubject("Updated subject");
         noteUpdateDTO.setText("Updated text");
 
-        MvcResult result = mockMvc.perform(post("/api/note/update")
+        mockMvc.perform(post("/api/note/update")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteUpdateDTO)))
-                .andExpect(status().isOk()).andReturn();
-
-        checkReturnedMessageCode(result, "note.update.success");
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("note.update.success")));
     }
 
     @Test
@@ -113,12 +103,11 @@ public class NoteControllerTests extends AbstractControllerTest {
         noteUpdateDTO.setSubject("Updated subject");
         noteUpdateDTO.setText("Updated text");
 
-        MvcResult result = mockMvc.perform(post("/api/note/update")
+        mockMvc.perform(post("/api/note/update")
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteUpdateDTO)))
-                .andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "NotBlank.noteUpdateDTO.id");
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotBlank.noteUpdateDTO.id")));
     }
 
     @Test
@@ -127,7 +116,8 @@ public class NoteControllerTests extends AbstractControllerTest {
 
         note.setId("3");
 
-        findNote(note).andExpect(status().isOk())
+        findNote(note)
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].subject", is("subject 3 goes here. Third")));
     }
 
@@ -137,7 +127,8 @@ public class NoteControllerTests extends AbstractControllerTest {
 
         noteFindDTO.setSubject("Second 2");
 
-        findNote(noteFindDTO).andExpect(status().isOk())
+        findNote(noteFindDTO)
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].subject", is("subject 2 goes here. Second")));
     }
 
@@ -147,7 +138,8 @@ public class NoteControllerTests extends AbstractControllerTest {
 
         noteFindDTO.setText("2 dog");
 
-        findNote(noteFindDTO).andExpect(status().isOk())
+        findNote(noteFindDTO)
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].text", is("text2. Dog")));
     }
 
@@ -155,9 +147,9 @@ public class NoteControllerTests extends AbstractControllerTest {
     public void findNotes_EmptyFieldsDTO_400() throws Exception {
         NoteFindDTO noteFindDTO = new NoteFindDTO();
 
-        MvcResult result = findNote(noteFindDTO).andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "NotBlank.noteFindDTO.idOrSubjectOrText");
+        findNote(noteFindDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("NotBlank.noteFindDTO.idOrSubjectOrText")));
     }
 
     private ResultActions createNote(NoteCreateDTO noteCreateDTO) throws Exception {

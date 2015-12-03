@@ -4,13 +4,14 @@ import com.mynote.dto.user.UserFindDTO;
 import com.mynote.dto.user.UserRegistrationDTO;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
-import static com.mynote.test.utils.UserDtoTestUtil.createSimpleUserRegistrationDTO;
+import static com.mynote.test.utils.UserTestUtils.createNonExistentUser;
+import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -19,289 +20,306 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 public class RegistrationControllerTests extends AbstractControllerTest {
 
-    @Before
-    @Override
-    public void setup() throws Exception {
-        super.setup();
+    // Error codes
+    public static final String EMAIL_FORMAT_CODE = "Email.userRegistrationDTO.emailConstraint.email";
+    public static final String EMAIL_LENGTH_CODE = "Length.userRegistrationDTO.emailConstraint.email";
+    public static final String EMAIL_BLANK_CODE = "NotBlank.userRegistrationDTO.emailConstraint.email";
 
+    public static final String PASSWORD_NOT_BLANK_CODE = "NotBlank.userRegistrationDTO.passwordConstraint.password";
+    public static final String PASSWORD_PATTERN_CODE = "Password.userRegistrationDTO.passwordConstraint.password";
+    public static final String PASSWORD_LENGTH_CODE = "Length.userRegistrationDTO.passwordConstraint.password";
+
+    public static final String FIRST_NAME_NOT_BLANK_CODE = "NotBlank.userRegistrationDTO.firstNameConstraint.firstName";
+    public static final String FIRST_NAME_SAFE_HTML_CODE = "SafeHtml.userRegistrationDTO.firstNameConstraint.firstName";
+    public static final String FIRST_NAME_LENGTH_CODE = "Length.userRegistrationDTO.firstNameConstraint.firstName";
+
+    public static final String LAST_NAME_NOT_BLANK_CODE = "NotBlank.userRegistrationDTO.lastNameConstraint.lastName";
+    public static final String LAST_NAME_SAFE_HTML_CODE = "SafeHtml.userRegistrationDTO.lastNameConstraint.lastName";
+    public static final String LAST_NAME_LENGTH_CODE = "Length.userRegistrationDTO.lastNameConstraint.lastName";
+
+    public static final String LOGIN_NOT_BLANK_CODE = "NotBlank.userRegistrationDTO.loginConstraint.login";
+    public static final String LOGIN_PATTERN_CODE = "Pattern.userRegistrationDTO.loginConstraint.login";
+    public static final String LOGIN_LENGTH_CODE = "Length.userRegistrationDTO.loginConstraint.login";
+
+    @Before
+    public void setup() throws Exception {
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
     }
 
     @Test
     public void registerNewUser_ValidUserDetails_RegistrationSuccess() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-
-        MvcResult result = registerNewUser(userRegistrationDTO).andExpect(status().isOk()).andReturn();
-        checkReturnedMessageCode(result, "user.registration.success");
-    }
-
-    @Test
-    public void registerNewUser_EmailInUpperCase_RegistrationSuccess() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-
-        userRegistrationDTO.setEmail("UPPERCASE@EMAIL.COM");
-
-        MvcResult result = registerNewUser(userRegistrationDTO).andExpect(status().isOk()).andReturn();
-        checkReturnedMessageCode(result, "user.registration.success");
-    }
-
-    @Test
-    public void registerNewUser_LoginInUpperCase_RegistrationSuccess() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-
-        userRegistrationDTO.setLogin("DoorsAREInsAne_1967");
-
-        MvcResult result = registerNewUser(userRegistrationDTO).andExpect(status().isOk()).andReturn();
-        checkReturnedMessageCode(result, "user.registration.success");
+        registerNewUser(createRegistrationDTO())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.registration.success")));
     }
 
     @Test
     public void registerNewUser_BlankOrEmptyEmail_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setEmail("");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_BLANK_CODE)));
 
         userRegistrationDTO.setEmail(" ");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_BLANK_CODE)));
 
         userRegistrationDTO.setEmail(null);
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_BLANK_CODE)));
     }
 
     @Test
     public void registerNewUser_NotValidEmailFormat_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setEmail("email98WithoutAtSymbol");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
 
         userRegistrationDTO.setEmail("email78WithoutDNSName@");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
 
         userRegistrationDTO.setEmail("@NoAddress8");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
 
         userRegistrationDTO.setEmail("emailWithoutDomain@somewhere.");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
 
         userRegistrationDTO.setEmail("emai98lDomainLessThan2Characters@somewhere.a");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
 
         userRegistrationDTO.setEmail("@NoAddress.com");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
 
         userRegistrationDTO.setEmail("@NoAddress.c");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
 
         userRegistrationDTO.setEmail("email33@NoAddress.789");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
 
         userRegistrationDTO.setEmail("адресс@пошта.ком");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
     }
 
     @Test
     public void registerNewUser_BlankOrEmptyPassword_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setPassword("");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_NOT_BLANK_CODE)));
 
         userRegistrationDTO.setPassword("  ");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_NOT_BLANK_CODE)));
 
         userRegistrationDTO.setPassword(null);
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_NOT_BLANK_CODE)));
     }
 
     @Test
     public void registerNewUser_PasswordDoesNotMuchComplexity_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setPassword("alllowercas4e#");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Password.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_PATTERN_CODE)));
 
         userRegistrationDTO.setPassword("!!ALLUPPERCASE88");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Password.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_PATTERN_CODE)));
 
         userRegistrationDTO.setPassword("nospecialSymboLs123");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Password.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_PATTERN_CODE)));
 
         userRegistrationDTO.setPassword("!#@#nodigitS");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Password.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_PATTERN_CODE)));
 
         userRegistrationDTO.setPassword("noDigitS");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Password.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_PATTERN_CODE)));
 
         userRegistrationDTO.setPassword("!#@#456456");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Password.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_PATTERN_CODE)));
 
         userRegistrationDTO.setPassword("юнікод@#$234");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Password.userRegistrationDTO.password");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_PATTERN_CODE)));
     }
 
     @Test
     public void registerNewUser_BlankOrEmptyFirstName_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setFirstName("");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.firstName");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(FIRST_NAME_NOT_BLANK_CODE)));
 
         userRegistrationDTO.setFirstName(" ");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.firstName");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(FIRST_NAME_NOT_BLANK_CODE)));
 
         userRegistrationDTO.setFirstName(null);
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.firstName");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(FIRST_NAME_NOT_BLANK_CODE)));
     }
 
     @Test
     public void registerNewUser_BlankOrEmptyLastName_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setLastName("");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.lastName");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LAST_NAME_NOT_BLANK_CODE)));
 
         userRegistrationDTO.setLastName("  ");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.lastName");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LAST_NAME_NOT_BLANK_CODE)));
 
         userRegistrationDTO.setLastName(null);
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.lastName");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LAST_NAME_NOT_BLANK_CODE)));
     }
 
     @Test
     public void registerNewUser_BlankOrEmptyLogin_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setLogin("");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.login");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LOGIN_NOT_BLANK_CODE)));
 
         userRegistrationDTO.setLogin("  ");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.login");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LOGIN_NOT_BLANK_CODE)));
 
         userRegistrationDTO.setLogin(null);
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "NotBlank.userRegistrationDTO.login");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LOGIN_NOT_BLANK_CODE)));
     }
 
     @Test
     public void registerNewUser_LoginWithSpecialCharacters_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setLogin("@Login!!IsNotValid132");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Pattern.userRegistrationDTO.login");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LOGIN_PATTERN_CODE)));
     }
 
     @Test
     public void registerNewUser_LoginWithNewLineCharacter_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setLogin("LoginSeems_valid123\n" +
                 "newline");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Pattern.userRegistrationDTO.login");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LOGIN_PATTERN_CODE)));
     }
 
     @Test
     public void registerNewUser_LoginSpaceInside_BadRequestReturned() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setLogin("LoginSeems valid123");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Pattern.userRegistrationDTO.login");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LOGIN_PATTERN_CODE)));
     }
 
     @Test
     public void registerNewUser_AlreadyTakenEmail_BadRequestReturned() throws Exception {
-        UserRegistrationDTO registrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO registrationDTO = createRegistrationDTO();
 
         registerNewUser(registrationDTO).andExpect(status().isOk());
 
         registrationDTO.setLogin("differentLogin");
 
-        result = registerNewUser(registrationDTO).andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "user.registration.error.alreadyTakenEmail");
+        registerNewUser(registrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.registration.error.alreadyTakenEmail")));
     }
 
     @Test
     public void registerNewUser_AlreadyTakenLogin_BadRequestReturned() throws Exception {
-        UserRegistrationDTO registrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
-        String login = registrationDTO.getLogin().toLowerCase();
+        UserRegistrationDTO registrationDTO = createRegistrationDTO();
 
         registerNewUser(registrationDTO).andExpect(status().isOk());
 
         registrationDTO.setEmail("different@email.com");
 
-        result = registerNewUser(registrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "user.registration.error.alreadyTakenLogin");
+        registerNewUser(registrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.registration.error.alreadyTakenLogin")));
     }
 
     @Test
     public void registerNewUser_LoginLongerThan191Characters_BadRequestReturned() throws Exception {
-        UserRegistrationDTO registrationDTO = createSimpleUserRegistrationDTO();
+        UserRegistrationDTO registrationDTO = createRegistrationDTO();
         StringBuilder sb = new StringBuilder();
-        MvcResult result;
 
         for (int i = 0; i < 192; i++) {
             sb.append("a");
         }
         registrationDTO.setLogin(sb.toString());
 
-        result = registerNewUser(registrationDTO).andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "Length.userRegistrationDTO.login");
+        registerNewUser(registrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LOGIN_LENGTH_CODE)));
     }
 
     @Test
     public void registerNewUser_EmailLongerThan191Characters_BadRequestReturned() throws Exception {
-        UserRegistrationDTO registrationDTO = createSimpleUserRegistrationDTO();
+        UserRegistrationDTO registrationDTO = createRegistrationDTO();
         StringBuilder sb = new StringBuilder();
-        MvcResult result;
 
         for (int i = 0; i < 64; i++) {
             sb.append("a");
@@ -314,52 +332,48 @@ public class RegistrationControllerTests extends AbstractControllerTest {
 
         registrationDTO.setEmail(sb.toString());
 
-        result = registerNewUser(registrationDTO).andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "Length.userRegistrationDTO.email");
+        registerNewUser(registrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_LENGTH_CODE)));
     }
 
     @Test
     public void registerNewUser_EmailLessThan5Characters_BadRequestReturned() throws Exception {
-        UserRegistrationDTO registrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO registrationDTO = createRegistrationDTO();
 
         registrationDTO.setEmail("a@b");
 
-        result = registerNewUser(registrationDTO).andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "Length.userRegistrationDTO.email");
+        registerNewUser(registrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_LENGTH_CODE)));
     }
 
     @Test
     public void registerNewUser_LoginLessThan8Characters_BadRequestReturned() throws Exception {
-        UserRegistrationDTO registrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO registrationDTO = createRegistrationDTO();
 
         registrationDTO.setLogin("1234567");
 
-        result = registerNewUser(registrationDTO).andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "Length.userRegistrationDTO.login");
+        registerNewUser(registrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LOGIN_LENGTH_CODE)));
     }
 
     @Test
     public void registerNewUser_PasswordLessThan8Characters_BadRequestReturned() throws Exception {
-        UserRegistrationDTO registrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO registrationDTO = createRegistrationDTO();
 
         registrationDTO.setPassword("1234567");
 
-        result = registerNewUser(registrationDTO).andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "Length.userRegistrationDTO.password");
+        registerNewUser(registrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(PASSWORD_LENGTH_CODE)));
     }
 
     @Test
     public void registerNewUser_FirstNameMoreThan255Character_BadRequestReturned() throws Exception {
-        UserRegistrationDTO registrationDTO = createSimpleUserRegistrationDTO();
+        UserRegistrationDTO registrationDTO = createRegistrationDTO();
         StringBuilder sb = new StringBuilder();
-        MvcResult result;
 
         for (int i = 0; i < 256; i++) {
             sb.append("a");
@@ -367,16 +381,15 @@ public class RegistrationControllerTests extends AbstractControllerTest {
 
         registrationDTO.setFirstName(sb.toString());
 
-        result = registerNewUser(registrationDTO).andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "Length.userRegistrationDTO.firstName");
+        registerNewUser(registrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(FIRST_NAME_LENGTH_CODE)));
     }
 
     @Test
     public void registerNewUser_LastNameMoreThan255Character_BadRequestReturned() throws Exception {
-        UserRegistrationDTO registrationDTO = createSimpleUserRegistrationDTO();
+        UserRegistrationDTO registrationDTO = createRegistrationDTO();
         StringBuilder sb = new StringBuilder();
-        MvcResult result;
 
         for (int i = 0; i < 256; i++) {
             sb.append("a");
@@ -384,34 +397,37 @@ public class RegistrationControllerTests extends AbstractControllerTest {
 
         registrationDTO.setLastName(sb.toString());
 
-        result = registerNewUser(registrationDTO).andExpect(status().isBadRequest()).andReturn();
-
-        checkReturnedMessageCode(result, "Length.userRegistrationDTO.lastName");
+        registerNewUser(registrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LAST_NAME_LENGTH_CODE)));
     }
 
     @Test
     public void registerNewUser_NotHtmlSafeInput_BadRequest() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
-        MvcResult result;
+        UserRegistrationDTO userRegistrationDTO = createRegistrationDTO();
 
         userRegistrationDTO.setEmail("<script>alert('I can steal cookies')</script>@mail.com");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Email.userRegistrationDTO.email");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(EMAIL_FORMAT_CODE)));
 
-        userRegistrationDTO = createSimpleUserRegistrationDTO();
+        userRegistrationDTO = createRegistrationDTO();
         userRegistrationDTO.setLogin("<script>alert('I can steal cookies')</script>");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "Pattern.userRegistrationDTO.login");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LOGIN_PATTERN_CODE)));
 
-        userRegistrationDTO = createSimpleUserRegistrationDTO();
+        userRegistrationDTO = createRegistrationDTO();
         userRegistrationDTO.setFirstName("<script>alert('I can steal cookies')</script>");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "SafeHtml.userRegistrationDTO.firstName");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(FIRST_NAME_SAFE_HTML_CODE)));
 
-        userRegistrationDTO = createSimpleUserRegistrationDTO();
+        userRegistrationDTO = createRegistrationDTO();
         userRegistrationDTO.setLastName("<script>alert('I can steal cookies')</script>");
-        result = registerNewUser(userRegistrationDTO).andExpect(status().isBadRequest()).andReturn();
-        checkReturnedMessageCode(result, "SafeHtml.userRegistrationDTO.lastName");
+        registerNewUser(userRegistrationDTO)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath(MESSAGE_CODE, is(LAST_NAME_SAFE_HTML_CODE)));
     }
 
     @Test
@@ -420,9 +436,9 @@ public class RegistrationControllerTests extends AbstractControllerTest {
 
         userFindDTO.setEmail("not@exist.com");
 
-        MvcResult result = checkAvailableEmail(userFindDTO).andExpect(status().isOk()).andReturn();
-
-        checkReturnedMessageCode(result, "user.email.isAvailable");
+        checkAvailable(userFindDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.email.isAvailable")));
     }
 
     @Test
@@ -431,9 +447,9 @@ public class RegistrationControllerTests extends AbstractControllerTest {
 
         userFindDTO.setEmail("user2@email.com");
 
-        MvcResult result = checkAvailableEmail(userFindDTO).andExpect(status().isOk()).andReturn();
-
-        checkReturnedMessageCode(result, "user.email.isNotAvailable");
+        checkAvailable(userFindDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.email.isNotAvailable")));
     }
 
     @Test
@@ -442,9 +458,9 @@ public class RegistrationControllerTests extends AbstractControllerTest {
 
         userFindDTO.setLogin("notExist");
 
-        MvcResult result = checkAvailableLogin(userFindDTO).andExpect(status().isOk()).andReturn();
-
-        checkReturnedMessageCode(result, "user.login.isAvailable");
+        checkAvailable(userFindDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.isAvailable")));
     }
 
     @Test
@@ -453,9 +469,9 @@ public class RegistrationControllerTests extends AbstractControllerTest {
 
         userFindDTO.setLogin("user2");
 
-        MvcResult result = checkAvailableLogin(userFindDTO).andExpect(status().isOk()).andReturn();
-
-        checkReturnedMessageCode(result, "user.login.isNotAvailable");
+        checkAvailable(userFindDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.isNotAvailable")));
     }
 
     private ResultActions registerNewUser(UserRegistrationDTO userRegistrationDTO) throws Exception {
@@ -465,17 +481,18 @@ public class RegistrationControllerTests extends AbstractControllerTest {
         );
     }
 
-    private ResultActions checkAvailableEmail(UserFindDTO userFindDTO) throws Exception {
-        return mockMvc.perform(post("/api/registration/check-available-email")
+    private ResultActions checkAvailable(UserFindDTO userFindDTO) throws Exception {
+        return mockMvc.perform(post("/api/registration/check-available")
                         .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                         .content(jacksonObjectMapper.writeValueAsString(userFindDTO))
         );
     }
 
-    private ResultActions checkAvailableLogin(UserFindDTO userFindDTO) throws Exception {
-        return mockMvc.perform(post("/api/registration/check-available-login")
-                        .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
-                        .content(jacksonObjectMapper.writeValueAsString(userFindDTO))
-        );
+    private UserRegistrationDTO createRegistrationDTO() {
+        UserRegistrationDTO userRegistrationDTO = new UserRegistrationDTO();
+
+        userRegistrationDTO.setUser(createNonExistentUser());
+
+        return userRegistrationDTO;
     }
 }

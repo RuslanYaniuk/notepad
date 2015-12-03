@@ -1,11 +1,12 @@
 package com.mynote.controllers;
 
+import com.google.common.collect.Lists;
 import com.mynote.config.web.Constants;
 import com.mynote.dto.CsrfTokenDTO;
-import com.mynote.dto.user.UserRoleDTO;
-import com.mynote.utils.UserRoleDtoUtil;
+import com.mynote.models.UserRole;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -39,8 +41,7 @@ public class LoginController extends AbstractController {
     @RequestMapping(value = "/get-authorities", method = GET)
     public ResponseEntity getAuthorities(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserRoleDTO[] roleDTOs;
-        Collection authorities;
+        Collection<? extends GrantedAuthority> authorities;
 
         setCsrfCookies(httpServletRequest, httpServletResponse);
 
@@ -50,9 +51,13 @@ public class LoginController extends AbstractController {
             if (authorities.contains(Constants.ROLE_ADMIN) ||
                     authorities.contains(Constants.ROLE_USER) ||
                     authorities.contains(Constants.ROLE_ANONYMOUS)) {
-                roleDTOs = UserRoleDtoUtil.convertAuthorities(authentication.getAuthorities());
+                List<UserRole> roles = Lists.newArrayList();
 
-                return ok(roleDTOs);
+                for (GrantedAuthority grantedAuthority : authorities) {
+                    roles.add(new UserRole(grantedAuthority.getAuthority()));
+                }
+
+                return ok(roles);
             }
         }
 

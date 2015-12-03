@@ -1,12 +1,12 @@
 package com.mynote.test.unit.security;
 
+import com.mynote.config.web.Constants;
 import com.mynote.dto.user.UserRegistrationDTO;
 import com.mynote.test.unit.controllers.AbstractSecuredControllerTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
-import static com.mynote.test.utils.UserDtoTestUtil.createSimpleUserRegistrationDTO;
+import static com.mynote.test.utils.UserTestUtils.createNonExistentUser;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -19,10 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AnonymousAccessTests extends AbstractSecuredControllerTest {
 
     @Before
-    @Override
     public void setup() throws Exception {
-        super.setup();
-
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
     }
@@ -38,11 +35,14 @@ public class AnonymousAccessTests extends AbstractSecuredControllerTest {
 
     @Test
     public void registerNewUser_Anonymous_RegistrationSuccess() throws Exception {
-        UserRegistrationDTO userRegistrationDTO = createSimpleUserRegistrationDTO();
+        UserRegistrationDTO userRegistrationDTO = new UserRegistrationDTO();
+
+        userRegistrationDTO.setUser(createNonExistentUser());
+
         mockMvc.perform(put("/api/registration/register-new-user")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
-                .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
+                .contentType(Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(userRegistrationDTO))).andExpect(status().isOk());
     }
 

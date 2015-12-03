@@ -1,11 +1,9 @@
 package com.mynote.controllers;
 
-import com.mynote.config.web.Constants;
-import com.mynote.dto.user.UserDTO;
+import com.mynote.dto.user.UserInfoDTO;
 import com.mynote.exceptions.UserNotFoundException;
 import com.mynote.models.User;
 import com.mynote.services.UserService;
-import com.mynote.utils.UserRoleDtoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,14 +27,10 @@ public class UserController extends AbstractController {
     private UserService userService;
 
     @RequestMapping(value = "/get-info", method = GET)
-    public ResponseEntity getUserInfo(HttpSession httpSession) throws IOException, UserNotFoundException {
+    public ResponseEntity getInfo(HttpSession httpSession) throws IOException, UserNotFoundException {
         Long userId = (Long) httpSession.getAttribute(SESSION_ATTRIBUTE_USER_ID);
         User user = userService.findUserById(userId);
-        UserDTO userDTO = new UserDTO(user);
-
-        if (user.getRoles().contains(Constants.ROLE_ADMIN)) {
-            userDTO.setUserRoleDTOs(UserRoleDtoUtil.convert(user.getRoles()));
-        }
+        UserInfoDTO userDTO = new UserInfoDTO(user);
 
         return ok(userDTO);
     }
