@@ -31,7 +31,7 @@ public class LoginLogoutTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, admin).andExpect(status().isOk()).andReturn();
 
-        mockMvc.perform(post("/api/logout")
+        mockMvc.perform(post("/api/auth/logout")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
                 .andExpect(status().isOk())
@@ -49,7 +49,7 @@ public class LoginLogoutTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, admin).andExpect(status().isOk()).andReturn();
 
-        mockMvc.perform(post("/api/logout")
+        mockMvc.perform(post("/api/auth/logout")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
                 .andExpect(status().isOk());
@@ -59,17 +59,5 @@ public class LoginLogoutTests extends AbstractSecuredControllerTest {
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath(MESSAGE_CODE, is(Constants.SYSTEM_MESSAGE_CODE)));
-    }
-
-    @Test
-    public void logout_Anonymous_UserLoggedOut() throws Exception {
-        UserLoginDTO admin = createAdminLoginDTO();
-
-        loginUser(csrfTokenDTO, admin).andExpect(status().isOk()).andReturn();
-
-        mockMvc.perform(get("/api/logout")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
-                .andExpect(status().isOk()).andReturn();
     }
 }

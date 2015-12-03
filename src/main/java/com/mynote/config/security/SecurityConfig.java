@@ -32,8 +32,8 @@ import static com.mynote.config.web.Constants.APPLICATION_ENCODING;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String LOGIN_URL = "/api/login";
-    public static final String LOGOUT_URL = "/api/logout";
+    private static final String LOGIN_URL = "/api/auth/login";
+    public static final String LOGOUT_URL = "/api/auth/logout";
 
     @Autowired
     private AccessDeniedHandler customAccessDeniedHandler;
@@ -77,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(
                         "/",
-                        "/api/login/*",
+                        "/api/auth/*",
                         "/api/registration/*",
                         LOGOUT_URL).permitAll()
 

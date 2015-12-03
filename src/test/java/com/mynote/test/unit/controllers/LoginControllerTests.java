@@ -37,7 +37,7 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
     @Test
     public void getToken_NotAuthenticatedUsers_TokenReturned() throws Exception {
-        mockMvc.perform(get("/api/login/get-token"))
+        mockMvc.perform(get("/api/auth/get-token"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.headerName", is("X-CSRF-TOKEN")))
                 .andExpect(jsonPath("$.headerValue", not(StringUtils.EMPTY)));
@@ -160,7 +160,7 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
     }
 
     private MvcResult getAuthorities() throws Exception {
-        return mockMvc.perform(get("/api/login/get-authorities")
+        return mockMvc.perform(get("/api/auth/get-authorities")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
                 .andExpect(status().isOk()).andReturn();

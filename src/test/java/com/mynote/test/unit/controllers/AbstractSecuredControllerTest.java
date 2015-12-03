@@ -40,7 +40,7 @@ public abstract class AbstractSecuredControllerTest extends AbstractControllerTe
     }
 
     protected CsrfTokenDTO getCsrfToken() throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/login/get-token"))
+        MvcResult result = mockMvc.perform(get("/api/auth/get-token"))
                 .andExpect(status().isOk()).andReturn();
 
         session = (MockHttpSession) result.getRequest().getSession();
@@ -49,7 +49,7 @@ public abstract class AbstractSecuredControllerTest extends AbstractControllerTe
     }
 
     protected ResultActions loginUser(CsrfTokenDTO csrfTokenDTO, UserLoginDTO userLoginDTO) throws Exception {
-        return mockMvc.perform(post("/api/login")
+        return mockMvc.perform(post("/api/auth/login")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
