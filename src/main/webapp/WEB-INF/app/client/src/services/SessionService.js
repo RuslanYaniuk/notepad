@@ -5,15 +5,13 @@
 (function (define) {
     "use strict";
 
-    var GET_AUTH_URL = "/api/login/get-authorities";
-
     define(function () {
 
-        var SessionService = function ($rootScope, $http, $q, userService, userRoleService) {
+        var SessionService = function ($rootScope, $http, $q, userService, userRoleService, authService) {
 
             var onGetAuthority = function () {
 
-                    return $http.get(GET_AUTH_URL)
+                    return authService.getAuth()
                         .then(
                         function onSuccess_getAuthority(response) {
                             var userRoles = response.data,
@@ -109,7 +107,13 @@
             }
         };
 
-        return ["$rootScope", "$http", "$q", "userService", "userRoleService", SessionService];
+        return [
+            "$rootScope",
+            "$http",
+            "$q",
+            "userService",
+            "userRoleService",
+            "authService", SessionService];
     })
 
 })(define);

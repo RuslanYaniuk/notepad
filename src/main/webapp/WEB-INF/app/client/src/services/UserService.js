@@ -10,7 +10,7 @@
         var UserService = function ($http) {
 
             var onGetUserInfo = function () {
-                return $http.get("/api/user/get-user-info")
+                return $http.get("/api/user/get-info")
             };
 
             return {

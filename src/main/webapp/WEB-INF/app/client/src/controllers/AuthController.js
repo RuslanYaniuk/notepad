@@ -25,7 +25,7 @@
                             .then(
                             function onSuccess_login(response) {
                                 sessionService.updateAccountDetails(response.data.userDTO);
-                                $rootScope.$broadcast('dispatchByRoles', response.data.userDTO.userRoleDTOs);
+                                $rootScope.$broadcast('dispatchByRoles', response.data.userDTO.userRoles);
                             },
 
                             function onFault_login(response) {

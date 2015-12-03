@@ -6,10 +6,10 @@
     "use strict";
 
     define(function () {
-        var LOGIN_URL = "/api/login",
-            LOGOUT_URL = "/api/logout",
+        var LOGIN_URL = "/api/auth/login",
+            LOGOUT_URL = "/api/auth/logout",
 
-            GET_AUTH_URL = "/api/login/get-authorities";
+            GET_AUTH_URL = "/api/auth/get-authorities";
 
         var AuthService = function ($http) {
 
@@ -19,7 +19,7 @@
                         password: password
                     };
 
-                    return $http.get(GET_AUTH_URL)
+                    return onGetAuth()
                         .then(
                         function onSuccess_getAuthority() {
                             return $http.post(LOGIN_URL, credentials);
@@ -28,9 +28,14 @@
 
                 logoutUser = function () {
                     return $http.post(LOGOUT_URL);
+                },
+
+                onGetAuth = function () {
+                    return $http.get(GET_AUTH_URL);
                 };
 
             return {
+                getAuth: onGetAuth,
                 login: loginUser,
                 logout: logoutUser
             }
