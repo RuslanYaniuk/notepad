@@ -10,7 +10,15 @@ import com.mynote.models.Note;
 public abstract class AbstractNoteDTO {
 
     @JsonIgnore
-    protected Note note = new Note();
+    protected Note note;
+
+    public AbstractNoteDTO() {
+        this.note = new Note();
+    }
+
+    public AbstractNoteDTO(Note note) {
+        this.note = note;
+    }
 
     public Note getNote() {
         return note;

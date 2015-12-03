@@ -27,7 +27,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  */
 @RestController
 @RequestMapping(value = "/api/login")
-public class LoginController extends AbstractController {
+public class AuthController extends AbstractController {
 
     public static final String XSRF_TOKEN_NAME = "XSRF-TOKEN";
 
