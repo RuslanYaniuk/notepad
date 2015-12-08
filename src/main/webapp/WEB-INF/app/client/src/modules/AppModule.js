@@ -6,15 +6,17 @@
     "use strict";
 
     var dependencies = [
-        "controllers/AppController"
+        "controllers/AppController",
+        "controllers/NoteController"
     ];
 
-    define(dependencies, function (AppController) {
+    define(dependencies, function (AppController, NoteController) {
         var moduleName = "mynote.App";
 
         var mod = angular.module(moduleName, [])
 
-            .controller('AppController', AppController);
+            .controller('AppController', AppController)
+            .controller('NoteController', NoteController);
 
         /*mod.directive('note', function factory() {
          var directiveDefinitionObject = {

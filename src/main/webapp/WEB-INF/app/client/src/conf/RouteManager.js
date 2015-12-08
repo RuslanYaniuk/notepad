@@ -16,7 +16,6 @@
                 .state('index', {
                     url: "/",
                     views: {
-                        "menu": {templateUrl: "assets/views/index/index.menu.html"},
                         "body": {templateUrl: "assets/views/index/index.body.html"}
                     },
                     permissions: ["*"]
@@ -26,7 +25,6 @@
                 .state('login', {
                     url: "/login",
                     views: {
-                        "menu": {templateUrl: "assets/views/index/index.menu.html"},
                         "body": {templateUrl: "assets/views/login/login.body.html"}
                     },
                     permissions: ["*"]
@@ -36,7 +34,6 @@
                 .state('user-registration', {
                     url: "/user-registration",
                     views: {
-                        "menu": {templateUrl: "assets/views/index/index.menu.html"},
                         "body": {templateUrl: "assets/views/registration/user-registration.body.html"}
                     },
                     permissions: ["*"]
@@ -46,7 +43,6 @@
                 .state('admin-page', {
                     url: "/admin-page",
                     views: {
-                        "menu": {templateUrl: "assets/views/index/index.menu.html"},
                         "body": {templateUrl: "assets/views/admin/admin.body.html"},
                         "side-menu": {templateUrl: "assets/views/admin/admin.side-menu.html"}
                     },
@@ -78,8 +74,10 @@
                 .state('application', {
                     url: "/app",
                     views: {
-                        "menu": {templateUrl: "assets/views/index/index.menu.html"},
-                        "body": {templateUrl: "assets/views/app/app.body.html"}
+                        "main-toolbar-left-section": {templateUrl: "assets/views/app/main-toolbar/left-section.html"},
+                        "main-toolbar-middle-section": {templateUrl: "assets/views/app/main-toolbar/middle-section.html"},
+                        "body": {templateUrl: "assets/views/app/app.body.html"},
+                        "side-menu": {templateUrl: "assets/views/app/note.side-nav.html"}
                     },
                     permissions: ["ROLE_USER"]
                 });

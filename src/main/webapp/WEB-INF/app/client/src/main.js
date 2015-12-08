@@ -33,7 +33,6 @@
                     $mdThemingProvider.theme('default')
                         .accentPalette('orange')
                         .primaryPalette('teal')
-
                         .warnPalette('red');
                 })
 

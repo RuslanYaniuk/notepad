@@ -1,1 +1,58 @@
-<div>Body of the app</div>
+<div layout="column">
+
+  <div flex id="note-container" layout="column" layout-align="start center">
+
+
+
+    <!--<md-card style="width: 400px;" class="md-padding">
+
+      <div layout="row">
+        <md-input-container class="md-block" flex>
+          <label style="visibility: hidden">Subject</label>
+          <input>
+        </md-input-container>
+
+        <md-menu ng-controller="AuthController" ng-show="logged" class="ng-hide">
+          <md-button class="md-icon-button" ng-click="$mdOpenMenu($event)">
+            <md-icon class="material-icons md-light">menu</md-icon>
+          </md-button>
+
+          <md-menu-content width="3">
+            <md-menu-item>
+              <md-button>
+                <md-icon class="material-icons">edit</md-icon>
+                Edit
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button>
+                <md-icon class="material-icons">delete</md-icon>
+                Delete
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+
+      </div>
+
+      <div style="max-height: 300px; overflow: auto">
+        <md-input-container md-no-float class="md-block">
+          <label style="visibility: hidden">Text...</label>
+          <textarea disabled columns="1" rows="5">This is what i need</textarea>
+        </md-input-container>
+      </div>
+
+      <md-card-actions layout="row" layout-align="end center">
+        <md-button style="visibility: hidden" class="md-raised md-primary">Save</md-button>
+        <span class="md-padding">21.2.2015</span>
+      </md-card-actions>
+    </md-card>-->
+
+  </div>
+</div>
+
+<div ng-controller="NoteController" style="position: fixed; top: 70px; left: 75%">
+  <md-button ng-click="addNote()" class="md-fab md-primary md-accent">
+    <md-icon class="material-icons">add</md-icon>
+  </md-button>
+</div>

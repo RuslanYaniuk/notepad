@@ -1,0 +1,37 @@
+
+<md-dialog style="width: 400px;" class="md-padding" ng-controller="NoteController" aria-label="List dialog">
+  <md-dialog-content>
+
+    <fieldset class="standard">
+      <legend>Search in</legend>
+      <div layout="column" layout-wrap>
+        <div flex="50">
+          <md-checkbox ng-model="data.cb1" aria-label="Checkbox 1">
+            Subject
+          </md-checkbox>
+        </div>
+
+        <div flex="50">
+          <md-checkbox aria-label="Disabled checkbox" ng-model="data.cb3">
+            Text
+          </md-checkbox>
+        </div>
+        <div flex="50">
+          <md-checkbox aria-label="Disabled checked checkbox" ng-model="data.cb4" ng-init="data.cb4=true">
+            Date
+          </md-checkbox>
+        </div>
+        <div flex="50">
+          <md-checkbox md-no-ink aria-label="Checkbox No Ink" ng-model="data.cb5">
+            Label
+          </md-checkbox>
+        </div>
+      </div>
+      </fieldset>
+  </md-dialog-content>
+
+  <div class="md-actions">
+    <md-button ng-click="closeAddNoteDialog()" class="md-primary">Cancel</md-button>
+    <md-button class="md-raised md-primary">Apply</md-button>
+  </div>
+</md-dialog>

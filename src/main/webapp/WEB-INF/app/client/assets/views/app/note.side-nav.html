@@ -1,0 +1,36 @@
+<section id="side-menu" layout="row" ng-cloak ng-controller="NoteController">
+
+  <md-sidenav md-component-id="note-side-nav" class="md-sidenav-left md-whiteframe-z2" md-component-id="left">
+
+    <md-toolbar>
+      <div layout="row" layout-align="space-between center">
+        <h1 class="md-toolbar-tools">NotePad Online</h1>
+
+        <md-button ng-click="closeNoteSidenav()" class="md-icon-button" style="margin-right: 20px">
+          <md-icon class="material-icons">chevron_left</md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+
+    <md-content>
+      <md-menu-content>
+
+        <md-menu-item>
+          <md-button ng-click="showSearchOptionsDialog()">
+            <md-icon class="material-icons">search</md-icon>
+            Search options
+          </md-button>
+        </md-menu-item>
+
+        <md-menu-item>
+          <md-button ui-sref="admin-page.statistic">
+            <md-icon class="material-icons">note_add</md-icon>
+            Manage notebooks
+          </md-button>
+        </md-menu-item>
+
+      </md-menu-content>
+    </md-content>
+  </md-sidenav>
+
+</section>

@@ -1,0 +1,38 @@
+
+
+<md-dialog style="width: 400px;" ng-controller="NoteController" aria-label="List dialog">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>Add a note</h2>
+      <span flex></span>
+      <md-button class="md-icon-button" ng-click="closeAddNoteDialog()">
+        <md-icon class="material-icons">close</md-icon>
+      </md-button>
+    </div>
+  </md-toolbar>
+
+ <div class="md-padding" >
+   <md-dialog-content>
+
+     <md-input-container class="md-block">
+       <label>Subject</label>
+       <input>
+     </md-input-container>
+
+     <div style="max-height: 300px; overflow: auto">
+       <md-input-container md-no-float class="md-block">
+         <label>Text...</label>
+         <textarea columns="1" rows="5"></textarea>
+       </md-input-container>
+     </div>
+
+   </md-dialog-content>
+
+   <div class="md-actions">
+     <md-button ng-click="closeAddNoteDialog()" class="md-primary">Cancel</md-button>
+     <md-button class="md-raised md-primary">Save</md-button>
+   </div>
+
+ </div>
+
+</md-dialog>

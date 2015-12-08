@@ -5,20 +5,85 @@
 <meta name="keywords" content="Note,documents,online,free">
 <title>Welcome to MyNote</title>
 
+<!--<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic'>-->
 <link rel="stylesheet" href="assets/vendor/angular-material/angular-material.css">
-<link rel='stylesheet' href='assets/vendor/angular-loading-bar/loading-bar.css' media='all'/>
 <link rel="stylesheet" href="assets/vendor/angular-material-data-table/md-data-table.min.css"/>
+<link rel='stylesheet' href='assets/vendor/angular-loading-bar/loading-bar.css' media='all'/>
 <link rel="stylesheet" href="assets/css/main.css"/>
 
-<body ng-controller="Dispatcher">
 
+<body class="layout-row" ng-controller="Dispatcher">
+<div ui-view="side-menu"></div>
 
-<div id="application-view" ng-controller="SessionController" ng-init="updateAccountDetails()" layout="row" layout-fill>
-  <div ui-view="side-menu" flex="none"></div>
+<div class="body-container layout-column flex" ng-controller="SessionController" ng-init="updateAccountDetails()">
+  <md-toolbar class="fixed-on-top md-whiteframe-1dp">
+    <div class="md-toolbar-tools" layout="row" lyout-align="space-between center">
+      <div ui-view="main-toolbar-left-section" flex layout="row" layout-align="start center"></div>
 
-  <div id="index-content" class="index-content" layout="column" flex>
-    <md-toolbar ui-view="menu" class="md-whiteframe-1dp" ng-cloak></md-toolbar>
-    <md-content ui-view="body" flex style="background-color: #F5F5F5" layout="column" layout-align="start center"></md-content>
+      <div ui-view="main-toolbar-middle-section" flex layout="row" layout-align="center center"></div>
+
+      <div id="main-toolbar-right-section" flex layout="row">
+        <span flex></span>
+
+        <md-button id="toolbar-login-button" ng-hide="logged" aria-label="Login" ui-sref="login">Login</md-button>
+
+        <md-menu style="padding: 0;" ng-controller="AuthController" ng-show="logged" class="ng-hide">
+          <md-button id="user-menu-open-button" aria-label="Menu" class="md-icon-button" ng-click="$mdOpenMenu($event)">
+            <md-icon class="material-icons md-light">more_vert</md-icon>
+          </md-button>
+
+          <md-menu-content width="4">
+            <md-menu-item style="height: initial;">
+              <div layout="column" layout-align="center center" class="menu-trigger-button">
+                <md-icon class="md-default material-icons">account_circle</md-icon>
+                <p align="center" class="md-body-1" ng-bind="getUserEmail()"></p>
+              </div>
+            </md-menu-item>
+
+            <md-menu-divider></md-menu-divider>
+
+            <md-menu-item id="go-to-administration-button" ng-show="isAdminSession()">
+              <md-button ui-sref="admin-page">
+                <md-icon class="material-icons">dashboard</md-icon>
+                Administration page
+              </md-button>
+            </md-menu-item>
+
+            <md-menu-item>
+              <md-button>
+                <md-icon class="material-icons">settings</md-icon>
+                Account settings
+              </md-button>
+            </md-menu-item>
+
+            <md-menu-divider></md-menu-divider>
+
+            <md-menu-item>
+              <md-button id="user-menu-logout-button" ng-click="logout()">
+                <md-icon class="material-icons">exit_to_app</md-icon>
+                Logout
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+
+      </div>
+    </div>
+  </md-toolbar>
+  <md-toolbar class="toolbar-height-offset"></md-toolbar>
+
+  <div class="content flex layout-row" ui-view="body"></div>
+
+  <div class="footer">
+    <div class="md-whiteframe-1dp md-padding" style="background-color: white" layout="column"
+         layout-align="center center" layout-wrap="">
+      <div>
+        <md-button target="_blank">Terms of use</md-button>
+        <md-button target="_blank">Contact us</md-button>
+        <md-button target="_blank">About</md-button>
+      </div>
+      <span class="md-caption">Name corp. All rights reserved.  Version 1.0.1</span>
+    </div>
   </div>
 </div>
 
