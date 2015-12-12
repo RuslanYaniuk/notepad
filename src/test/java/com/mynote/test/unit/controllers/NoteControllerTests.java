@@ -5,18 +5,15 @@ import com.mynote.dto.note.NoteDeleteDTO;
 import com.mynote.dto.note.NoteFindDTO;
 import com.mynote.dto.note.NoteUpdateDTO;
 import com.mynote.test.utils.ElasticSearchUnit;
+import com.mynote.test.utils.UserLoginDTOTestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,14 +22,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-public class NoteControllerTests extends AbstractControllerTest {
+public class NoteControllerTests extends AbstractSecuredControllerTest {
 
     @Autowired
     private ElasticSearchUnit elasticSearchUnit;
 
     @Before
-    public void loadFixtures() throws IOException, ExecutionException {
+    public void loadFixtures() throws Exception {
+        dbUnitHelper.deleteUsersFromDb();
+        dbUnitHelper.cleanInsertUsersIntoDb();
+
         elasticSearchUnit.cleanInsertNotes();
+
+        loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser2LoginDTO());
     }
 
     @Test
@@ -63,6 +65,8 @@ public class NoteControllerTests extends AbstractControllerTest {
         noteFindDTO.setId("1");
 
         mockMvc.perform(delete("/api/note/delete")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteFindDTO)))
                 .andExpect(status().isOk())
@@ -74,6 +78,8 @@ public class NoteControllerTests extends AbstractControllerTest {
         NoteDeleteDTO noteDeleteDTO = new NoteDeleteDTO();
 
         mockMvc.perform(delete("/api/note/delete")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteDeleteDTO)))
                 .andExpect(status().isBadRequest())
@@ -89,6 +95,8 @@ public class NoteControllerTests extends AbstractControllerTest {
         noteUpdateDTO.setText("Updated text");
 
         mockMvc.perform(post("/api/note/update")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteUpdateDTO)))
                 .andExpect(status().isOk())
@@ -104,6 +112,8 @@ public class NoteControllerTests extends AbstractControllerTest {
         noteUpdateDTO.setText("Updated text");
 
         mockMvc.perform(post("/api/note/update")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteUpdateDTO)))
                 .andExpect(status().isBadRequest())
@@ -152,14 +162,36 @@ public class NoteControllerTests extends AbstractControllerTest {
                 .andExpect(jsonPath(MESSAGE_CODE, is("NotBlank.noteFindDTO.idOrSubjectOrText")));
     }
 
+    @Test
+    public void findNotes_LoggedUser_UserCanGetOnlyHisOwnNotes() throws Exception {
+        buildWebAppContext();
+        loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser3LoginDTO());
+
+        NoteFindDTO noteFindDTO = new NoteFindDTO();
+
+        noteFindDTO.setSubject("goes");
+
+        mockMvc.perform(post("/api/note/find")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
+                .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
+                .content(jacksonObjectMapper.writeValueAsString(noteFindDTO)))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id", is("AVFKmX5oLbYQMtdG0GOO")));
+    }
+
     private ResultActions createNote(NoteCreateDTO noteCreateDTO) throws Exception {
         return mockMvc.perform(put("/api/note/create")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteCreateDTO)));
     }
 
     private ResultActions findNote(NoteFindDTO note) throws Exception {
         return mockMvc.perform(post("/api/note/find")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(note)));
     }

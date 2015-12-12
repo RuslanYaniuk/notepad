@@ -1,11 +1,11 @@
 package com.mynote.services;
 
-import com.google.common.collect.Lists;
 import com.mynote.models.Note;
+import com.mynote.models.User;
 import com.mynote.repositories.elastic.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +18,12 @@ import java.util.NoSuchElementException;
 @Service
 public class NoteService {
 
+    public static final int NOTES_PER_PAGE = 20;
     @Autowired
     private NoteRepository noteRepository;
 
-    public Note saveNote(Note note) {
+    public Note saveNote(Note note, User user) {
+        note.setUserId(user.getId());
         return noteRepository.save(note);
     }
 
@@ -36,14 +38,15 @@ public class NoteService {
         return noteRepository.save(note);
     }
 
-    public Page<Note> findNotes(Note note, Pageable pageable) {
-        String id;
+    public Page<Note> findNotes(Note note, User user, Pageable pageable) {
+        Long userId = user.getId();
+        int pageNumber = 0;
 
-        if ((id = note.getId()) != null) {
-            return new PageImpl<>(Lists.newArrayList(noteRepository.findOne(id)));
+        if (pageable == null) {
+            pageable = new PageRequest(pageNumber, NOTES_PER_PAGE);
         }
 
-        return noteRepository.find(note, pageable);
+        return noteRepository.find(note, userId, pageable);
     }
 
     public Page findAll(Pageable pageable) {

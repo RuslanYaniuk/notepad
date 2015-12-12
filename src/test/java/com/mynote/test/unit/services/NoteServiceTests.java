@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
+import static com.mynote.test.utils.UserTestUtils.getUser2;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -42,7 +42,7 @@ public class NoteServiceTests extends AbstractServiceTest {
         note.setText("asdasd");
         note.setSubject("qweqwe");
 
-        note = noteService.saveNote(note);
+        note = noteService.saveNote(note, getUser2());
 
         assertThat(note.getId().length(), greaterThan(0));
     }
@@ -61,7 +61,6 @@ public class NoteServiceTests extends AbstractServiceTest {
         assertThat(note.getSubject(), is(note.getSubject()));
         assertThat(note.getText(), is(note.getText()));
     }
-
 
     @Test(expected = NoSuchElementException.class)
     public void updateNote_NotExistentId_ExceptionThrown() {
@@ -93,10 +92,11 @@ public class NoteServiceTests extends AbstractServiceTest {
 
         note.setId("3");
 
-        Page<Note> page = noteService.findNotes(note, null);
+        Page<Note> page = noteService.findNotes(note, getUser2(), null);
         note = page.getContent().get(0);
 
         assertThat(note.getId(), is("3"));
+        assertThat(note.getUserId(), is(2L));
         assertThat(note.getSubject(), is("subject 3 goes here. Third"));
     }
 
@@ -106,10 +106,10 @@ public class NoteServiceTests extends AbstractServiceTest {
 
         note.setSubject("Third 3");
 
-        Page<Note> page = noteService.findNotes(note, null);
+        Page<Note> page = noteService.findNotes(note, getUser2(), null);
         note = page.getContent().get(0);
 
-        assertThat(page.getContent().size(), is(1));
+        assertThat(page.getContent(), hasSize(1));
         assertTrue(note.getSubject().contains("Third"));
         assertTrue(note.getSubject().contains("3"));
     }

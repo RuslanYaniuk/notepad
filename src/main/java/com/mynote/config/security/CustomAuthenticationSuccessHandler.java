@@ -31,7 +31,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 @Component
 public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    public static final String SESSION_ATTRIBUTE_USER_ID = "user_id";
+    public static final String SESSION_ATTRIBUTE_USER = "user";
 
     @Autowired
     private JsonResponseBuilder jsonResponseBuilder;
@@ -65,7 +65,7 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         successDTO.setMessageCode(messageDTO.getMessageCode());
         successDTO.setUserDTO(new UserInfoDTO(user));
 
-        session.setAttribute(SESSION_ATTRIBUTE_USER_ID, authentication.getDetails());
+        session.setAttribute(SESSION_ATTRIBUTE_USER, user);
 
         jsonResponseBuilder.sendJson(response, SC_OK, jacksonObjectMapper.writeValueAsString(successDTO));
     }

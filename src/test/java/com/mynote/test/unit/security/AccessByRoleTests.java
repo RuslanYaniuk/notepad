@@ -4,7 +4,7 @@ import com.mynote.test.unit.controllers.AbstractSecuredControllerTest;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.mynote.test.utils.UserLoginDTOTestUtils.createUserLoginDTO;
+import static com.mynote.test.utils.UserLoginDTOTestUtils.createUser2LoginDTO;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -12,14 +12,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Ruslan Yaniuk
  * @date September 2015
  */
-public class UserRoleAccessTests extends AbstractSecuredControllerTest {
+public class AccessByRoleTests extends AbstractSecuredControllerTest {
 
     @Before
     public void setup() throws Exception {
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
 
-        loginUser(csrfTokenDTO, createUserLoginDTO());
+        loginUser(csrfTokenDTO, createUser2LoginDTO());
     }
 
     @Test

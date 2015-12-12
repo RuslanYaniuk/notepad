@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.mynote.test.utils.UserLoginDTOTestUtils.createAdminLoginDTO;
-import static com.mynote.test.utils.UserLoginDTOTestUtils.createUserLoginDTO;
+import static com.mynote.test.utils.UserLoginDTOTestUtils.createUser2LoginDTO;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -27,7 +27,7 @@ public class UserControllerTests extends AbstractSecuredControllerTest {
 
     @Test
     public void getInfo_AuthenticatedUser_UserDTOWithRolesReturned() throws Exception {
-        loginUser(csrfTokenDTO, createUserLoginDTO());
+        loginUser(csrfTokenDTO, createUser2LoginDTO());
 
         getInfo()
                 .andExpect(jsonPath("$.userRoles[0].role", not(StringUtils.EMPTY)))

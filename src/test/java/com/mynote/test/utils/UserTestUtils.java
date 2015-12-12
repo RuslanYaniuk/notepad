@@ -45,6 +45,20 @@ public class UserTestUtils {
         return user;
     }
 
+    public static User getUser3() {
+        User user = new User("user3", "user3@email.com");
+
+        user.setId(2L);
+        user.setFirstName("User3 FirstName");
+        user.setLastName("User3 LastName");
+        user.setEmail("user3@email.com");
+        user.setPassword("$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe");
+        user.setEnabled(true);
+        user.addRole(getRoleUser());
+
+        return user;
+    }
+
     public static User getUserAdmin() {
         User user = new User("admin", "admin@email.com");
 

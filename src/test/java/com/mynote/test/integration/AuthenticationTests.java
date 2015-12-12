@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Ruslan Yaniuk
  * @date October 2015
  */
-public class LoginLogoutTests extends AbstractSecuredControllerTest {
+public class AuthenticationTests extends AbstractSecuredControllerTest {
 
     @Before
     public void setup() throws Exception {

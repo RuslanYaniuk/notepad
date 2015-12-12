@@ -82,7 +82,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         LOGOUT_URL).permitAll()
 
                 .antMatchers("/api/administration/**").hasRole("ADMIN")
-                .antMatchers("/api/user/**").hasRole("USER")
+                .antMatchers(
+                        "/api/user/**",
+                        "/api/note/**").hasRole("USER")
                 .anyRequest().authenticated()
                 .and()
 

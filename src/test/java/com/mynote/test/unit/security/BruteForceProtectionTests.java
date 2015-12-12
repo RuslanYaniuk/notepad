@@ -15,7 +15,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
-import static com.mynote.test.utils.UserLoginDTOTestUtils.createUserLoginDTO;
+import static com.mynote.test.utils.UserLoginDTOTestUtils.createUser2LoginDTO;
 import static com.mynote.test.utils.UserTestUtils.createNonExistentUser;
 import static org.hamcrest.number.OrderingComparison.greaterThanOrEqualTo;
 import static org.junit.Assert.assertThat;
@@ -55,7 +55,7 @@ public class BruteForceProtectionTests extends AbstractSecuredControllerTest {
     @Test
     @Ignore //TODO should be implemented prior production
     public void whenUserLoginFailsMoreThan3TimesUserIsBlocked() throws Exception {
-        UserLoginDTO loginDTO = createUserLoginDTO();
+        UserLoginDTO loginDTO = createUser2LoginDTO();
 
         loginDTO.setPassword("notValid");
 

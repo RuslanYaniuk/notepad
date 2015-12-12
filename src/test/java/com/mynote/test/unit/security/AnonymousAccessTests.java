@@ -1,11 +1,13 @@
 package com.mynote.test.unit.security;
 
 import com.mynote.config.web.Constants;
+import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.user.UserRegistrationDTO;
 import com.mynote.test.unit.controllers.AbstractSecuredControllerTest;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static com.mynote.test.utils.UserTestUtils.createNonExistentUser;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -59,6 +61,21 @@ public class AnonymousAccessTests extends AbstractSecuredControllerTest {
         mockMvc.perform(get("/api/user/get-user-info")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void createNote_Anonymous_Unauthorized() throws Exception {
+        NoteCreateDTO createDTO = new NoteCreateDTO();
+
+        createDTO.setSubject("Some text");
+        createDTO.setText("text...");
+
+        mockMvc.perform(put("/api/note/create")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
+                .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
+                .content(jacksonObjectMapper.writeValueAsString(createDTO)))
                 .andExpect(status().isUnauthorized());
     }
 }

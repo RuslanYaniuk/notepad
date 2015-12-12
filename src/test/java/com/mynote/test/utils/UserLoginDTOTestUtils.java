@@ -2,8 +2,7 @@ package com.mynote.test.utils;
 
 import com.mynote.dto.user.UserLoginDTO;
 
-import static com.mynote.test.utils.UserTestUtils.getUser2;
-import static com.mynote.test.utils.UserTestUtils.getUserAdmin;
+import static com.mynote.test.utils.UserTestUtils.*;
 
 /**
  * @author Ruslan Yaniuk
@@ -11,7 +10,16 @@ import static com.mynote.test.utils.UserTestUtils.getUserAdmin;
  */
 public class UserLoginDTOTestUtils {
 
-    public static UserLoginDTO createUserLoginDTO() {
+    public static UserLoginDTO createUser3LoginDTO() {
+        UserLoginDTO loginDTO = new UserLoginDTO();
+
+        loginDTO.setUser(getUser3());
+        loginDTO.setPassword("Passw0rd");
+
+        return loginDTO;
+    }
+
+    public static UserLoginDTO createUser2LoginDTO() {
         UserLoginDTO loginDTO = new UserLoginDTO();
 
         loginDTO.setUser(getUser2());

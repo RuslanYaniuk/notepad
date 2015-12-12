@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Ruslan Yaniuk
  * @date September 2015
  */
-public class CustomerRegistrationAndLoggingTests extends AbstractSecuredControllerTest {
+public class RegistrationTests extends AbstractSecuredControllerTest {
 
     @Before
     public void setup() throws Exception {

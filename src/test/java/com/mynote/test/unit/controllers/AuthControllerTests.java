@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Ruslan Yaniuk
  * @date July 2015
  */
-public class LoginControllerTests extends AbstractSecuredControllerTest {
+public class AuthControllerTests extends AbstractSecuredControllerTest {
 
     public static final String USER_LOGIN_SUCCESS_CODE = "user.login.success";
 
@@ -50,7 +50,7 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
     @Test
     public void getAuthorities_UsersRequest_UserRoleReturned() throws Exception {
-        loginUser(csrfTokenDTO, createUserLoginDTO());
+        loginUser(csrfTokenDTO, createUser2LoginDTO());
 
         assertThatHasRole(getAuthorities(), getRoleUser());
     }
@@ -64,7 +64,7 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
     @Test
     public void login_CorrectEmailAndPassword_LoginSuccessMessageDTOReturned() throws Exception {
-        UserLoginDTO userLoginDTO = createUserLoginDTO();
+        UserLoginDTO userLoginDTO = createUser2LoginDTO();
 
         MvcResult result = loginUser(csrfTokenDTO, userLoginDTO)
                 .andExpect(status().isOk())
@@ -78,7 +78,7 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
     @Test
     public void login_InvalidCsrfToken_UnauthorizedReturned() throws Exception {
-        UserLoginDTO userLoginDTO = createUserLoginDTO();
+        UserLoginDTO userLoginDTO = createUser2LoginDTO();
 
         csrfTokenDTO.setHeaderValue("incorrect");
 
@@ -89,7 +89,7 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
     @Test
     public void login_LoginInMixedCase_LoggedIn() throws Exception {
-        UserLoginDTO userLoginDTO = createUserLoginDTO();
+        UserLoginDTO userLoginDTO = createUser2LoginDTO();
 
         userLoginDTO.setLogin("usER3");
 
@@ -112,7 +112,7 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
     @Test
     public void login_CorrectLoginAndPassword_LoggedIn() throws Exception {
-        UserLoginDTO user = createUserLoginDTO();
+        UserLoginDTO user = createUser2LoginDTO();
 
         loginUser(csrfTokenDTO, user)
                 .andExpect(status().isOk())
@@ -121,7 +121,7 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
     @Test
     public void login_IncorrectEmail_UnauthorizedReturned() throws Exception {
-        UserLoginDTO user = createUserLoginDTO();
+        UserLoginDTO user = createUser2LoginDTO();
 
         user.setLogin("incorrect@email");
 
@@ -141,7 +141,7 @@ public class LoginControllerTests extends AbstractSecuredControllerTest {
 
     @Test
     public void login_IncorrectPassword_UnauthorizedReturned() throws Exception {
-        UserLoginDTO user = createUserLoginDTO();
+        UserLoginDTO user = createUser2LoginDTO();
 
         user.setPassword("notValidPassword");
 
