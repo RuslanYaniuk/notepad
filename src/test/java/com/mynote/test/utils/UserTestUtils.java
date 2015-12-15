@@ -48,7 +48,7 @@ public class UserTestUtils {
     public static User getUser3() {
         User user = new User("user3", "user3@email.com");
 
-        user.setId(2L);
+        user.setId(3L);
         user.setFirstName("User3 FirstName");
         user.setLastName("User3 LastName");
         user.setEmail("user3@email.com");

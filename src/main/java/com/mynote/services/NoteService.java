@@ -49,7 +49,11 @@ public class NoteService {
         return noteRepository.find(note, userId, pageable);
     }
 
-    public Page findAll(Pageable pageable) {
+    public Page<Note> findAll(Pageable pageable) {
         return noteRepository.findAll(pageable);
+    }
+
+    public Page<Note> getLatest(Long userId, Pageable pageable) {
+        return noteRepository.getLatest(userId, pageable);
     }
 }

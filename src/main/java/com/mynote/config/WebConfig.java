@@ -2,6 +2,7 @@ package com.mynote.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.google.common.collect.Lists;
 import com.mynote.config.db.DatabaseInitializer;
 import com.mynote.config.validation.CustomValidator;
@@ -91,7 +92,9 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
     public ObjectMapper jacksonObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
 
+        objectMapper.registerModule(new JSR310Module());
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
         return objectMapper;
     }
 

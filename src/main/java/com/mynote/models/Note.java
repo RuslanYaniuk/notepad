@@ -1,9 +1,14 @@
 package com.mynote.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 /**
  * @author Ruslan Yaniuk
@@ -23,6 +28,10 @@ public class Note {
 
     @Field(type = FieldType.String)
     private String text;
+
+    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "Z")
+    private ZonedDateTime creationDate = ZonedDateTime.now(ZoneOffset.UTC);
 
     public Note() {
     }
@@ -63,6 +72,14 @@ public class Note {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public ZonedDateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(ZonedDateTime creationDate) {
+        this.creationDate = creationDate;
     }
 
     @Override

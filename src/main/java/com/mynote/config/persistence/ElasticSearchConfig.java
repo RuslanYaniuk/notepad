@@ -1,13 +1,16 @@
 package com.mynote.config.persistence;
 
+import com.mynote.config.db.CustomEntityMapper;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.*;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
+import org.springframework.data.elasticsearch.core.convert.MappingElasticsearchConverter;
+import org.springframework.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 import javax.servlet.ServletContext;
@@ -36,7 +39,15 @@ public class ElasticSearchConfig {
     }
 
     @Bean
-    public ElasticsearchOperations elasticsearchTemplate(Client client) {
-        return new ElasticsearchTemplate(client);
+    public ElasticsearchOperations elasticsearchTemplate(Client client, EntityMapper customEntityMapper) {
+        ElasticsearchConverter converter = new MappingElasticsearchConverter(new SimpleElasticsearchMappingContext());
+        ResultsMapper mapper = new DefaultResultMapper(converter.getMappingContext(), customEntityMapper);
+
+        return new ElasticsearchTemplate(client, converter, mapper);
+    }
+
+    @Bean
+    public EntityMapper customEntityMapper() {
+        return new CustomEntityMapper();
     }
 }

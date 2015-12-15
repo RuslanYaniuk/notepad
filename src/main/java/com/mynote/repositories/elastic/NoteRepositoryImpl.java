@@ -6,6 +6,9 @@ import com.mynote.models.Note;
 import org.elasticsearch.index.query.BaseQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermFilterBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +18,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 
 import java.util.List;
 
-import static org.elasticsearch.index.query.QueryBuilders.idsQuery;
-import static org.elasticsearch.index.query.QueryBuilders.multiMatchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * @author Ruslan Yaniuk
@@ -53,10 +55,24 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
         }
 
         searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(QueryBuilders.filteredQuery(queryBuilder, FilterBuilders.termFilter("userId", userId)))
+                .withQuery(QueryBuilders.filteredQuery(queryBuilder, getUserIdFilter(userId)))
                 .withPageable(pageable)
                 .build();
 
         return elasticsearchTemplate.queryForPage(searchQuery, Note.class);
+    }
+
+    public Page<Note> getLatest(Long userId, Pageable pageable) {
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(QueryBuilders.filteredQuery(matchAllQuery(), getUserIdFilter(userId)))
+                .withSort(SortBuilders.fieldSort("creationDate").order(SortOrder.DESC))
+                .withPageable(pageable)
+                .build();
+
+        return elasticsearchTemplate.queryForPage(searchQuery, Note.class);
+    }
+
+    public TermFilterBuilder getUserIdFilter(Long userId) {
+        return FilterBuilders.termFilter("userId", userId);
     }
 }

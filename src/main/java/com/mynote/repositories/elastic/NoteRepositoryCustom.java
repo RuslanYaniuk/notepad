@@ -11,4 +11,6 @@ import org.springframework.data.domain.Pageable;
 public interface NoteRepositoryCustom {
 
     Page<Note> find(Note note, Long userId, Pageable pageable);
+
+    Page<Note> getLatest(Long userId, Pageable pageable);
 }

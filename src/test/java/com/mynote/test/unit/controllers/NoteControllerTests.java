@@ -1,5 +1,6 @@
 package com.mynote.test.unit.controllers;
 
+import com.mynote.dto.common.PageRequestDTO;
 import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.note.NoteDeleteDTO;
 import com.mynote.dto.note.NoteFindDTO;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
@@ -128,7 +130,7 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
 
         findNote(note)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].subject", is("subject 3 goes here. Third")));
+                .andExpect(jsonPath("$.content[0].subject", is("subject 23 goes here. Third")));
     }
 
     @Test
@@ -139,18 +141,18 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
 
         findNote(noteFindDTO)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].subject", is("subject 2 goes here. Second")));
+                .andExpect(jsonPath("$.content[0].subject", is("subject 22 goes here. Second")));
     }
 
     @Test
     public void findNotes_WordsInText_OneNoteReturned_200() throws Exception {
         NoteFindDTO noteFindDTO = new NoteFindDTO();
 
-        noteFindDTO.setText("2 dog");
+        noteFindDTO.setText("xyz. not present text. abc");
 
         findNote(noteFindDTO)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].text", is("text2. Dog")));
+                .andExpect(jsonPath("$.content[0].text", is("xyz. text22. abc")));
     }
 
     @Test
@@ -176,9 +178,42 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteFindDTO)))
-                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content", hasSize(20)))
                 .andExpect(jsonPath("$.content[0].id", is("AVFKmX5oLbYQMtdG0GOO")));
     }
+
+    @Test
+    public void getLatest_RequestForPageWith20Notes_PageWith18notesReturned() throws Exception {
+        buildWebAppContext();
+        loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser3LoginDTO());
+
+        Pageable page = new PageRequestDTO(0, 18);
+
+        getLatestNotes(page)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(18)));
+    }
+
+    @Test
+    public void getLatest_RequestForPageWith0PageSize_PageWith0notesReturned() throws Exception {
+        buildWebAppContext();
+        loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser3LoginDTO());
+
+        Pageable page = new PageRequestDTO(0, 0);
+
+        getLatestNotes(page)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(0)));
+    }
+
+    private ResultActions getLatestNotes(Pageable page) throws Exception {
+        return mockMvc.perform(get("/api/note/get-latest")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
+                .param("pageNumber", Integer.toString(page.getPageNumber()))
+                .param("pageSize", Integer.toString(page.getPageSize())));
+    }
+
 
     private ResultActions createNote(NoteCreateDTO noteCreateDTO) throws Exception {
         return mockMvc.perform(put("/api/note/create")

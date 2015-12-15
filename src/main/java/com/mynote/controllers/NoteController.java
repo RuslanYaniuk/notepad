@@ -1,5 +1,6 @@
 package com.mynote.controllers;
 
+import com.mynote.dto.common.PageRequestDTO;
 import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.note.NoteDeleteDTO;
 import com.mynote.dto.note.NoteFindDTO;
@@ -55,5 +56,10 @@ public class NoteController extends AbstractController {
         noteService.deleteNote(noteDeleteDTO.getNote());
 
         return messageOK("note.delete.success");
+    }
+
+    @RequestMapping(value = "/get-latest", method = GET)
+    public ResponseEntity getLatest(PageRequestDTO pageRequest) {
+        return ok(noteService.getLatest(getCurrentUser().getId(), pageRequest));
     }
 }

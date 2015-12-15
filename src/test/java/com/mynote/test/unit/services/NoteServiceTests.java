@@ -8,12 +8,15 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 
 import static com.mynote.test.utils.UserTestUtils.getUser2;
+import static com.mynote.test.utils.UserTestUtils.getUser3;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -83,7 +86,7 @@ public class NoteServiceTests extends AbstractServiceTest {
 
         Page notes = noteService.findAll(new PageRequest(1, 10));
 
-        assertThat(notes.getTotalElements(), is(4L));
+        assertThat(notes.getTotalElements(), is(23L));
     }
 
     @Test
@@ -97,7 +100,7 @@ public class NoteServiceTests extends AbstractServiceTest {
 
         assertThat(note.getId(), is("3"));
         assertThat(note.getUserId(), is(2L));
-        assertThat(note.getSubject(), is("subject 3 goes here. Third"));
+        assertThat(note.getSubject(), is("subject 23 goes here. Third"));
     }
 
     @Test
@@ -112,5 +115,41 @@ public class NoteServiceTests extends AbstractServiceTest {
         assertThat(page.getContent(), hasSize(1));
         assertTrue(note.getSubject().contains("Third"));
         assertTrue(note.getSubject().contains("3"));
+    }
+
+    @Test
+    public void getLatest_PageRequestFor20Notes_20NotesReturned() {
+        Pageable pageable = new PageRequest(0, 20);
+
+        Page page = noteService.getLatest(getUser3().getId(), pageable);
+
+        assertThat(page.getNumberOfElements(), is(20));
+    }
+
+    @Test
+    public void getLatest_RequestForPage0_PageWithNotesSortedByDateDESCReturned() {
+        Pageable pageable = new PageRequest(0, 20);
+
+        Page<Note> page = noteService.getLatest(getUser3().getId(), pageable);
+
+        ZonedDateTime firstNoteDateTime = page.getContent().get(0).getCreationDate();
+        ZonedDateTime secondDateTime = page.getContent().get(1).getCreationDate();
+
+        assertTrue(firstNoteDateTime.isAfter(secondDateTime));
+    }
+
+    @Test
+    public void getLatest_RequestFor2Pages_FirstPageDatesAreAfterSecondPageDates() {
+        Pageable pageable = new PageRequest(0, 10);
+
+        Page<Note> firstPage = noteService.getLatest(getUser3().getId(), pageable);
+
+        pageable = new PageRequest(1, 10);
+        Page<Note> secondPage = noteService.getLatest(getUser3().getId(), pageable);
+
+        ZonedDateTime firstPageNoteDateTime = firstPage.getContent().get(9).getCreationDate();
+        ZonedDateTime secondPageDateTime = secondPage.getContent().get(0).getCreationDate();
+
+        assertTrue(firstPageNoteDateTime.isAfter(secondPageDateTime));
     }
 }
