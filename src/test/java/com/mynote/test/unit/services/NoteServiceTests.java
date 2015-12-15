@@ -1,5 +1,6 @@
 package com.mynote.test.unit.services;
 
+import com.mynote.exceptions.NoteNotFoundException;
 import com.mynote.models.Note;
 import com.mynote.services.NoteService;
 import com.mynote.test.utils.ElasticSearchUnit;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 
 import static com.mynote.test.utils.UserTestUtils.getUser2;
@@ -51,29 +51,29 @@ public class NoteServiceTests extends AbstractServiceTest {
     }
 
     @Test
-    public void updateNote_CorrectDTO_UpdatedNoteReturned() {
+    public void updateNote_CorrectDTO_UpdatedNoteReturned() throws NoteNotFoundException {
         Note note = new Note();
 
         note.setId("1");
         note.setText("Updated text");
         note.setSubject("Updated subject");
 
-        note = noteService.updateNote(note);
+        note = noteService.updateNote(note, getUser2());
 
         assertThat(note.getId(), is(note.getId()));
         assertThat(note.getSubject(), is(note.getSubject()));
         assertThat(note.getText(), is(note.getText()));
     }
 
-    @Test(expected = NoSuchElementException.class)
-    public void updateNote_NotExistentId_ExceptionThrown() {
+    @Test(expected = NoteNotFoundException.class)
+    public void updateNote_NotExistentId_ExceptionThrown() throws NoteNotFoundException {
         Note note = new Note();
 
         note.setId("8888");
         note.setText("Updated text");
         note.setSubject("Updated subject");
 
-        noteService.updateNote(note);
+        noteService.updateNote(note, getUser2());
     }
 
     @Test
@@ -82,7 +82,7 @@ public class NoteServiceTests extends AbstractServiceTest {
 
         note.setId("3");
 
-        noteService.deleteNote(note);
+        noteService.deleteNote(note, getUser2());
 
         Page notes = noteService.findAll(new PageRequest(1, 10));
 

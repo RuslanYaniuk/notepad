@@ -22,7 +22,8 @@ public class ExceptionController extends AbstractController {
 
     @ExceptionHandler({
             UserNotFoundException.class,
-            UserRoleNotFoundException.class})
+            UserRoleNotFoundException.class,
+            NoteNotFoundException.class})
     public ResponseEntity handleNotFound(Exception e) {
         return messageNotFound(e.getMessage());
     }

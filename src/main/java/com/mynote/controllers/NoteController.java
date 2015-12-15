@@ -5,6 +5,7 @@ import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.note.NoteDeleteDTO;
 import com.mynote.dto.note.NoteFindDTO;
 import com.mynote.dto.note.NoteUpdateDTO;
+import com.mynote.exceptions.NoteNotFoundException;
 import com.mynote.models.Note;
 import com.mynote.models.User;
 import com.mynote.services.NoteService;
@@ -45,15 +46,15 @@ public class NoteController extends AbstractController {
     }
 
     @RequestMapping(value = "/update", method = POST)
-    public ResponseEntity updateNote(@Validated @RequestBody NoteUpdateDTO noteUpdateDTO) {
-        noteService.updateNote(noteUpdateDTO.getNote());
+    public ResponseEntity updateNote(@Validated @RequestBody NoteUpdateDTO noteUpdateDTO) throws NoteNotFoundException {
+        noteService.updateNote(noteUpdateDTO.getNote(), getCurrentUser());
 
         return messageOK("note.update.success");
     }
 
     @RequestMapping(value = "/delete", method = DELETE)
     public ResponseEntity deleteNote(@Validated @RequestBody NoteDeleteDTO noteDeleteDTO) {
-        noteService.deleteNote(noteDeleteDTO.getNote());
+        noteService.deleteNote(noteDeleteDTO.getNote(), getCurrentUser());
 
         return messageOK("note.delete.success");
     }

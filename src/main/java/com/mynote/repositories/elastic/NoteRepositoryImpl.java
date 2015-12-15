@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.query.GetQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -33,11 +35,13 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
     private ElasticsearchOperations elasticsearchTemplate;
 
     @Override
-    public Page<Note> find(Note note, Long userId, Pageable pageable) {
+    public Page<Note> find(Note note, Pageable pageable) {
         List<String> fields = Lists.newArrayList();
         NativeSearchQuery searchQuery;
         String textToSearch = null;
         BaseQueryBuilder queryBuilder;
+
+        Assert.notNull(note.getUserId());
 
         if (note.getSubject() != null) {
             fields.add(SUBJECT_FIELD);
@@ -55,7 +59,7 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
         }
 
         searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(QueryBuilders.filteredQuery(queryBuilder, getUserIdFilter(userId)))
+                .withQuery(QueryBuilders.filteredQuery(queryBuilder, getUserIdFilter(note.getUserId())))
                 .withPageable(pageable)
                 .build();
 
@@ -70,6 +74,23 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
                 .build();
 
         return elasticsearchTemplate.queryForPage(searchQuery, Note.class);
+    }
+
+    @Override
+    public boolean exists(Note note) {
+        GetQuery query = new GetQuery();
+        Long userId = note.getUserId();
+
+        Assert.notNull(userId);
+
+        query.setId(note.getId());
+        note = elasticsearchTemplate.queryForObject(query, Note.class);
+
+        if (note != null) {
+            return note.getUserId().equals(userId);
+        } else {
+            return false;
+        }
     }
 
     public TermFilterBuilder getUserIdFilter(Long userId) {

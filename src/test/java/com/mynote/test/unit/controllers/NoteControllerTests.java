@@ -123,6 +123,23 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
     }
 
     @Test
+    public void updateNote_IdOfDifferentUserNote_ErrorReturned_400() throws Exception {
+        NoteUpdateDTO noteUpdateDTO = new NoteUpdateDTO();
+
+        noteUpdateDTO.setId("32");
+        noteUpdateDTO.setSubject("Updated subject");
+        noteUpdateDTO.setText("Updated text");
+
+        mockMvc.perform(post("/api/note/update")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
+                .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
+                .content(jacksonObjectMapper.writeValueAsString(noteUpdateDTO)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath(MESSAGE_CODE, is("note.lookup.notFound")));
+    }
+
+    @Test
     public void findNotes_CorrectNoteId_NoteUpdated_200() throws Exception {
         NoteFindDTO note = new NoteFindDTO();
 
