@@ -8,6 +8,7 @@
 
         { angular       : "assets/vendor/angular/angular.js" },
         { ng_route      : "assets/vendor/angular-ui-router/angular-ui-router.js" },
+        { ng_sanitize      : "assets/vendor/angular-sanitize/angular-sanitize.js" },
         { ng_aria       : "assets/vendor/angular-aria/angular-aria.js" },
         { ng_material   : "assets/vendor/angular-material/angular-material.js" },
         { ng_animate    : "assets/vendor/angular-animate/angular-animate.js" },

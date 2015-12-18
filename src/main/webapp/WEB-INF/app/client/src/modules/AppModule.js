@@ -7,16 +7,22 @@
 
     var dependencies = [
         "controllers/AppController",
-        "controllers/NoteController"
+        "controllers/NoteController",
+        "controllers/NoteSideNavController",
+        "controllers/SearchBoxController",
+        "services/NoteService"
     ];
 
-    define(dependencies, function (AppController, NoteController) {
+    define(dependencies, function (AppController, NoteController, NoteSideNavController, SearchBoxController, NoteService) {
         var moduleName = "mynote.App";
 
         var mod = angular.module(moduleName, [])
 
             .controller('AppController', AppController)
-            .controller('NoteController', NoteController);
+            .controller('NoteController', NoteController)
+            .controller('NoteSideNavController', NoteSideNavController)
+            .controller('SearchBoxController', SearchBoxController)
+            .service("noteService", NoteService);
 
         /*mod.directive('note', function factory() {
          var directiveDefinitionObject = {

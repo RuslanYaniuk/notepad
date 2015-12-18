@@ -52,9 +52,6 @@ md-icon.login-card-logo {
   height: 48px;
   width: 48px;
 }
-body {
-  min-width: 320px;
-}
 @font-face {
   font-family: 'Material Icons';
   font-style: normal;

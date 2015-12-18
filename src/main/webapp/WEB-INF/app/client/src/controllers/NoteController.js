@@ -7,43 +7,95 @@
 
     define(function () {
 
-        var NoteController = function ($scope, $mdDialog, $mdSidenav) {
+        var NoteController = function ($scope, $mdDialog, $sce, noteService) {
 
-            $scope.addNote = function(ev) {
-                $mdDialog.show({
-                    controller: NoteController,
-                    templateUrl: 'assets/views/app/note.tmpl.html',
-                    parent: angular.element(document.body),
-                    targetEvent: ev
-                });
-            };
+            var onShowNewNoteDialog = function (ev) {
+                    $scope.notesContainer.note.id = "";
+                    $scope.notesContainer.note.subject = "";
+                    $scope.notesContainer.note.text = "";
 
-            $scope.closeAddNoteDialog = function () {
-                $mdDialog.hide();
-            };
+                    $mdDialog.show({
+                        controller: NoteController,
+                        templateUrl: 'assets/views/app/note.create.dlg.html',
+                        parent: angular.element(document.body),
+                        targetEvent: ev
+                    });
+                },
 
-            $scope.toggleSideNav = function () {
-                $mdSidenav("note-side-nav")
-                    .toggle();
-            };
+                onShowEditDialog = function (ev, note) {
+                    $scope.notesContainer.note.id = note.id;
+                    $scope.notesContainer.note.subject = note.subject.valueOf();
+                    $scope.notesContainer.note.text = note.text.valueOf();
 
-            $scope.showSearchOptionsDialog = function (ev) {
-                $mdDialog.show({
-                    controller: NoteController,
-                    templateUrl: 'assets/views/app/search-options.dlg.html',
-                    parent: angular.element(document.body),
-                    targetEvent: ev,
-                    clickOutsideToClose:true
-                });
-            };
+                    $mdDialog.show({
+                        controller: NoteController,
+                        templateUrl: 'assets/views/app/note.edit.dlg.html',
+                        parent: angular.element(document.body)
+                    });
+                },
 
-            $scope.closeNoteSidenav = function () {
-                $mdSidenav("note-side-nav").close();
-            }
+                onCloseDialog = function () {
+                    $mdDialog.hide();
+                },
 
+                onCreateNote = function () {
+                    noteService.createNote();
+                    $mdDialog.hide();
+                },
+
+                onUpdateNote = function () {
+                    noteService.updateNote();
+                    $mdDialog.hide()
+                },
+
+                onDeleteNote = function (note) {
+                    var confirm = $mdDialog.confirm()
+                        .title('Delete confirmation')
+                        .content('Delete this note? All data will be lost.')
+                        .ariaLabel('Delete note')
+                        .ok('Yes')
+                        .cancel('Cancel');
+                    $mdDialog.show(confirm).then(function onSelectYes() {
+                        noteService.deleteNote(note.id);
+                    }, function onDecline() {
+                    });
+
+                },
+
+                onGetFormattedText = function (note) {
+                    return note.text;
+                },
+
+                isValidNote = function (note) {
+                    if (note.subject != undefined || "") {
+                        return true;
+                    }
+                    if (note.text != undefined || "") {
+                        return true;
+                    }
+
+                    return false;
+                },
+
+                init = function () {
+                    noteService.getLatest();
+                };
+
+            $scope.showNewNoteDialog = onShowNewNoteDialog;
+            $scope.showEditNoteDialog = onShowEditDialog;
+            $scope.closeDialog = onCloseDialog;
+
+            $scope.createNote = onCreateNote;
+            $scope.updateNote = onUpdateNote;
+            $scope.deleteNote = onDeleteNote;
+
+            $scope.init = init;
+
+            $scope.notesContainer = noteService.notesContainer;
+            $scope.getFormattedText = onGetFormattedText;
         };
 
-        return ["$scope", "$mdDialog", "$mdSidenav", NoteController];
+        return ["$scope", "$mdDialog", "$sce", "noteService", NoteController];
     });
 
 })(define);

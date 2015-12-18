@@ -1,19 +1,25 @@
-<div flex style="max-width: 600px">
+<div flex style="max-width: 600px; position: relative" ng-controller="SearchBoxController">
 
   <div class="md-whiteframe-1dp" style="background-color: white;
                                             border-radius: 2px;
-                                            padding-left: 12px;
+                                            padding: 0 0 0 12px;
                                             z-index: 2" layout="row">
     <md-icon style="color: #444; opacity: 0.5" class="material-icons md-light">search</md-icon>
 
-    <input placeholder="Search" flex style="
-                                                border-radius: 2px;
+    <input ng-model="searchString" placeholder="Search" flex style="border-radius: 2px;
                                                 min-width: 100px;
                                                 border: 0;
                                                 padding: 8px 10px 8px 12px;
                                                 outline: none;
                                                 width: auto;
                                                 font-size: 16px">
+
+    <button ng-class="{hidden: searchString == ''}" ng-click="searchString = ''" style="background-color: transparent; border: 0; outline: 0; margin-right: 8px" class="ng-scope">
+      <md-icon style="color: #444; opacity: 0.5" class="material-icons md-accent">clear</md-icon>
+    </button>
   </div>
 
+    <div class="md-whiteframe-2dp" style="position: absolute; background-color: white; height: auto; width: 100%">
+
+    </div>
 </div>

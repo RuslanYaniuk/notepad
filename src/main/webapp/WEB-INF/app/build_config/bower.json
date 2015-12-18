@@ -24,6 +24,7 @@
     "requirejs": "~2.1.8",
     "requirejs-text": "2.0.10",
     "angular": "~1.4.7",
+    "angular-sanitize" : "~1.4.7",
     "angular-ui-router": "~0.2.15",
     "angular-mocks": "~1.4",
     "angular-specs": "~0.0.1",
