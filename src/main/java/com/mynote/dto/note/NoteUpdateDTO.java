@@ -32,9 +32,4 @@ public class NoteUpdateDTO extends AbstractNoteDTO {
     public void setText(String text) {
         note.setText(text);
     }
-
-    @Override
-    public String toString() { //TODO remove this
-        return "NoteUpdateDTO{} " + note.toString();
-    }
 }

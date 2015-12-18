@@ -16,9 +16,4 @@ public class NoteDeleteDTO extends AbstractNoteDTO {
     public void setId(String id) {
         note.setId(id);
     }
-
-    @Override
-    public String toString() {
-        return "NoteDeleteDTO{} " + super.toString();
-    }
 }

@@ -59,11 +59,4 @@ public class NoteFindDTO extends AbstractNoteDTO {
         }
         return null;
     }
-
-    @Override
-    public String toString() {
-        return "NoteFindDTO{" +
-                "page=" + page +
-                "} " + note.toString();
-    }
 }

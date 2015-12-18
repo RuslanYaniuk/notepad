@@ -36,9 +36,4 @@ public class NoteCreateDTO extends AbstractNoteDTO {
         }
         return null;
     }
-
-    @Override
-    public String toString() {
-        return "NoteCreateDTO{} " + note.toString();
-    }
 }
