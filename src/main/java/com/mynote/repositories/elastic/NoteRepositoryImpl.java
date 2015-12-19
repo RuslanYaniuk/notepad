@@ -3,10 +3,7 @@ package com.mynote.repositories.elastic;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.mynote.models.Note;
-import org.elasticsearch.index.query.BaseQueryBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermFilterBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +33,6 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
 
     @Override
     public Page<Note> find(Note note, Pageable pageable) {
-        List<String> fields = Lists.newArrayList();
         NativeSearchQuery searchQuery;
         String textToSearch = null;
         BaseQueryBuilder queryBuilder;
@@ -44,18 +40,16 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
         Assert.notNull(note.getUserId());
 
         if (note.getSubject() != null) {
-            fields.add(SUBJECT_FIELD);
             textToSearch = note.getSubject();
         }
         if (note.getText() != null) {
-            fields.add(TEXT_FIELD);
             textToSearch = note.getText();
         }
 
         if (note.getId() != null) {
             queryBuilder = idsQuery("note").ids(note.getId());
         } else {
-            queryBuilder = multiMatchQuery(textToSearch, Iterables.toArray(fields, String.class));
+            queryBuilder = multiMatchQuery(textToSearch, getFieldsToSearch(note));
         }
 
         searchQuery = new NativeSearchQueryBuilder()
@@ -93,7 +87,41 @@ public class NoteRepositoryImpl implements NoteRepositoryCustom {
         }
     }
 
-    public TermFilterBuilder getUserIdFilter(Long userId) {
+    @Override
+    public Page<Note> getByPrefixQuery(Note note, Long userId, Pageable pageable) {
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        NativeSearchQuery searchQuery;
+
+        if (note.getSubject() != null) {
+            boolQueryBuilder.should(QueryBuilders.prefixQuery(SUBJECT_FIELD, note.getSubject()));
+        }
+        if (note.getText() != null) {
+            boolQueryBuilder.should(QueryBuilders.prefixQuery(TEXT_FIELD, note.getText()));
+        }
+
+        searchQuery = new NativeSearchQueryBuilder()
+                .withQuery(boolQueryBuilder)
+                .withPageable(pageable)
+                .withFilter(getUserIdFilter(userId))
+                .build();
+
+        return elasticsearchTemplate.queryForPage(searchQuery, Note.class);
+    }
+
+    private TermFilterBuilder getUserIdFilter(Long userId) {
         return FilterBuilders.termFilter("userId", userId);
+    }
+
+    private String[] getFieldsToSearch(Note note) {
+        List<String> fields = Lists.newArrayList();
+
+        if (note.getSubject() != null) {
+            fields.add(SUBJECT_FIELD);
+        }
+        if (note.getText() != null) {
+            fields.add(TEXT_FIELD);
+        }
+
+        return Iterables.toArray(fields, String.class);
     }
 }

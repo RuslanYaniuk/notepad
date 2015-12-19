@@ -223,6 +223,40 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
                 .andExpect(jsonPath("$.content", hasSize(0)));
     }
 
+    @Test
+    public void getSuggestedWords_WordPrefixInText_ArrayOfWordsReturned() throws Exception {
+        buildWebAppContext();
+        loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser3LoginDTO());
+
+        NoteFindDTO findDTO = new NoteFindDTO();
+
+        findDTO.setText("wor");
+
+        getSuggestedWords(findDTO)
+                .andExpect(jsonPath("$.", hasSize(3)));
+    }
+
+    @Test
+    public void getSuggestedWords_WordPrefixInSubject_ArrayOfWordsReturned() throws Exception {
+        buildWebAppContext();
+        loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser3LoginDTO());
+
+        NoteFindDTO findDTO = new NoteFindDTO();
+
+        findDTO.setSubject("gene");
+
+        getSuggestedWords(findDTO)
+                .andExpect(jsonPath("$.", hasSize(3)));
+    }
+
+    private ResultActions getSuggestedWords(NoteFindDTO findDTO) throws Exception {
+        return mockMvc.perform(get("/api/note/get-suggested-words")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
+                .param("text", findDTO.getText())
+                .param("subject", findDTO.getSubject()));
+    }
+
     private ResultActions getLatestNotes(Pageable page) throws Exception {
         return mockMvc.perform(get("/api/note/get-latest")
                 .session(session)
@@ -230,7 +264,6 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
                 .param("pageNumber", Integer.toString(page.getPageNumber()))
                 .param("pageSize", Integer.toString(page.getPageSize())));
     }
-
 
     private ResultActions createNote(NoteCreateDTO noteCreateDTO) throws Exception {
         return mockMvc.perform(put("/api/note/create")

@@ -63,4 +63,9 @@ public class NoteController extends AbstractController {
     public ResponseEntity getLatest(PageRequestDTO pageRequest) {
         return ok(noteService.getLatest(getCurrentUser().getId(), pageRequest));
     }
+
+    @RequestMapping(value = "/get-suggested-words", method = GET)
+    public ResponseEntity getSuggestedWords(@Validated NoteFindDTO noteFindDTO) {
+        return ok(noteService.getWordsSuggestion(noteFindDTO.getNote(), getCurrentUser()));
+    }
 }

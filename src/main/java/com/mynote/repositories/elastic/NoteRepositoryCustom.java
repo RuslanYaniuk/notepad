@@ -15,4 +15,6 @@ public interface NoteRepositoryCustom {
     Page<Note> getLatest(Long userId, Pageable pageable);
 
     boolean exists(Note note);
+
+    Page<Note> getByPrefixQuery(Note note, Long userId, Pageable pageable);
 }

@@ -4,6 +4,7 @@ import com.mynote.exceptions.NoteNotFoundException;
 import com.mynote.models.Note;
 import com.mynote.services.NoteService;
 import com.mynote.test.utils.ElasticSearchUnit;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +14,13 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import static com.mynote.test.utils.UserTestUtils.getUser2;
 import static com.mynote.test.utils.UserTestUtils.getUser3;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Ruslan Yaniuk
@@ -151,5 +152,22 @@ public class NoteServiceTests extends AbstractServiceTest {
         ZonedDateTime secondPageDateTime = secondPage.getContent().get(0).getCreationDate();
 
         assertTrue(firstPageNoteDateTime.isAfter(secondPageDateTime));
+    }
+
+    @Test
+    public void getWordSuggestion_WordPrefix_CompleteVariantsOfWordReturned() {
+        String wordPrefix = "wor";
+        Note note = new Note();
+
+        note.setText(wordPrefix);
+
+        Set<String> words = noteService.getWordsSuggestion(note, getUser3());
+
+        assertThat(words, hasSize(3));
+
+        for (String word : words) {
+            assertTrue(StringUtils.startsWithIgnoreCase(word, wordPrefix));
+            assertFalse(word.contains(" "));
+        }
     }
 }

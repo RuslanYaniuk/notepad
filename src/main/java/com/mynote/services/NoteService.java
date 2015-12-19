@@ -10,6 +10,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * @author Ruslan Yaniuk
  * @date November 2015
@@ -56,5 +62,37 @@ public class NoteService {
 
     public Page<Note> getLatest(Long ownerId, Pageable pageable) {
         return noteRepository.getLatest(ownerId, pageable);
+    }
+
+    public Set<String> getWordsSuggestion(Note note, User user) {
+        Page<Note> notes = noteRepository.getByPrefixQuery(note, user.getId(), new PageRequest(0, 20));
+        Set<String> suggestedWords = new HashSet<>();
+
+        for (Note suggestedNote : notes.getContent()) {
+            Set<String> suggestedSet = Collections.emptySet();
+
+            if (note.getSubject() != null) {
+                suggestedSet = getWordByPrefix(suggestedNote.getSubject(), note.getSubject());
+            }
+            if (note.getText() != null) {
+                suggestedSet = getWordByPrefix(suggestedNote.getText(), note.getText());
+            }
+            suggestedWords.addAll(suggestedSet);
+        }
+
+        return suggestedWords;
+    }
+
+    private Set<String> getWordByPrefix(String input, String prefix) {
+        Set<String> result = new HashSet<>();
+        String prefixRegex = "\\b" + prefix + "\\w+";
+        Pattern p = Pattern.compile(prefixRegex, Pattern.CASE_INSENSITIVE);
+        Matcher m = p.matcher(input);
+
+        while (m.find()) {
+            result.add(m.group());
+        }
+
+        return result;
     }
 }
