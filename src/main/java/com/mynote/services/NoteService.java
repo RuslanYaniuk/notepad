@@ -2,8 +2,7 @@ package com.mynote.services;
 
 import com.mynote.exceptions.NoteNotFoundException;
 import com.mynote.models.Note;
-import com.mynote.models.User;
-import com.mynote.repositories.elastic.NoteRepository;
+import com.mynote.repositories.elasticsearch.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,48 +23,41 @@ import java.util.regex.Pattern;
 public class NoteService {
 
     public static final int NOTES_PER_PAGE = 20;
+
     @Autowired
-    private NoteRepository noteRepository;
+    private NoteRepository noteRepositoryImpl;
 
-    public Note saveNote(Note note, User owner) {
-        note.setUserId(owner.getId());
-        return noteRepository.save(note);
+    public Note saveNote(Note note) {
+        return noteRepositoryImpl.save(note);
     }
 
-    public void deleteNote(Note note, User owner) {
-        note.setUserId(owner.getId());
-        noteRepository.delete(note);
-    }
-
-    public Note updateNote(Note note, User owner) throws NoteNotFoundException {
-        note.setUserId(owner.getId());
-        if (!noteRepository.exists(note)) {
+    public Note updateNote(Note note) throws NoteNotFoundException {
+        if (!noteRepositoryImpl.exists(note.getId())) {
             throw new NoteNotFoundException();
         }
-        return noteRepository.save(note);
+        return noteRepositoryImpl.save(note);
     }
 
-    public Page<Note> findNotes(Note note, User owner, Pageable pageable) {
+    public Page<Note> findNotes(Note note, Pageable pageable) {
         int pageNumber = 0;
 
         if (pageable == null) {
             pageable = new PageRequest(pageNumber, NOTES_PER_PAGE);
         }
-        note.setUserId(owner.getId());
 
-        return noteRepository.find(note, pageable);
+        return noteRepositoryImpl.find(note, pageable);
     }
 
     public Page<Note> findAll(Pageable pageable) {
-        return noteRepository.findAll(pageable);
+        return noteRepositoryImpl.findAll(pageable);
     }
 
-    public Page<Note> getLatest(Long ownerId, Pageable pageable) {
-        return noteRepository.getLatest(ownerId, pageable);
+    public Page<Note> getLatest(Pageable pageable) {
+        return noteRepositoryImpl.getLatest(pageable);
     }
 
-    public Set<String> getWordsSuggestion(Note note, User user) {
-        Page<Note> notes = noteRepository.getByPrefixQuery(note, user.getId(), new PageRequest(0, 20));
+    public Set<String> getWordsSuggestion(Note note) {
+        Page<Note> notes = noteRepositoryImpl.getByPrefixQuery(note, new PageRequest(0, 20));
         Set<String> suggestedWords = new HashSet<>();
 
         for (Note suggestedNote : notes.getContent()) {
@@ -81,6 +73,10 @@ public class NoteService {
         }
 
         return suggestedWords;
+    }
+
+    public void deleteNote(Note note) {
+        noteRepositoryImpl.delete(note);
     }
 
     private Set<String> getWordByPrefix(String input, String prefix) {

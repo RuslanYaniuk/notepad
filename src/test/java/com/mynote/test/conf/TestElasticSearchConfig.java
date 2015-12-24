@@ -1,6 +1,6 @@
 package com.mynote.test.conf;
 
-import com.mynote.config.persistence.ElasticSearchConfig;
+import com.mynote.config.elasticsearch.ElasticSearchConfig;
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -20,8 +20,6 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
  */
 public class TestElasticSearchConfig extends ElasticSearchConfig {
 
-    public static final String INDEX_NAME = "mynote";
-
     @Autowired
     private EmbeddedElasticsearchServer embeddedElasticsearchServer;
 
@@ -35,7 +33,7 @@ public class TestElasticSearchConfig extends ElasticSearchConfig {
         return embeddedElasticsearchServer.getClient();
     }
 
-    public class EmbeddedElasticsearchServer {
+    private class EmbeddedElasticsearchServer {
 
         private static final String DEFAULT_DATA_DIRECTORY = "target/elasticsearch-data";
 
@@ -51,7 +49,8 @@ public class TestElasticSearchConfig extends ElasticSearchConfig {
 
             ImmutableSettings.Builder elasticsearchSettings = ImmutableSettings.settingsBuilder()
                     .put("http.enabled", "false")
-                    .put("path.data", dataDirectory);
+                    .put("path.data", dataDirectory)
+                    .put("action.auto_create_index", "false");
 
             node = nodeBuilder()
                     .local(true)

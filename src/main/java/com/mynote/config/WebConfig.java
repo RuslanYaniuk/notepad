@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.google.common.collect.Lists;
 import com.mynote.config.db.DatabaseInitializer;
+import com.mynote.config.session.HttpSessionContext;
 import com.mynote.config.validation.CustomValidator;
 import com.mynote.config.web.ChainableUrlBasedViewResolver;
 import com.mynote.config.web.ExtendedMessageSource;
@@ -122,6 +123,11 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
         source.setDefaultEncoding(APPLICATION_ENCODING);
 
         return source;
+    }
+
+    @Bean
+    public HttpSessionContext httpSessionContext() {
+        return new HttpSessionContext();
     }
 
     @Bean(initMethod = "init")

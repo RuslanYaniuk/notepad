@@ -14,14 +14,11 @@ import java.time.ZonedDateTime;
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-@Document(indexName = "mynote", type = "note")
+@Document(indexName = "mynote_#{httpSessionContext.user.id}", type = "note")
 public class Note {
 
     @Id
     private String id;
-
-    @Field(type = FieldType.Long)
-    private Long userId;
 
     @Field(type = FieldType.String)
     private String subject;
@@ -48,14 +45,6 @@ public class Note {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getSubject() {
@@ -101,7 +90,6 @@ public class Note {
     public String toString() {
         return "Note{" +
                 "id='" + id + '\'' +
-                ", userId=" + userId +
                 ", subject='" + subject + '\'' +
                 ", text='" + text + '\'' +
                 '}';

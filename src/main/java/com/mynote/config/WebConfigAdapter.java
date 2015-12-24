@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = {
         "com.mynote.config.db",
         "com.mynote.config.persistence",
+        "com.mynote.config.elasticsearch",
         "com.mynote.config.security",
         "com.mynote.config.validation",
         "com.mynote.config.web",

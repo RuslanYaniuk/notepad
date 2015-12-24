@@ -1,6 +1,10 @@
 package com.mynote.test.utils;
 
+import com.jayway.jsonpath.JsonPath;
+import com.mynote.models.User;
+import net.minidev.json.JSONObject;
 import org.apache.commons.io.IOUtils;
+import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.Client;
@@ -10,10 +14,11 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import static com.mynote.test.conf.TestElasticSearchConfig.INDEX_NAME;
 import static org.elasticsearch.client.Requests.refreshRequest;
 
 /**
@@ -24,53 +29,74 @@ import static org.elasticsearch.client.Requests.refreshRequest;
 public class ElasticSearchUnit {
 
     public static final String TYPE_NAME = "note";
+    public static final String INDEX_NAME = "mynote_";
     public static final String NOTES_FIXTURES = "elasticsearch-datasets/notes.bulk";
 
-    private static String BULK_DATA;
+    private static Map<String, List<JSONObject>> CACHE = new HashMap<>();
 
     @Autowired
     private Client client;
 
-    public void cleanInsertNotes() throws IOException, ExecutionException {
-        StringTokenizer st = new StringTokenizer(getBulkData(), "\n");
+    public void cleanInsertNotes(User user) throws IOException, ExecutionException, InterruptedException {
         BulkRequestBuilder bulkRequest = client.prepareBulk();
+        String indexName = INDEX_NAME + user.getId();
+        List<JSONObject> userNotes;
 
-        removeAllFixtures();
+        dropIndex(indexName);
+        createIndex(indexName);
 
-        while (st.hasMoreTokens()) {
-            String data = st.nextToken();
-            StringTokenizer dataTokenizer = new StringTokenizer(data, ";");
-
-            if (dataTokenizer.countTokens() == 2) {
-                String pk = dataTokenizer.nextToken();
-                String content = dataTokenizer.nextToken();
-                bulkRequest.add(client.prepareIndex(INDEX_NAME, TYPE_NAME, pk)
-                        .setSource(content));
-            }
+        if ((userNotes = CACHE.get(indexName)) == null) {
+            userNotes = JsonPath.read(getBulkData(), "$." + indexName);
+            CACHE.put(indexName, userNotes);
         }
+
+        for (JSONObject noteFixture : userNotes) {
+            bulkRequest.add(
+                    client.prepareIndex(indexName, TYPE_NAME, extractId(noteFixture))
+                            .setSource(prepareBulkRequest(noteFixture)));
+        }
+
         BulkResponse bulkResponse = bulkRequest.execute().actionGet();
         if (bulkResponse.hasFailures()) {
             throw new IllegalArgumentException("Could not insert fixtures");
         }
-        refresh();
+        refresh(indexName);
+    }
+
+    private String prepareBulkRequest(JSONObject input) {
+        input = (JSONObject) input.clone();
+        input.replace("id", null);
+
+        return input.toString();
+    }
+
+    private String extractId(JSONObject input) {
+        return JsonPath.read(input, "$.id");
     }
 
     public static String getBulkData() throws IOException {
-        if (BULK_DATA == null) {
-            BULK_DATA = IOUtils.toString(new ClassPathResource(NOTES_FIXTURES).getInputStream());
+        return IOUtils.toString(new ClassPathResource(NOTES_FIXTURES).getInputStream());
+    }
+
+    private void createIndex(String indexName) throws ExecutionException, InterruptedException {
+        if (isExists(indexName)) {
+            return;
         }
-        return BULK_DATA;
+        client.admin().indices().prepareCreate(indexName).execute().actionGet().isAcknowledged();
     }
 
-    private void removeAllFixtures() throws ExecutionException {
-        client.prepareDeleteByQuery(INDEX_NAME)
-                .setQuery(QueryBuilders.matchAllQuery())
-                .setTypes(TYPE_NAME)
-                .get();
-        refresh();
+    private void dropIndex(String indexName) throws ExecutionException, InterruptedException {
+        if (!isExists(indexName)) {
+            return;
+        }
+        client.prepareDeleteByQuery(indexName).setTypes(TYPE_NAME).setQuery(QueryBuilders.matchAllQuery()).execute().actionGet();
     }
 
-    private void refresh() {
-        client.admin().indices().refresh(refreshRequest(INDEX_NAME).force(true)).actionGet();
+    private boolean isExists(String indexName) throws InterruptedException, ExecutionException {
+        return client.admin().indices().exists(new IndicesExistsRequest(indexName)).get().isExists();
+    }
+
+    private void refresh(String indexName) {
+        client.admin().indices().refresh(refreshRequest(indexName).force(true)).actionGet();
     }
 }

@@ -1,17 +1,19 @@
-package com.mynote.config.persistence;
+package com.mynote.config.elasticsearch;
 
-import com.mynote.config.db.CustomEntityMapper;
+import com.mynote.repositories.elasticsearch.NoteRepository;
+import com.mynote.repositories.elasticsearch.support.CustomElasticsearchRepositoryFactory;
+import com.mynote.repositories.elasticsearch.support.RepositoryProxy;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.data.elasticsearch.core.*;
 import org.springframework.data.elasticsearch.core.convert.ElasticsearchConverter;
 import org.springframework.data.elasticsearch.core.convert.MappingElasticsearchConverter;
 import org.springframework.data.elasticsearch.core.mapping.SimpleElasticsearchMappingContext;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 import javax.servlet.ServletContext;
 
@@ -20,7 +22,7 @@ import javax.servlet.ServletContext;
  * @date November 2015
  */
 @Configuration
-@EnableElasticsearchRepositories(basePackages = "com.mynote.repositories.elastic")
+@EnableAspectJAutoProxy
 public class ElasticSearchConfig {
 
     public static final String ELASTICSEARCH_HOST_PARAM_NAME = "mynote.elasticsearch.host";
@@ -47,7 +49,22 @@ public class ElasticSearchConfig {
     }
 
     @Bean
+    public CustomElasticsearchRepositoryFactory elasticsearchRepositoryFactory(ElasticsearchOperations elasticsearchTemplate) {
+        return new CustomElasticsearchRepositoryFactory(elasticsearchTemplate);
+    }
+
+    @Bean
     public EntityMapper customEntityMapper() {
         return new CustomEntityMapper();
+    }
+
+    @Bean
+    public NoteRepository noteRepositoryImpl(CustomElasticsearchRepositoryFactory elasticsearchRepositoryFactory) {
+        return elasticsearchRepositoryFactory.getNoteRepository();
+    }
+
+    @Bean
+    public RepositoryProxy noteRepositoryProxy() {
+        return new RepositoryProxy();
     }
 }

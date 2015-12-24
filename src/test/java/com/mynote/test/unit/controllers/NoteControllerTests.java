@@ -15,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
+import static com.mynote.test.utils.UserTestUtils.getUser2;
+import static com.mynote.test.utils.UserTestUtils.getUser3;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,7 +36,7 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
         dbUnitHelper.deleteUsersFromDb();
         dbUnitHelper.cleanInsertUsersIntoDb();
 
-        elasticSearchUnit.cleanInsertNotes();
+        elasticSearchUnit.cleanInsertNotes(getUser2());
 
         loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser2LoginDTO());
     }
@@ -186,6 +188,8 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
         buildWebAppContext();
         loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser3LoginDTO());
 
+        elasticSearchUnit.cleanInsertNotes(getUser3());
+
         NoteFindDTO noteFindDTO = new NoteFindDTO();
 
         noteFindDTO.setSubject("goes");
@@ -203,6 +207,7 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
     public void getLatest_RequestForPageWith20Notes_PageWith18notesReturned() throws Exception {
         buildWebAppContext();
         loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser3LoginDTO());
+        elasticSearchUnit.cleanInsertNotes(getUser3());
 
         Pageable page = new PageRequestDTO(0, 18);
 
@@ -221,40 +226,6 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
         getLatestNotes(page)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(0)));
-    }
-
-    @Test
-    public void getSuggestedWords_WordPrefixInText_ArrayOfWordsReturned() throws Exception {
-        buildWebAppContext();
-        loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser3LoginDTO());
-
-        NoteFindDTO findDTO = new NoteFindDTO();
-
-        findDTO.setText("wor");
-
-        getSuggestedWords(findDTO)
-                .andExpect(jsonPath("$.", hasSize(3)));
-    }
-
-    @Test
-    public void getSuggestedWords_WordPrefixInSubject_ArrayOfWordsReturned() throws Exception {
-        buildWebAppContext();
-        loginUser(csrfTokenDTO, UserLoginDTOTestUtils.createUser3LoginDTO());
-
-        NoteFindDTO findDTO = new NoteFindDTO();
-
-        findDTO.setSubject("gene");
-
-        getSuggestedWords(findDTO)
-                .andExpect(jsonPath("$.", hasSize(3)));
-    }
-
-    private ResultActions getSuggestedWords(NoteFindDTO findDTO) throws Exception {
-        return mockMvc.perform(get("/api/note/get-suggested-words")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
-                .param("text", findDTO.getText())
-                .param("subject", findDTO.getSubject()));
     }
 
     private ResultActions getLatestNotes(Pageable page) throws Exception {
