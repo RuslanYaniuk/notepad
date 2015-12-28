@@ -1,5 +1,94 @@
+.layout-align-center-stretch {
+  -webkit-align-items: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  -webkit-align-content: stretch;
+  -ms-flex-line-pack: stretch;
+  align-content: stretch;
+}
+
+.note-container {
+  max-width: 660px;
+}
+
+//////////////////////////
+// Registration form
+//////////////////////////
+.header-correction > h2 {
+  margin-bottom: 3px;
+}
+
+.header-correction > h3 {
+  margin-top: 0;
+  margin-bottom: 37px;
+}
+
+.registration-card {
+  max-width: 800px;
+  min-height: 818px;
+}
+
+//////////////////////////
+// Search box
+//////////////////////////
+.search-box-container {
+  position: relative;
+  max-width: 660px;
+}
+
+.search-box-input-wrapper {
+  background-color: white;
+  border-radius: 2px;
+  padding: 0 0 0 12px;
+  z-index: 2
+}
+
+.search-box-input {
+  border-radius: 2px;
+  min-width: 100px;
+  border: 0;
+  padding: 8px 10px 8px 12px;
+  outline: none;
+  width: 100%;
+  font-size: 16px
+}
+
+.search-box-icon {
+  color: #444 !important;
+  opacity: 0.5
+}
+
+.search-box-input-wrapper .clear-button {
+  background-color: transparent;
+  border: 0;
+  outline: 0;
+  margin-right: 8px
+}
+
+.search-box-container .suggest-list {
+  position: absolute;
+  background-color: white;
+  height: auto;
+  width: 100%
+}
+//////////////////////////
+
+.text-center {
+  text-align: center;
+}
+
+.scroll-y-shifter {
+  overflow-y: scroll;
+  visibility: hidden;
+  height: 100%;
+}
+
 .hidden {
   visibility: hidden;
+}
+
+body {
+  overflow: hidden;
 }
 
 .card-body p {
@@ -9,23 +98,25 @@
   line-height: 20px;
 }
 
-.body-container {
+.content {
   background-color: transparent;
+  overflow-y: scroll;
 }
 
-.content {
+.mobile-toolbar {
+  display: none;
+}
+
+.page-container {
   background-color: @grey-100;
 }
 
-.footer {
+footer {
   background-color: white;
 }
 
-md-toolbar.fixed-on-top {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
+.main-toolbar {
+  z-index: 2;
 }
 
 .toolbar-height-offset {
@@ -63,7 +154,7 @@ fieldset.standard {
 }
 
 .login-card {
-  width: 350px
+  width: 310px
 }
 
 .full-height {

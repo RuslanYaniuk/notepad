@@ -9,9 +9,27 @@
 
         var SearchBoxController = function ($scope, noteService) {
 
+            var onSearch = function () {
+                    noteService.search($scope.notesContainer.searchString);
+                },
+
+                onExitSearchMode = function () {
+                    $scope.notesContainer.searchString = "";
+                    $scope.notesContainer.searchMode = false;
+                    noteService.getLatest();
+
+                },
+
+                onClearSearchField = function () {
+                    $scope.notesContainer.searchString = '';
+                    angular.element(document.getElementById('search-field')).focus();
+                };
+
+            $scope.search = onSearch;
+            $scope.exitSearchMode = onExitSearchMode;
+            $scope.clearSearchField = onClearSearchField;
 
             $scope.suggestions = [];
-            $scope.searchString = "";
             $scope.notesContainer = noteService.notesContainer;
         };
 

@@ -8,6 +8,7 @@ import com.mynote.dto.note.NoteUpdateDTO;
 import com.mynote.exceptions.NoteNotFoundException;
 import com.mynote.models.Note;
 import com.mynote.services.NoteService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -34,10 +35,14 @@ public class NoteController extends AbstractController {
         return ok(noteService.saveNote(noteDTO.getNote()));
     }
 
-    @RequestMapping(value = "/find", method = POST)
-    public ResponseEntity findNotes(@Validated @RequestBody NoteFindDTO noteFindDTO) {
+    @RequestMapping(value = "/find", method = GET)
+    public ResponseEntity findNotes(NoteFindDTO noteFindDTO) {
         Note note = noteFindDTO.getNote();
         Pageable page = (Pageable) noteFindDTO.getPage();
+
+        if (StringUtils.isBlank(noteFindDTO.getIdOrSubjectOrText())) {
+            return ok(noteService.getLatest(page));
+        }
 
         return ok(noteService.findNotes(note, page));
     }

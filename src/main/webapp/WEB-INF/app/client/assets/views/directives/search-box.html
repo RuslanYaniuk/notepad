@@ -1,0 +1,17 @@
+<div class="search-box-container" ng-controller="SearchBoxController" flex>
+
+  <div class="md-whiteframe-1dp search-box-input-wrapper" layout="row">
+    <md-icon class="material-icons md-light search-box-icon">search</md-icon>
+
+    <form ng-submit="search()" name="searchBox" flex autocomplete="off">
+      <input id="search-field" type="text" ng-model="notesContainer.searchString" placeholder="Search"
+             class="search-box-input">
+    </form>
+
+    <button ng-class="{hidden: notesContainer.searchString == ''}" ng-click="clearSearchField()" class="clear-button">
+      <md-icon class="search-box-icon material-icons">clear</md-icon>
+    </button>
+  </div>
+
+  <div class="md-whiteframe-2dp suggest-list"></div>
+</div>

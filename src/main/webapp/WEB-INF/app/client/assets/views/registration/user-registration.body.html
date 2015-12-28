@@ -1,16 +1,18 @@
 <div layout="row" layout-align="center center" flex>
 
-  <md-card style="width: 624px;" ng-controller="RegistrationController">
+  <md-card ng-controller="RegistrationController" style="max-width: 820px;" flex>
+    <md-card-content class="header-correction">
 
-    <md-tabs md-dynamic-height md-stretch-tabs="always" md-border-bottom>
-      <md-tab label="1. Create account">
-        <md-content style="height: 515px" class="md-padding" layout="column" layout-align="center start">
+      <h2 class="md-display-2">Join NotePad</h2>
+      <h3 class="md-headline">The simple way to store your notes</h3>
 
-          <form class="md-padding" name="userRegistrationForm">
-            <h1 class="md-headline">Create your personal account</h1>
+      <md-tabs md-dynamic-height md-stretch-tabs="always" md-border-bottom>
+        <md-tab label="1. Create account">
+          <md-content layout="column" layout-align="start start">
+            <form class="md-padding" name="userRegistrationForm">
+              <h4 class="md-title">Create your personal account</h4>
 
-            <div class="md-dialog-content">
-              <div layout="row">
+              <div class="md-dialog-content">
                 <md-input-container flex>
                   <label>First name</label>
                   <input ng-model="user.firstName" type="text" required>
@@ -20,119 +22,81 @@
                   <label>Last name</label>
                   <input ng-model="user.lastName" type="text" required>
                 </md-input-container>
+
+                <md-input-container>
+                  <label>Login</label>
+                  <input name="userLogin"
+                         type="text"
+                         ng-model="user.login"
+                         ng-minlength="8"
+                         ng-maxlength="100"
+                         ng-required="true"
+                         ng-pattern="/^[a-z0-9_-]{8,}$/i">
+
+                  <div ng-messages="userRegistrationForm.userLogin.$error" role="alert">
+                    <div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">
+                      Your login must be between 8 and 100 characters long.<br>
+                      You can use letters (a - z), numbers (0 - 9) and dash.
+                    </div>
+                  </div>
+                </md-input-container>
+
+                <md-input-container>
+                  <label>email</label>
+                  <input name="userEmail"
+                         type="email"
+                         ng-model="user.email"
+                         ng-minlength="5"
+                         ng-maxlength="100"
+                         ng-required="true"
+                         ng-pattern="/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i">
+
+                  <div ng-messages="userRegistrationForm.userEmail.$error" role="alert">
+                    <div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">
+                      Your email must be between 5 and 100 characters long and look like an e-mail address.
+                    </div>
+                  </div>
+                </md-input-container>
+
+                <md-input-container class="md-block">
+                  <label>Password</label>
+                  <input name="userPassword"
+                         type="text"
+                         ng-model="user.password"
+                         ng-minlength="8"
+                         ng-maxlength="100"
+                         ng-required="true"
+                         password>
+
+                  <div ng-messages="userRegistrationForm.userPassword.$error" role="alert">
+                    <div ng-message-exp="['password', 'required', 'minlength', 'maxlength']">
+                      Password should consist of lowercase characters,
+                      uppercase characters, special characters (e.g., ~!@#$%^&*) and numbers.
+                    </div>
+                  </div>
+                </md-input-container>
               </div>
 
-              <md-input-container class="md-block">
-                <label>Login</label>
-                <input name="userLogin"
-                       type="text"
-                       ng-model="user.login"
-                       ng-minlength="8"
-                       ng-maxlength="100"
-                       ng-required="true"
-                       ng-pattern="/^[a-z0-9_-]{8,}$/i">
+              <div class="md-actions" layout="row" layout-align="end center">
+                <md-button class="md-raised md-primary" ng-click="submitRegistrationForm()">
+                  create
+                </md-button>
+              </div>
+            </form>
+          </md-content>
+        </md-tab>
 
-                <div ng-messages="userRegistrationForm.userLogin.$error" role="alert">
-                  <div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">
-                    Your login must be between 8 and 100 characters long.<br>
-                    You can use letters (a - z), numbers (0 - 9) and dash.
-                  </div>
-                </div>
-              </md-input-container>
+        <md-tab label="2. Sign in">
+          <md-content class="md-padding" layout="column" layout-align="center center">
+            <h4 class="md-title text-center">Registration complete</h4>
 
-              <md-input-container md-no-float class="md-block">
-                <label>email</label>
-                <input name="userEmail"
-                       type="email"
-                       ng-model="user.email"
-                       ng-minlength="5"
-                       ng-maxlength="100"
-                       ng-required="true"
-                       ng-pattern="/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i">
+            <p class="md-body-1 text-center">Now you can login with your credentials</p>
+            <md-button class="md-raised md-primary" ui-sref="login">Login</md-button>
+          </md-content>
+        </md-tab>
+      </md-tabs>
 
-                <div ng-messages="userRegistrationForm.userEmail.$error" role="alert">
-                  <div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">
-                    Your email must be between 5 and 100 characters long and look like an e-mail address.
-                  </div>
-                </div>
-              </md-input-container>
-
-              <md-input-container class="md-block">
-                <label>Password</label>
-                <input name="userPassword"
-                       type="text"
-                       ng-model="user.password"
-                       ng-minlength="8"
-                       ng-maxlength="100"
-                       ng-required="true"
-                       password>
-
-                <div ng-messages="userRegistrationForm.userPassword.$error" role="alert">
-                  <div ng-message-exp="['password', 'required', 'minlength', 'maxlength']">
-                    Password should consist of lowercase characters,
-                    uppercase characters, special characters (e.g., ~!@#$%^&*) and numbers.
-                  </div>
-                </div>
-              </md-input-container>
-            </div>
-
-            <div class="md-actions" layout="row" layout-align="end center">
-              <md-button class="md-raised md-primary" ng-click="submitRegistrationForm()">
-                create
-              </md-button>
-            </div>
-          </form>
-
-        </md-content>
-      </md-tab>
-
-      <md-tab label="2. Choose plan">
-        <md-content style="height: 515px" class="md-padding" layout="row" layout-align="center start">
-
-          <form class="md-padding" flex>
-            <h1 class="md-headline">Choose one of the following plans</h1>
-
-            <div class="radioDemo2">
-              <md-divider></md-divider>
-              <md-radio-group ng-model="selectedPlan" >
-                <div ng-repeat='plan in plans' class="row">
-
-                  <md-radio-button
-                          ng-value="plan.id"
-                          class="md-primary"
-                          layout="row" layout-align="start center">
-                    <div flex style="max-width:200px;">
-                      {{plan.title}}
-                    </div>
-                    <div flex style="max-width:200px;">
-                      {{plan.title}}
-                    </div>
-                  </md-radio-button>
-
-                </div>
-              </md-radio-group>
-              <md-divider></md-divider>
-            </div>
-
-            <div class="md-actions" layout="row" layout-align="end center">
-              <md-button class="md-raised md-primary" ng-click="submitRegistrationForm()">
-                next
-              </md-button>
-            </div>
-          </form>
-
-        </md-content>
-      </md-tab>
-
-      <md-tab label="3. Sign in">
-        <md-content style="height: 515px" class="md-padding" layout="column" layout-align="center center">
-          <div class="md-padding">
-            <h1 class="md-display-2">Done</h1>
-          </div>
-        </md-content>
-      </md-tab>
-    </md-tabs>
-
+    </md-card-content>
   </md-card>
 
 </div>

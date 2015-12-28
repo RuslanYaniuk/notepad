@@ -16,27 +16,33 @@
                 .state('index', {
                     url: "/",
                     views: {
-                        "body": {templateUrl: "assets/views/index/index.body.html"}
+                        "tool-bar": {templateUrl: "assets/views/index/index.tool-bar.html"},
+                        "body": {templateUrl: "assets/views/index/index.body.html"},
+                        "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },
-                    permissions: ["*"]
+                    permissions: ["ROLE_ANONYMOUS"]
                 })
 
 
                 .state('login', {
                     url: "/login",
                     views: {
-                        "body": {templateUrl: "assets/views/login/login.body.html"}
+                        "tool-bar": {templateUrl: "assets/views/index/index.tool-bar.html"},
+                        "body": {templateUrl: "assets/views/login/login.body.html"},
+                        "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },
-                    permissions: ["*"]
+                    permissions: ["ROLE_ANONYMOUS"]
                 })
 
 
                 .state('user-registration', {
                     url: "/user-registration",
                     views: {
-                        "body": {templateUrl: "assets/views/registration/user-registration.body.html"}
+                        "tool-bar": {templateUrl: "assets/views/index/index.tool-bar.html"},
+                        "body": {templateUrl: "assets/views/registration/user-registration.body.html"},
+                        "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },
-                    permissions: ["*"]
+                    permissions: ["ROLE_ANONYMOUS"]
                 })
 
 
@@ -74,12 +80,23 @@
                 .state('application', {
                     url: "/app",
                     views: {
-                        "main-toolbar-left-section": {templateUrl: "assets/views/app/main-toolbar/left-section.html"},
-                        "main-toolbar-middle-section": {templateUrl: "assets/views/app/main-toolbar/middle-section.html"},
+                        "tool-bar": {templateUrl: "assets/views/app/app.tool-bar.html"},
                         "body": {templateUrl: "assets/views/app/app.body.html"},
-                        "side-menu": {templateUrl: "assets/views/app/note.side-nav.html"}
+                        "footer": {templateUrl: "assets/views/index/index.footer.html"},
+                        "side-nav": {templateUrl: "assets/views/app/note.side-nav.html"}
                     },
                     permissions: ["ROLE_USER"]
+                })
+
+                // Errors
+                .state('access-denied', {
+                    url: "/access-denied",
+                    views: {
+                        "tool-bar": {templateUrl: "assets/views/index/index.tool-bar.html"},
+                        "body": {templateUrl: "assets/views/errors/access-denied.body.html"},
+                        "footer": {templateUrl: "assets/views/index/index.footer.html"}
+                    },
+                    permissions: ["*"]
                 });
         };
     });

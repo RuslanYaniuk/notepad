@@ -60,6 +60,17 @@
                     });
                 },
 
+                onSearch = function (searchString) {
+                    return $http({
+                        url: "/api/note/find",
+                        method: "GET",
+                        params: {subject: searchString, text: searchString}
+                    }).then(function onGetLatest_Success(response) {
+                        _notesContainer.notes = response.data.content;
+                        _notesContainer.searchMode = true;
+                    });
+                },
+
                 getNoteIndex = function (noteId) {
                     var length = _notesContainer.notes.length;
 
@@ -78,10 +89,13 @@
                         subject: "",
                         text: "",
                         creationDate: ""
-                    }
+                    },
+                    searchMode: false,
+                    searchString: ""
                 };
 
             return {
+                search: onSearch,
                 createNote: onCreateNote,
                 updateNote: onUpdateNote,
                 getLatest: onGetLatest,

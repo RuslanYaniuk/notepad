@@ -16,7 +16,6 @@
         "services/UserRegistrationService",
         "controllers/AuthController",
         "controllers/SessionController",
-        "controllers/Dispatcher",
         "controllers/RegistrationController",
         "directives/PasswordValidator"
     ];
@@ -31,7 +30,6 @@
                                    UserRegistrationService,
                                    AuthController,
                                    SessionController,
-                                   Dispatcher,
                                    RegistrationController,
                                    PasswordValidator) {
 
@@ -51,7 +49,6 @@
             .service("userRoleService", UserRoleService)
             .service("userRegistrationService", UserRegistrationService)
 
-            .controller("Dispatcher", Dispatcher)
             .controller("RegistrationController", RegistrationController)
 
             .directive("password", PasswordValidator);

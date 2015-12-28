@@ -8,23 +8,21 @@
 
         var SessionController = function ($rootScope,
                                           $state,
-                                          $mdToast,
                                           sessionService,
                                           securityService) {
 
             var validateSession = function (event, stateTo) {
-                    if (sessionService.isAnonymousSession()) {
-                        securityService.validateNavigation(stateTo);
-                        return;
-                    }
+                if(!sessionService.isEmptySession()) {
+                    securityService.validateNavigation(event, stateTo);
+                }
 
-                    sessionService
-                        .getAuthority()
-                        .then(
-                        function onSuccess_getAuthority() {
-                            securityService.validateNavigation(stateTo);
-                        });
-                };
+                sessionService
+                    .getAuthority()
+                    .then(
+                    function onSuccess_getAuthority() {
+                        securityService.validateNavigation(event, stateTo);
+                    });
+            };
 
             /**
              * Each time a user performs transition between states
@@ -38,7 +36,6 @@
         return [
             "$rootScope",
             "$state",
-            "$mdToast",
             "sessionService",
             "securityService", SessionController];
     })

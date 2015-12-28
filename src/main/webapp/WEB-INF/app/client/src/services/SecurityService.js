@@ -7,15 +7,31 @@
 
     define(function () {
 
-        var SecurityService = function ($state, sessionService, userRoleService) {
+        var SecurityService = function (dispatcherService, sessionService, userRoleService) {
 
-            var onValidateNavigation = function (stateTo) {
-                    if (!hasStatePermission(sessionService.session.type, stateTo)) {
-                        $state.go("login");
+            var onValidateNavigation = function (event, stateTo) {
+                    var permission = sessionService.session.type;
+
+                    if (permission == '') {
+                        permission = 'ROLE_ANONYMOUS';
+                    }
+
+                    if (!hasPermission(permission, stateTo)) {
+                        event.preventDefault();
+
+                        if (sessionService.isAnonymousSession() ||
+                            sessionService.isEmptySession()) {
+                            dispatcherService.goToAccessDeniedErrorPage();
+                            return;
+                        }
+
+                        if (sessionService.isUserSession()) {
+                            dispatcherService.goToApplicationPage();
+                        }
                     }
                 },
 
-                hasStatePermission = function (permission, stateTo) {
+                hasPermission = function (permission, stateTo) {
                     if (stateTo.permissions[0] == "*") {
                         return true;
                     }
@@ -28,7 +44,7 @@
             }
         };
 
-        return ["$state", "sessionService", "userRoleService", SecurityService];
+        return ["dispatcherService", "sessionService", "userRoleService", SecurityService];
     });
 
 })(define);

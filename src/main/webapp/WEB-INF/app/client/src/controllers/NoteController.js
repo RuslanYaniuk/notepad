@@ -14,12 +14,32 @@
                     $scope.notesContainer.note.subject = "";
                     $scope.notesContainer.note.text = "";
 
-                    $mdDialog.show({
-                        controller: NoteController,
-                        templateUrl: 'assets/views/app/note.create.dlg.html',
-                        parent: angular.element(document.body),
-                        targetEvent: ev
-                    });
+                    var newNoteDialog = function () {
+                        $mdDialog.show({
+                            controller: NoteController,
+                            templateUrl: 'assets/views/app/note.create.dlg.html',
+                            parent: angular.element(document.body),
+                            targetEvent: ev
+                        });
+                    };
+
+                    if ($scope.notesContainer.searchMode) {
+                        var confirm = $mdDialog.confirm()
+                            .title('You are in the search mode')
+                            .content('To add a new note you need to quit the search mode')
+                            .ok('Quit')
+                            .cancel('Keep searching');
+
+                        $mdDialog.show(confirm).then(function onSelectYes() {
+                            $scope.notesContainer.searchString = "";
+                            $scope.notesContainer.searchMode = false;
+                            noteService.getLatest();
+
+                            newNoteDialog();
+                        });
+                    } else {
+                        newNoteDialog();
+                    }
                 },
 
                 onShowEditDialog = function (ev, note) {
@@ -53,7 +73,7 @@
                         .title('Delete confirmation')
                         .content('Delete this note? All data will be lost.')
                         .ariaLabel('Delete note')
-                        .ok('Yes')
+                        .ok('Delete')
                         .cancel('Cancel');
                     $mdDialog.show(confirm).then(function onSelectYes() {
                         noteService.deleteNote(note.id);
@@ -64,6 +84,10 @@
 
                 onGetFormattedText = function (note) {
                     return note.text;
+                },
+
+                onInitNewNoteDialog = function () {
+                    angular.element(document.getElementById('new-note-subject')).focus();
                 },
 
                 isValidNote = function (note) {
@@ -84,6 +108,7 @@
             $scope.showNewNoteDialog = onShowNewNoteDialog;
             $scope.showEditNoteDialog = onShowEditDialog;
             $scope.closeDialog = onCloseDialog;
+            $scope.initNewNoteDialog = onInitNewNoteDialog;
 
             $scope.createNote = onCreateNote;
             $scope.updateNote = onUpdateNote;

@@ -10,9 +10,8 @@
 
     define(function () {
 
-        var AuthController = function ($rootScope,
-                                       $scope,
-                                       $state,
+        var AuthController = function ($scope,
+                                       dispatcherService,
                                        authService,
                                        sessionService) {
 
@@ -24,8 +23,11 @@
                             .login($scope.login, $scope.password)
                             .then(
                             function onSuccess_login(response) {
-                                sessionService.updateAccountDetails(response.data.userDTO);
-                                $rootScope.$broadcast('dispatchByRoles', response.data.userDTO.userRoles);
+                                var userDTO = response.data.userDTO;
+
+                                sessionService.updateAccountDetails(userDTO);
+                                sessionService.createSession(userDTO.userRoles);
+                                dispatcherService.goToApplicationPage({location: 'replace'});
                             },
 
                             function onFault_login(response) {
@@ -45,7 +47,7 @@
                         .then(
                         function onSuccess_Logout() {
                             sessionService.clearSession();
-                            $rootScope.$broadcast('dispatchAfterLogout');
+                            dispatcherService.goToIndexPage();
                         });
                 },
 
@@ -64,9 +66,8 @@
         };
 
         return [
-            "$rootScope",
             "$scope",
-            "$state",
+            "dispatcherService",
             "authService",
             "sessionService", AuthController];
     });

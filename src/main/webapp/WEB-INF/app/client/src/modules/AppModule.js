@@ -6,40 +6,40 @@
     "use strict";
 
     var dependencies = [
-        "controllers/AppController",
         "controllers/NoteController",
         "controllers/NoteSideNavController",
         "controllers/SearchBoxController",
-        "services/NoteService"
+        "services/NoteService",
+        "services/DispatcherService"
     ];
 
-    define(dependencies, function (AppController, NoteController, NoteSideNavController, SearchBoxController, NoteService) {
+    define(dependencies, function (NoteController,
+                                   NoteSideNavController,
+                                   SearchBoxController,
+                                   NoteService,
+                                   DispatcherService) {
         var moduleName = "mynote.App";
 
-        var mod = angular.module(moduleName, [])
+        angular.module(moduleName, [])
 
-            .controller('AppController', AppController)
             .controller('NoteController', NoteController)
             .controller('NoteSideNavController', NoteSideNavController)
             .controller('SearchBoxController', SearchBoxController)
-            .service("noteService", NoteService);
+            .service('noteService', NoteService)
+            .service('dispatcherService', DispatcherService)
 
-        /*mod.directive('note', function factory() {
-         var directiveDefinitionObject = {
-         priority: 0,
-         templateUrl: 'assets/views/app.note.tpl.html',
-         transclude: false,
-         restrict: 'A',
-         templateNamespace: 'html',
-         scope: false,
-         controller: AppController,
-         controllerAs: 'AppController',
-         bindToController: true,
-         require: 'siblingDirectiveName'
-
-         };
-         return directiveDefinitionObject;
-         });*/
+            .directive('searchbox', function factory() {
+                return {
+                    priority: 0,
+                    templateUrl: 'assets/views/directives/search-box.html',
+                    transclude: false,
+                    restrict: 'A',
+                    scope: false,
+                    controller: SearchBoxController,
+                    controllerAs: 'SearchBoxController',
+                    bindToController: true
+                };
+            });
 
         return moduleName
     })
