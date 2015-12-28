@@ -101,6 +101,14 @@
                     return false;
                 },
 
+                onApplySearchOptions = function () {
+                    if (!$scope.notesContainer.searchInText && !$scope.notesContainer.searchInSubject) {
+                        $scope.notesContainer.searchInText = true;
+                        $scope.notesContainer.searchInSubject = true;
+                    }
+                    onCloseDialog();
+                },
+
                 init = function () {
                     noteService.getLatest();
                 };
@@ -113,6 +121,8 @@
             $scope.createNote = onCreateNote;
             $scope.updateNote = onUpdateNote;
             $scope.deleteNote = onDeleteNote;
+
+            $scope.applySearchOptions = onApplySearchOptions;
 
             $scope.init = init;
 

@@ -61,10 +61,19 @@
                 },
 
                 onSearch = function (searchString) {
+                    var requestParams = {};
+
+                    if (_notesContainer.searchInSubject) {
+                        requestParams.subject = searchString;
+                    }
+                    if (_notesContainer.searchInText) {
+                        requestParams.text = searchString;
+                    }
+
                     return $http({
                         url: "/api/note/find",
                         method: "GET",
-                        params: {subject: searchString, text: searchString}
+                        params: requestParams
                     }).then(function onGetLatest_Success(response) {
                         _notesContainer.notes = response.data.content;
                         _notesContainer.searchMode = true;
@@ -91,7 +100,9 @@
                         creationDate: ""
                     },
                     searchMode: false,
-                    searchString: ""
+                    searchString: "",
+                    searchInText: true,
+                    searchInSubject: true
                 };
 
             return {
