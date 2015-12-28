@@ -5,17 +5,28 @@
 (function (define) {
     "use strict";
 
-    var REGISTER_USER_URL = 'api/registration/register-new-user';
-
     define(function () {
         var UserRegistrationService = function ($http) {
 
+            var REGISTER_USER_URL = 'api/registration/register-new-user',
+                CHECK_AVAILABLE_CREDENTIALS_URL = 'api/registration/check-available';
+
             var onRegisterUser = function (user) {
-                return $http.put(REGISTER_USER_URL, user);
-            };
+                    return $http.put(REGISTER_USER_URL, user);
+                },
+
+                onCheckAvailableLogin = function (login) {
+                    return $http.post(CHECK_AVAILABLE_CREDENTIALS_URL, {login: login});
+                },
+
+                onCheckAvailableEmail = function (email) {
+                    return $http.post(CHECK_AVAILABLE_CREDENTIALS_URL, {email: email});
+                };
 
             return {
-                registerUser: onRegisterUser
+                registerUser: onRegisterUser,
+                checkAvailableLogin: onCheckAvailableLogin,
+                checkAvailableEmail: onCheckAvailableEmail
             }
         };
 

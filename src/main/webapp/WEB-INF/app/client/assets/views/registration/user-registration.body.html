@@ -1,15 +1,17 @@
 <div layout="row" layout-align="center center" flex>
 
-  <md-card ng-controller="RegistrationController" style="max-width: 820px;" flex>
+  <md-card md-selected="selectedTab" ng-controller="RegistrationController" style="max-width: 820px;" flex>
     <md-card-content class="header-correction">
 
       <h2 class="md-display-2">Join NotePad</h2>
       <h3 class="md-headline">The simple way to store your notes</h3>
 
       <md-tabs md-dynamic-height md-stretch-tabs="always" md-border-bottom>
-        <md-tab label="1. Create account">
-          <md-content layout="column" layout-align="start start">
-            <form class="md-padding" name="userRegistrationForm">
+        <md-tab label="1. Create account" ng-disabled="step1Disabled">
+          <md-content layout="row" layout-align="start start">
+
+            <span hide-sm flex="20"></span>
+            <form name="userRegistrationForm" flex>
               <h4 class="md-title">Create your personal account</h4>
 
               <div class="md-dialog-content">
@@ -31,12 +33,17 @@
                          ng-minlength="8"
                          ng-maxlength="100"
                          ng-required="true"
-                         ng-pattern="/^[a-z0-9_-]{8,}$/i">
+                         ng-pattern="/^[a-z0-9_-]{8,}$/i"
+                         ng-model-options='{ debounce: 1000 }'
+                         ng-change='checkAvailableLogin()'>
 
                   <div ng-messages="userRegistrationForm.userLogin.$error" role="alert">
                     <div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">
                       Your login must be between 8 and 100 characters long.<br>
                       You can use letters (a - z), numbers (0 - 9) and dash.
+                    </div>
+                    <div ng-message="notAvailable">
+                      Login is already taken
                     </div>
                   </div>
                 </md-input-container>
@@ -49,11 +56,16 @@
                          ng-minlength="5"
                          ng-maxlength="100"
                          ng-required="true"
-                         ng-pattern="/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i">
+                         ng-pattern="/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i"
+                         ng-model-options='{ debounce: 1000 }'
+                         ng-change='checkAvailableEmail()'>
 
                   <div ng-messages="userRegistrationForm.userEmail.$error" role="alert">
                     <div ng-message-exp="['required', 'minlength', 'maxlength', 'pattern']">
                       Your email must be between 5 and 100 characters long and look like an e-mail address.
+                    </div>
+                    <div ng-message="notAvailable">
+                      Email is already taken
                     </div>
                   </div>
                 </md-input-container>
@@ -61,7 +73,7 @@
                 <md-input-container class="md-block">
                   <label>Password</label>
                   <input name="userPassword"
-                         type="text"
+                         type="password"
                          ng-model="user.password"
                          ng-minlength="8"
                          ng-maxlength="100"
@@ -77,16 +89,17 @@
                 </md-input-container>
               </div>
 
-              <div class="md-actions" layout="row" layout-align="end center">
+              <div layout="row" layout-align="end center">
                 <md-button class="md-raised md-primary" ng-click="submitRegistrationForm()">
                   create
                 </md-button>
               </div>
             </form>
+            <span hide-sm flex="20"></span>
           </md-content>
         </md-tab>
 
-        <md-tab label="2. Sign in">
+        <md-tab label="2. Sign in" ng-disabled="step2Disabled">
           <md-content class="md-padding" layout="column" layout-align="center center">
             <h4 class="md-title text-center">Registration complete</h4>
 
