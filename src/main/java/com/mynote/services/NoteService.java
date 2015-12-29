@@ -32,10 +32,15 @@ public class NoteService {
     }
 
     public Note updateNote(Note note) throws NoteNotFoundException {
-        if (!noteRepositoryImpl.exists(note.getId())) {
+        Note existentNote;
+
+        if ((existentNote = noteRepositoryImpl.findOne(note.getId())) == null) {
             throw new NoteNotFoundException();
         }
-        return noteRepositoryImpl.save(note);
+        existentNote.setSubject(note.getSubject());
+        existentNote.setText(note.getText());
+
+        return noteRepositoryImpl.save(existentNote);
     }
 
     public Page<Note> findNotes(Note note, Pageable pageable) {

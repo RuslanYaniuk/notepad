@@ -1,10 +1,12 @@
 package com.mynote.test.unit.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mynote.dto.common.PageRequestDTO;
 import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.note.NoteDeleteDTO;
 import com.mynote.dto.note.NoteFindDTO;
 import com.mynote.dto.note.NoteUpdateDTO;
+import com.mynote.models.Note;
 import com.mynote.test.utils.ElasticSearchUnit;
 import com.mynote.test.utils.UserLoginDTOTestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -105,6 +107,31 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
                 .content(jacksonObjectMapper.writeValueAsString(noteUpdateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(MESSAGE_CODE, is("note.update.success")));
+    }
+
+    @Test
+    public void updateNote_CorrectNoteDTO_CreationDateRemainsTheSame() throws Exception {
+        NoteUpdateDTO noteUpdateDTO = new NoteUpdateDTO();
+        NoteFindDTO findDTO = new NoteFindDTO();
+        Note note = new Note();
+
+        note.setId("2");
+        note.setSubject("Updated subject");
+        note.setText("Updated text");
+
+        noteUpdateDTO.setNote(note);
+
+        mockMvc.perform(post("/api/note/update")
+                .session(session)
+                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
+                .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
+                .content(jacksonObjectMapper.writeValueAsString(noteUpdateDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(MESSAGE_CODE, is("note.update.success")));
+
+        findDTO.setNote(note);
+
+        findNote(findDTO).andExpect(jsonPath("$.content[0].creationDate", is("2015-12-14T18:34:02.122Z")));
     }
 
     @Test
