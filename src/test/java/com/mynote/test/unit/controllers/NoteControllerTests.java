@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static com.mynote.config.web.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static com.mynote.test.utils.UserTestUtils.getUser2;
@@ -51,8 +52,7 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
         createNote(noteCreateDTO)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", not(StringUtils.EMPTY)))
-                .andExpect(jsonPath("$.subject", is("Test subject")))
-                .andExpect(jsonPath("$.text", is("test text......")));
+                .andExpect(jsonPath("$.creationDate", not(StringUtils.EMPTY)));
     }
 
     @Test
@@ -175,12 +175,23 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
     }
 
     @Test
-    public void findNotes_EmptyFieldsDTO_400() throws Exception {
+    public void findNotes_NoteId_CorrectlyFormattedUTCDateReturned_200() throws Exception {
+        NoteFindDTO noteFindDTO = new NoteFindDTO();
+
+        noteFindDTO.setId("2");
+
+        findNote(noteFindDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].creationDate", is("2015-12-14T18:34:02.122Z")));
+    }
+
+    @Test
+    public void findNotes_EmptyFieldsDTO_ReturnedAll() throws Exception {
         NoteFindDTO noteFindDTO = new NoteFindDTO();
 
         findNote(noteFindDTO)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath(MESSAGE_CODE, is("NotBlank.noteFindDTO.idOrSubjectOrText")));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(4)));
     }
 
     @Test
@@ -194,11 +205,11 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
 
         noteFindDTO.setSubject("goes");
 
-        mockMvc.perform(post("/api/note/find")
+        mockMvc.perform(get("/api/note/find")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
-                .content(jacksonObjectMapper.writeValueAsString(noteFindDTO)))
+                .param("subject", noteFindDTO.getSubject()))
                 .andExpect(jsonPath("$.content", hasSize(20)))
                 .andExpect(jsonPath("$.content[0].id", is("AVFKmX5oLbYQMtdG0GOO")));
     }
@@ -245,10 +256,21 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
     }
 
     private ResultActions findNote(NoteFindDTO note) throws Exception {
-        return mockMvc.perform(post("/api/note/find")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
-                .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
-                .content(jacksonObjectMapper.writeValueAsString(note)));
+        MockHttpServletRequestBuilder requestBuilder =
+                get("/api/note/find")
+                        .session(session)
+                        .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
+                        .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8);
+
+        if (note.getSubject() != null) {
+            requestBuilder = requestBuilder.param("subject", note.getSubject());
+        }
+        if (note.getText() != null) {
+            requestBuilder = requestBuilder.param("text", note.getText());
+        }
+        if (note.getId() != null) {
+            requestBuilder = requestBuilder.param("id", note.getId());
+        }
+        return mockMvc.perform(requestBuilder);
     }
 }

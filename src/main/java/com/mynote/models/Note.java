@@ -1,6 +1,9 @@
 package com.mynote.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.mynote.config.elasticsearch.ZonedDateTimeDeserializer;
+import com.mynote.config.elasticsearch.ZonedDateTimeSerializer;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -26,8 +29,9 @@ public class Note {
     @Field(type = FieldType.String)
     private String text;
 
-    @Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "Z")
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    @JsonSerialize(using = ZonedDateTimeSerializer.class)
+    @JsonDeserialize(using = ZonedDateTimeDeserializer.class)
     private ZonedDateTime creationDate = ZonedDateTime.now(ZoneOffset.UTC);
 
     public Note() {

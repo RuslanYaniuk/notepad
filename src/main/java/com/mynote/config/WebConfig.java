@@ -25,6 +25,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import static com.mynote.config.web.Constants.APPLICATION_ENCODING;
@@ -43,7 +44,7 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
     public static final String VIEW_SUFFIX = ".html";
 
     @Autowired
-    private HttpMessageConverter jsonConverter;
+    private ObjectMapper jacksonObjectMapper;
 
     @Autowired
     private HttpMessageConverter<String> responseBodyConverter;
@@ -69,7 +70,7 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
         super.configureMessageConverters(converters);
 
         converters.add(responseBodyConverter);
-        converters.add(jsonConverter);
+        converters.add(new MappingJackson2HttpMessageConverter(jacksonObjectMapper));
     }
 
     @Bean
@@ -95,6 +96,7 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
 
         objectMapper.registerModule(new JSR310Module());
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
 
         return objectMapper;
     }
