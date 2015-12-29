@@ -18,12 +18,12 @@
         </md-card>
       </md-list-item>
 
-      <md-list-item class="md-2-line" ng-repeat="note in notesContainer.notes">
+      <md-list-item class="md-2-line repeated-item" ng-repeat="note in notesContainer.notes">
         <md-card flex>
-          <md-card-content>
+          <md-card-content layout="column">
             <div layout="row">
               <div class="md-block" flex>
-                <h2 class="md-headline">{{note.subject}}</h2>
+                <h2 class="note-subject md-headline">{{note.subject}}</h2>
               </div>
 
               <md-menu>
@@ -48,20 +48,26 @@
               </md-menu>
             </div>
 
-            <div style="max-height: 300px; overflow: auto">
-              <p class="card-body">{{getFormattedText(note)}}</p>
-            </div>
+            <pre id="text_{{note.id}}" ng-class="isExpanded(note)" class="note-text-holder md-body-1">{{getFormattedText(note)}}</pre>
           </md-card-content>
 
-          <div class="md-margin" layout="row" layout-align="end center">
-            <span class="md-padding">Created {{note.creationDate | date:"MMM dd, yyyy 'at' HH:mm"}}</span>
+          <div class="md-margin" layout="row" layout-align="space-between center">
+            <div>
+              <md-button ng-show="isTextHolderOverloaded(note)" class="md-icon-button" ng-click="expandCollapse(note)">
+                <md-icon class="material-icons md-light">{{getExpandIcon(note)}}</md-icon>
+              </md-button>
+            </div>
+
+            <span class="creation-date md-padding">Created {{note.creationDate | date:"MMM dd, yyyy 'at' HH:mm"}}</span>
           </div>
+
         </md-card>
       </md-list-item>
     </md-list>
   </div>
 
-  <md-button ng-click="showNewNoteDialog()" class="md-fab md-fab-bottom-right md-primary md-accent" aria-label="Add a new note" >
+  <md-button ng-click="showNewNoteDialog()" class="md-fab md-fab-bottom-right md-primary md-accent"
+             aria-label="Add a new note">
     <md-icon class="material-icons">add</md-icon>
   </md-button>
 </div>
