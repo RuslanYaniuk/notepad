@@ -15,15 +15,15 @@ import java.io.IOException;
 public class CustomEntityMapper implements EntityMapper {
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper jacksonObjectMapper;
 
     @Override
     public String mapToString(Object object) throws IOException {
-        return objectMapper.writeValueAsString(object);
+        return jacksonObjectMapper.writeValueAsString(object);
     }
 
     @Override
     public <T> T mapToObject(String source, Class<T> clazz) throws IOException {
-        return objectMapper.readValue(source, clazz);
+        return jacksonObjectMapper.readValue(source, clazz);
     }
 }
