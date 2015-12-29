@@ -18,7 +18,7 @@
         </md-card>
       </md-list-item>
 
-      <md-list-item class="md-2-line repeated-item" ng-repeat="note in notesContainer.notes">
+      <md-list-item ng-class="notesContainer.searchMode ? '' : ' repeated-item'" class="md-2-line" ng-repeat="note in notesContainer.notes">
         <md-card flex>
           <md-card-content layout="column">
             <div layout="row">

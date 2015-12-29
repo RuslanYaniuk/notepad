@@ -15,9 +15,11 @@
 
                 onExitSearchMode = function () {
                     $scope.notesContainer.searchString = "";
-                    $scope.notesContainer.searchMode = false;
-                    noteService.getLatest();
-
+                    noteService.getLatest()
+                        .then(
+                        function onSuccess_getLatest() {
+                            $scope.notesContainer.searchMode = false;
+                        });
                 },
 
                 onClearSearchField = function () {
