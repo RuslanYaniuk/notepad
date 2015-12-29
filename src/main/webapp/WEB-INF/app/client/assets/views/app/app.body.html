@@ -66,8 +66,16 @@
     </md-list>
   </div>
 
-  <md-button ng-click="showNewNoteDialog()" class="md-fab md-fab-bottom-right md-primary md-accent"
-             aria-label="Add a new note">
-    <md-icon class="material-icons">add</md-icon>
-  </md-button>
+  <div layout="row" style="top: auto;
+    right: 20px;
+    bottom: 20px;
+    left: auto;
+    position: absolute;">
+    <md-button ng-click="showNewNoteDialog()" class="md-fab md-primary md-accent"
+               aria-label="Add a new note">
+      <md-icon class="material-icons">add</md-icon>
+    </md-button>
+    <span hide show-gt-lg style="width: 250px"></span>
+
+  </div>
 </div>
