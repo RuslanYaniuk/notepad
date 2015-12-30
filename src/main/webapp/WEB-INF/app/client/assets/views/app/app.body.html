@@ -1,6 +1,6 @@
 <div layout="row" layout-align="center start" ng-controller="NoteController" ng-init="init()" flex>
 
-  <div class="note-container" flex>
+  <div id="note-holder" class="note-container" flex>
     <md-list class="layout-align-center-stretch" layout="column">
 
       <md-list-item class="md-2-line" ng-show="notesContainer.searchMode">
@@ -9,7 +9,7 @@
             <H2 class="md-title">Search results</H2>
 
             <div layout="row" layout-align="space-between">
-              <p class="md-body-2">Found: {{notesContainer.notes.length}}</p>
+              <p class="md-body-2">Found: {{notesContainer.lastPage.totalElements}}</p>
               <md-button class="md-primary" ng-click="exitSearchMode()" ng-controller="SearchBoxController">
                 Quit search
               </md-button>
@@ -62,6 +62,10 @@
           </div>
 
         </md-card>
+      </md-list-item>
+
+      <md-list-item layout="row" layout-align="center center" ng-show="loadInProgress">
+        <md-progress-circular md-mode="indeterminate"></md-progress-circular>
       </md-list-item>
     </md-list>
   </div>

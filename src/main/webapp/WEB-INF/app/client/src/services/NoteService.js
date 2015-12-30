@@ -7,7 +7,9 @@
 
     define(function () {
 
-        var NoteService = function ($http) {
+        var NoteService = function ($http, $q) {
+
+            var ITEMS_PER_PAGE = 10;
 
             var onCreateNote = function () {
                     var noteDTO = {
@@ -37,16 +39,6 @@
                         });
                 },
 
-                onGetLatest = function () {
-                    return $http({
-                        url: "/api/note/get-latest",
-                        method: "GET",
-                        params: {pageNumber: 0, pageSize: 20}
-                    }).then(function onGetLatest_Success(response) {
-                        _notesContainer.notes = response.data.content;
-                    });
-                },
-
                 onDeleteNote = function (noteId) {
                     return $http({
                         method: "DELETE",
@@ -60,8 +52,36 @@
                     });
                 },
 
-                onSearch = function (searchString) {
-                    var requestParams = {};
+                onGetLatest = function () {
+                    if ((_notesContainer.lastPage.number != 0) && _notesContainer.searchMode) {
+                        clearNotesContainer();
+                    }
+
+                    if (_notesContainer.lastPage.last) {
+                        return $q.when({});
+                    }
+
+                    return $http({
+                        url: "/api/note/get-latest",
+                        method: "GET",
+                        params: {pageNumber: _notesContainer.lastPage.number, pageSize: ITEMS_PER_PAGE}
+                    }).then(function onGetLatest_Success(response) {
+                        _notesContainer.notes = _notesContainer.notes.concat(response.data.content);
+                        _notesContainer.lastPage = response.data;
+                        _notesContainer.lastPage.number += 1;
+                    });
+                },
+
+                onSearch = function () {
+                    var searchString = _notesContainer.searchString;
+                    var requestParams;
+
+                    clearNotesContainer();
+
+                    requestParams = {
+                        'pageNumber': _notesContainer.lastPage.number,
+                        'pageSize': ITEMS_PER_PAGE
+                    };
 
                     if (_notesContainer.searchInSubject) {
                         requestParams.subject = searchString;
@@ -76,7 +96,27 @@
                         params: requestParams
                     }).then(function onGetLatest_Success(response) {
                         _notesContainer.notes = response.data.content;
+                        _notesContainer.lastPage = response.data;
                         _notesContainer.searchMode = true;
+                        _notesContainer.lastPage.requestParams = requestParams;
+                    });
+                },
+
+                onSearchScroll = function () {
+                    var requestParams = _notesContainer.lastPage.requestParams;
+
+                    if (_notesContainer.lastPage.last) {
+                        return $q.when({});
+                    }
+
+                    return $http({
+                        url: "/api/note/find",
+                        method: "GET",
+                        params: requestParams
+                    }).then(function onGetLatest_Success(response) {
+                        _notesContainer.notes = _notesContainer.notes.concat(response.data.content);
+                        _notesContainer.lastPage = response.data;
+                        _notesContainer.lastPage.number += 1;
                     });
                 },
 
@@ -91,8 +131,29 @@
                     return -1;
                 },
 
+                clearNotesContainer = function () {
+                    _notesContainer.notes = [];
+                    _notesContainer.lastPage = {
+                        first: true,
+                        last: false,
+                        number: 0,
+                        numberOfElements: 0,
+                        size: 0,
+                        totalPages: 0
+                    };
+                },
+
                 _notesContainer = {
                     notes: [],
+                    lastPage: {
+                        first: true,
+                        last: false,
+                        number: 0,
+                        numberOfElements: 0,
+                        size: 0,
+                        totalElements: 0,
+                        totalPages: 0
+                    },
                     note: {
                         id: "",
                         subject: "",
@@ -111,11 +172,12 @@
                 updateNote: onUpdateNote,
                 getLatest: onGetLatest,
                 deleteNote: onDeleteNote,
+                searchScroll: onSearchScroll,
                 notesContainer: _notesContainer
             }
         };
 
-        return ["$http", NoteService];
+        return ["$http", "$q", NoteService];
     });
 
 })(define);

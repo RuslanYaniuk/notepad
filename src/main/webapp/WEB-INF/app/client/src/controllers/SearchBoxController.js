@@ -10,7 +10,7 @@
         var SearchBoxController = function ($scope, noteService) {
 
             var onSearch = function () {
-                    noteService.search($scope.notesContainer.searchString);
+                    noteService.search();
                 },
 
                 onExitSearchMode = function () {

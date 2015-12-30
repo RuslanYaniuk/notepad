@@ -9,6 +9,8 @@
 
         var NoteController = function ($scope, $mdDialog, $sce, noteService) {
 
+            var noteHolder = document.getElementById('content-holder');
+
             var onShowNewNoteDialog = function (ev) {
                     $scope.notesContainer.note.id = "";
                     $scope.notesContainer.note.subject = "";
@@ -110,7 +112,10 @@
                 },
 
                 init = function () {
-                    noteService.getLatest();
+                    $scope.loadInProgress = true;
+                    noteService.getLatest().finally(function onFinally() {
+                        $scope.loadInProgress = false;
+                    });
                 },
 
                 onIsExpanded = function (note) {
@@ -152,6 +157,28 @@
                     return false;
                 };
 
+            noteHolder.addEventListener("scroll",
+                function () {
+                    var target = noteHolder,
+                        leftToScroll = target.scrollHeight - target.scrollTop - target.clientHeight;
+
+                    $scope.loadInProgress = true;
+
+                    if (leftToScroll < 25) {
+                        var loader;
+
+                        if ($scope.notesContainer.searchMode) {
+                            loader = noteService.searchScroll;
+                        } else {
+                            loader = noteService.getLatest;
+                        }
+
+                        loader().finally(function onFinally() {
+                            $scope.loadInProgress = false;
+                        });
+                    }
+                }, false);
+
             $scope.showNewNoteDialog = onShowNewNoteDialog;
             $scope.showEditNoteDialog = onShowEditDialog;
             $scope.closeDialog = onCloseDialog;
@@ -172,6 +199,8 @@
 
             $scope.notesContainer = noteService.notesContainer;
             $scope.getFormattedText = onGetFormattedText;
+
+            $scope.loadInProgress = false;
         };
 
         return ["$scope", "$mdDialog", "$sce", "noteService", NoteController];
