@@ -1,9 +1,10 @@
 package com.mynote.dto.note;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mynote.models.Note;
+import com.mynote.dto.common.PageRequestDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 /**
  * @author Ruslan Yaniuk
@@ -11,7 +12,8 @@ import org.springframework.data.domain.PageImpl;
  */
 public class NoteFindDTO extends AbstractNoteDTO {
 
-    private PageImpl<Note> page;
+    @JsonIgnore
+    private PageRequestDTO pageRequestDTO = new PageRequestDTO(0, 20);
 
     public String getId() {
         return note.getId();
@@ -37,12 +39,30 @@ public class NoteFindDTO extends AbstractNoteDTO {
         note.setText(text);
     }
 
-    public PageImpl<Note> getPage() {
-        return page;
+    public void setPageNumber(int pageNumber) {
+        pageRequestDTO.setPageNumber(pageNumber);
     }
 
-    public void setPage(PageImpl<Note> page) {
-        this.page = page;
+    public int getPageNumber() {
+        return pageRequestDTO.getPageNumber();
+    }
+
+    public void setPageSize(int pageSize) {
+        pageRequestDTO.setPageSize(pageSize);
+    }
+
+    public int getPageSize() {
+        return pageRequestDTO.getPageSize();
+    }
+
+    @JsonIgnore
+    public Pageable getPage() {
+        return pageRequestDTO;
+    }
+
+    @JsonIgnore
+    public void setPage(Pageable page) {
+        this.pageRequestDTO = (PageRequestDTO) page;
     }
 
     @NotBlank
@@ -51,10 +71,10 @@ public class NoteFindDTO extends AbstractNoteDTO {
         if (getId() != null) {
             return getId();
         }
-        if (getSubject() != null) {
+        if (!StringUtils.isBlank(getSubject())) {
             return getSubject();
         }
-        if (getText() != null) {
+        if (!StringUtils.isBlank(getText())) {
             return getText();
         }
         return null;

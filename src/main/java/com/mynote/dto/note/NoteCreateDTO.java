@@ -1,6 +1,7 @@
 package com.mynote.dto.note;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.validator.constraints.NotBlank;
 
 /**
@@ -28,10 +29,10 @@ public class NoteCreateDTO extends AbstractNoteDTO {
     @NotBlank
     @JsonIgnore
     public String getTextOrSubject() {
-        if (getSubject() != null) {
+        if (!StringUtils.isBlank(getSubject())) {
             return getSubject();
         }
-        if (getText() != null) {
+        if (!StringUtils.isBlank(getText())) {
             return getText();
         }
         return null;

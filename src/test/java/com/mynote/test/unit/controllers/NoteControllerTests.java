@@ -1,6 +1,5 @@
 package com.mynote.test.unit.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.mynote.dto.common.PageRequestDTO;
 import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.note.NoteDeleteDTO;
@@ -65,16 +64,16 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
     }
 
     @Test
-    public void deleteNote_CorrectNoteFindDTO_NoteDeleted_200() throws Exception {
-        NoteFindDTO noteFindDTO = new NoteFindDTO();
+    public void deleteNote_CorrectNoteDeleteDTO_NoteDeleted_200() throws Exception {
+        NoteDeleteDTO noteDeleteDTO = new NoteDeleteDTO();
 
-        noteFindDTO.setId("1");
+        noteDeleteDTO.setId("1");
 
         mockMvc.perform(delete("/api/note/delete")
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
-                .content(jacksonObjectMapper.writeValueAsString(noteFindDTO)))
+                .content(jacksonObjectMapper.writeValueAsString(noteDeleteDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(MESSAGE_CODE, is("note.delete.success")));
     }

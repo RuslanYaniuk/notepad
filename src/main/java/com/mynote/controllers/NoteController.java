@@ -38,7 +38,7 @@ public class NoteController extends AbstractController {
     @RequestMapping(value = "/find", method = GET)
     public ResponseEntity findNotes(NoteFindDTO noteFindDTO) {
         Note note = noteFindDTO.getNote();
-        Pageable page = (Pageable) noteFindDTO.getPage();
+        Pageable page = noteFindDTO.getPage();
 
         if (StringUtils.isBlank(noteFindDTO.getIdOrSubjectOrText())) {
             return ok(noteService.getLatest(page));
