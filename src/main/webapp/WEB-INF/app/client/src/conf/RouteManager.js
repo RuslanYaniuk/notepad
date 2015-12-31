@@ -16,7 +16,6 @@
                 .state('index', {
                     url: "/",
                     views: {
-                        "tool-bar": {templateUrl: "assets/views/index/index.tool-bar.html"},
                         "body": {templateUrl: "assets/views/index/index.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },
@@ -27,7 +26,7 @@
                 .state('login', {
                     url: "/login",
                     views: {
-                        "tool-bar": {templateUrl: "assets/views/index/index.tool-bar.html"},
+                        "tool-bar": {templateUrl: "assets/views/login/login.tool-bar.html"},
                         "body": {templateUrl: "assets/views/login/login.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },
@@ -38,7 +37,7 @@
                 .state('user-registration', {
                     url: "/user-registration",
                     views: {
-                        "tool-bar": {templateUrl: "assets/views/index/index.tool-bar.html"},
+                        "tool-bar": {templateUrl: "assets/views/login/login.tool-bar.html"},
                         "body": {templateUrl: "assets/views/registration/user-registration.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },

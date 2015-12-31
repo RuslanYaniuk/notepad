@@ -1,1 +1,48 @@
-<p>This is body
+<div layout="row" layout-align="center start" flex>
+
+  <div layout="column" layout-align="start center" flex>
+    <md-toolbar>
+      <div class="md-toolbar-tools" layout="row" layout-align="center center">
+        <div style="max-width: 780px;" layout="row" lyout-align="space-between center" flex>
+          <h1 class="md-display-3">Online NotePad</h1>
+          <span flex></span>
+
+          <div layout="row" layout-align="center center">
+            <md-button ui-sref="user-registration" aria-label="User registration" ui-sref="login">Sign up</md-button>
+            <md-button ui-sref="login" aria-label="Sign in">Sign In</md-button>
+          </div>
+        </div>
+      </div>
+
+      <div class="md-toolbar-tools"></div>
+      <div class="md-toolbar-tools"></div>
+    </md-toolbar>
+
+    <md-card style="margin-top: -84px; max-width: 800px; z-index: 2;" flex>
+      <md-card-content>
+
+        <div layout="row" layout-align="start start">
+          <div class="md-padding">
+            <img src="assets/icons/fav/apple-icon-114x114.png">
+          </div>
+          <div style="padding-left: 24px">
+            <div layout="column" layout-align="center start">
+              <h2 class="md-headline">Creative and modern notepad</h2>
+              <p class="md-subhead">Online NotePad is a simple web application designed to be a handy app for storing your text data and allowing quick search on it.
+                You can quickly create, edit, find and manipulate your notes with Online Notepad.
+                Try this application for free and create your personal account.</p>
+            </div>
+            <md-button class="md-raised md-accent" ui-sref="user-registration">Create account</md-button>
+
+            <div>
+              <img style="height: 300px" src="assets/img/screenshot.png">
+            </div>
+
+          </div>
+        </div>
+
+      </md-card-content>
+    </md-card>
+  </div>
+
+</div>
