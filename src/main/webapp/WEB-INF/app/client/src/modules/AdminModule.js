@@ -5,22 +5,21 @@
 (function (define) {
     "use strict";
 
-    var dependencies = [
-        "controllers/AdminController",
-        "services/AdminService"
-    ];
+    define([
+            "controllers/AdminController",
+            "services/AdminService"
+        ],
+        function (AdminController, AdminService) {
+            var moduleName = "mynote.AdminModule",
+                modules = [
+                    'md.data.table'
+                ];
 
-    define(dependencies, function (AdminController, AdminService) {
-        var moduleName = "mynote.AdminModule",
-            modules = [
-                'md.data.table'
-            ];
+            angular.module(moduleName, modules)
+                .controller('AdminController', AdminController)
+                .service('adminService', AdminService);
 
-        angular.module(moduleName, modules)
-            .controller('AdminController', AdminController)
-            .service('adminService', AdminService);
-
-        return moduleName;
-    });
+            return moduleName;
+        });
 
 })(define);

@@ -7,7 +7,7 @@
 
     define(function () {
 
-        return function ($stateProvider, $urlRouterProvider, $locationProvider) {
+        var uiRouter = function ($stateProvider, $urlRouterProvider, $locationProvider) {
 
             $locationProvider.html5Mode(true);
             $urlRouterProvider.otherwise("/");
@@ -98,6 +98,8 @@
                     permissions: ["*"]
                 });
         };
+
+        return ["$stateProvider", "$urlRouterProvider", "$locationProvider" , uiRouter];
     });
 
 })(define);

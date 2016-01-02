@@ -29,14 +29,3 @@ For development create dev configuration
           maxActive="15" maxIdle="3"/>
 
 3. Create mynote_test database and grant privileges to mynote user
-
-Install mongodb v2.4
-
-1. Create database "mynote"
-    use mynote
-2. Then isert some data to initialize the database
-    db.createCollection("test")
-    db.test.insert({data : ""})
-3. Add user db.addUser({user: "mynote", pwd: "mynote", roles: ["readWrite"]})
-
-Repeat these steps for to create "mynote_test" database;

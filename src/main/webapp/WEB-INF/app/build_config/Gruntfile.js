@@ -2,8 +2,13 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-requirejs');
+    grunt.loadNpmTasks('grunt-contrib-less');
 
+    /**
+     * Load global variables
+     */
     var userConfig = require('./build.config.js');
 
     var taskConfig = {
@@ -25,16 +30,16 @@ module.exports = function(grunt) {
             index: {
                 files: [
                     {
-                        src: '<%= devDir %>/index.vm',
-                        dest: '<%= buildDir %>/index.vm'
+                        src: '<%= devDir %>/index.html',
+                        dest: '<%= buildDir %>/index.html'
                     }
                 ]
             },
 
-            build_assets: {
+            assets: {
                 files: [
                     {
-                        src: [ '**', '!less/!**' ],
+                        src: [ '**', '!less/**', '!js/**' ],
                         cwd: '<%= devDir %>/assets',
                         dest: '<%= buildDir %>/assets/',
                         expand: true
@@ -42,74 +47,64 @@ module.exports = function(grunt) {
                 ]
             },
 
-            sources: {
+            production_boot: {
                 files: [
                     {
-                        src: [ '**/*.js' ],
-                        cwd: '<%= devDir %>/src',
-                        dest: '<%= buildDir %>/src/',
-                        expand: true
+                        src: '<%= devDir %>/assets/js/boot_prod.js',
+                        dest: '<%= buildDir %>/assets/js/boot.js'
                     }
                 ]
             },
 
-            build_vendorjs: {
+            vendor_files: {
                 files: [
                     {
-                        src: [ '**/*.js' ],
+                        src: [ '**/*' ],
                         cwd: '<%= devDir %>/vendor',
-                        dest: '<%= buildDir %>/assets/js/vendor/',
+                        dest: '<%= buildDir %>/vendor/',
                         expand: true
                     }
                 ]
             }
         },
 
-        bower: {
-            install: {
+        less: {
+            compile_production : {
                 options: {
-                    verbose: true,
-                    targetDir: '../client/assets/vendor',
-                    cleanBowerDir: true,
-                    layout: 'byType'
+                    paths: ["<%= devDir %>/assets/css"]
+                },
+                files: {
+                    "<%= buildDir %>/css/main.css": "<%= devDir %>/main.less"
                 }
+            }
+        },
+
+        /**
+         * Minifies RJS files and makes it production ready
+         * Build files are minified and encapsulated using RJS Optimizer plugin
+         */
+        requirejs: {
+            compile: {
+                options: {
+                    baseUrl: "../client/src",
+                    out: '<%= buildDir %>/src/notepad.min.js',
+                    name: 'main'
+                },
+                preserveLicenseComments : false,
+                optimize: "uglify"
             }
         }
     };
 
     grunt.initConfig(grunt.util._.extend(taskConfig, userConfig));
 
-    /* Tasks */
-    grunt.registerTask("prepare", [
-        'clean:src',
-        'bower:install'
-    ]);
-
-    grunt.registerTask("dev", [
-        'clean:src',
-        'copy:build_assets',
-        'copy:sources',
-        'copy:build_vendorjs',
-        'copy:index'
-    ]);
-
     grunt.registerTask( "prod", [
         'clean:src',
-        'copy:build_assets',
-        'copy:build_vendorjs',
-        'copy:prod_boot',
+        'copy:assets',
+        'less:compile_production',
+        'copy:production_boot',
+        'copy:vendor_files',
         'copy:index',
-        "requirejs",
-        "concat:source"
+        "requirejs"
     ]);
-
-    function stripBanner( src ) {
-        var m = [
-                '(?:.*\\/\\/.*\\r?\\n)*\\s*',   // Strip // ... leading banners.
-                '\\/\\*[\\s\\S]*?\\*\\/'        // Strips all /* ... */ block comment banners.
-            ],
-            re = new RegExp('^\\s*(?:' + m.join('|') + ')\\s*', '');
-
-        return src.replace(re, '', "gm");
-    };
 };

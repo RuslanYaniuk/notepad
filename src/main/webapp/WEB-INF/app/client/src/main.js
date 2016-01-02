@@ -5,14 +5,12 @@
 (function (define) {
     "use strict";
 
-    var dependencies = [
+    define([
         'modules/AuthModule',
         'modules/AppModule',
         'modules/AdminModule',
         'conf/RouteManager'
-    ];
-
-    define(dependencies, function (AuthModule, AppModule, AdminModule, RouteManager) {
+    ], function (AuthModule, AppModule, AdminModule, RouteManager) {
         var appName = 'mynote',
             modules = [
                 'ui.router',
@@ -29,12 +27,12 @@
 
                 .config(RouteManager)
 
-                .config(function ($mdThemingProvider) {
+                .config(["$mdThemingProvider", function ($mdThemingProvider) {
                     $mdThemingProvider.theme('default')
                         .accentPalette('orange')
                         .primaryPalette('teal')
                         .warnPalette('red');
-                })
+                }])
 
                 .config(['$httpProvider', function ($httpProvider) {
                     $httpProvider.defaults.xsrfHeaderName = 'X-CSRF-TOKEN';

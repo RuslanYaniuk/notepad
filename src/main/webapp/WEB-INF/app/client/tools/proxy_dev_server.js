@@ -22,6 +22,7 @@ app.use(function barMiddleware(req, response, next) {
 
     if (req.url.startsWith('/api')
         || req.url.startsWith('/assets')
+        || req.url.startsWith('/vendor')
         || req.url.startsWith('/src')) {
         next();
     } else {

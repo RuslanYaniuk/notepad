@@ -40,7 +40,7 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
 
     public static final String MESSAGES_LOCATION = "messages/messages";
 
-    public static final String VIEWS_LOCATION = "/WEB-INF/app/client/";
+    public static final String VIEWS_LOCATION = "/WEB-INF/app/bin/";
     public static final String VIEW_SUFFIX = ".html";
 
     @Autowired
@@ -51,13 +51,9 @@ public abstract class WebConfig extends WebMvcConfigurationSupport {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        /* Dev mode assets*/
-        registry.addResourceHandler("/bin/assets/**").addResourceLocations("/WEB-INF/app/client/assets/").setCachePeriod(31556926);
-        registry.addResourceHandler("/assets/**").addResourceLocations("/WEB-INF/app/client/assets/").setCachePeriod(31556926);
-        registry.addResourceHandler("/bin/src/**").addResourceLocations("/WEB-INF/app/client/src/").setCachePeriod(31556926);
-        registry.addResourceHandler("/bin/vendor/**").addResourceLocations("/WEB-INF/app/client/vendor/").setCachePeriod(31556926);
-        registry.addResourceHandler("/vendor/**").addResourceLocations("/WEB-INF/app/client/vendor/").setCachePeriod(31556926);
-        registry.addResourceHandler("/src/**").addResourceLocations("/WEB-INF/app/client/src/").setCachePeriod(31556926);
+        registry.addResourceHandler("/vendor/**").addResourceLocations("/WEB-INF/app/bin/vendor/");
+        registry.addResourceHandler("/assets/**").addResourceLocations("/WEB-INF/app/bin/assets/");
+        registry.addResourceHandler("/src/**").addResourceLocations("/WEB-INF/app/bin/src/");
     }
 
     @Override

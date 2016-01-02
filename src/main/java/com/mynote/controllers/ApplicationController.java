@@ -10,7 +10,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * @date Jun 2015
  */
 @Controller
-@RequestMapping("/")
+@RequestMapping("/*")
 public class ApplicationController {
 
     @RequestMapping(method = GET)

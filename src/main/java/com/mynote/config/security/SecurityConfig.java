@@ -52,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web
                 .ignoring()
                 .antMatchers(
-                        "/bin/**",
+                        "/*",
                         "/assets/**",
                         "/vendor/**",
                         "/src/**"
@@ -76,7 +76,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeRequests()
                 .antMatchers(
-                        "/",
                         "/api/auth/*",
                         "/api/registration/*",
                         LOGOUT_URL).permitAll()
