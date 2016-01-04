@@ -18,7 +18,7 @@
 
                     var newNoteDialog = function () {
                         $mdDialog.show({
-                            controller: NoteController,
+                            controller: 'NoteController',
                             templateUrl: 'assets/views/app/note.create.dlg.html',
                             parent: angular.element(document.body),
                             targetEvent: ev
@@ -50,7 +50,7 @@
                     $scope.notesContainer.note.text = note.text.valueOf();
 
                     $mdDialog.show({
-                        controller: NoteController,
+                        controller: 'NoteController',
                         templateUrl: 'assets/views/app/note.edit.dlg.html',
                         parent: angular.element(document.body)
                     });

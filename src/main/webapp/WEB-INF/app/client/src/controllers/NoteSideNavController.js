@@ -16,7 +16,7 @@
 
                 onShowSearchOptionsDialog = function (ev) {
                     $mdDialog.show({
-                        controller: NoteSideNavController,
+                        controller: 'NoteSideNavController',
                         templateUrl: 'assets/views/app/search-options.dlg.html',
                         parent: angular.element(document.body),
                         targetEvent: ev,
