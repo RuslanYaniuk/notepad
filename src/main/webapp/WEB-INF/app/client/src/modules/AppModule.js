@@ -34,9 +34,39 @@
                         transclude: false,
                         restrict: 'A',
                         scope: false,
-                        controller: SearchBoxController,
-                        controllerAs: 'SearchBoxController',
+                        controllerAs: 'NoteController',
                         bindToController: true
+                    };
+                })
+
+                .directive('notesList', function factory() {
+                    return {
+                        priority: 0,
+                        templateUrl: 'assets/views/directives/notes-list.html',
+                        transclude: false,
+                        restrict: 'A',
+                        scope: false,
+                        controllerAs: 'NoteController',
+                        bindToController: true
+                    };
+                })
+
+                .directive('onScrollEnd', function () {
+                    return {
+                        restrict: 'A',
+                        link: function (scope, element, attrs) {
+                            element.bind('scroll', function () {
+                                var target = element[0],
+                                    leftToScroll =
+                                        target.scrollHeight - target.scrollTop - target.clientHeight;
+
+                                if (leftToScroll < 50) {
+                                    scope.$apply(function (self) {
+                                        self[attrs.onScrollEnd](element[0]);
+                                    });
+                                }
+                            });
+                        }
                     };
                 });
 

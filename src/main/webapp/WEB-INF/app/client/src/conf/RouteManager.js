@@ -9,6 +9,12 @@
 
         var uiRouter = function ($stateProvider, $urlRouterProvider, $locationProvider) {
 
+            var ROLE_ANONYMOUS = "ROLE_ANONYMOUS",
+                ROLE_ADMIN = "ROLE_ADMIN",
+                ROLE_USER = "ROLE_USER",
+                FORBIDDEN_ALL = "FORBIDDEN_ALL",
+                PERMIT_ALL = "*";
+
             $locationProvider.html5Mode(true);
             $urlRouterProvider.otherwise("/");
 
@@ -19,7 +25,7 @@
                         "body": {templateUrl: "assets/views/index/index.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },
-                    permissions: ["ROLE_ANONYMOUS"]
+                    permissions: [ROLE_ANONYMOUS]
                 })
 
 
@@ -30,7 +36,7 @@
                         "body": {templateUrl: "assets/views/login/login.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },
-                    permissions: ["ROLE_ANONYMOUS"]
+                    permissions: [ROLE_ANONYMOUS]
                 })
 
 
@@ -41,7 +47,7 @@
                         "body": {templateUrl: "assets/views/registration/user-registration.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },
-                    permissions: ["ROLE_ANONYMOUS"]
+                    permissions: [ROLE_ANONYMOUS]
                 })
 
 
@@ -51,40 +57,54 @@
                         "body": {templateUrl: "assets/views/admin/admin.body.html"},
                         "side-menu": {templateUrl: "assets/views/admin/admin.side-menu.html"}
                     },
-                    permissions: ["ROLE_ADMIN"]
+                    permissions: [ROLE_ADMIN]
                 })
                 .state('admin-page.users', {
                     url: "/users",
                     views: {
                         "admin-page.body": {templateUrl: "assets/views/admin/admin.body.users.html"}
                     },
-                    permissions: ["ROLE_ADMIN"]
+                    permissions: [ROLE_ADMIN]
                 })
                 .state('admin-page.settings', {
                     url: "/settings",
                     views: {
                         "admin-page.body": {templateUrl: "assets/views/admin/admin.body.settings.html"}
                     },
-                    permissions: ["ROLE_ADMIN"]
+                    permissions: [ROLE_ADMIN]
                 })
                 .state('admin-page.statistic', {
                     url: "/statistic",
                     views: {
                         "admin-page.body": {templateUrl: "assets/views/admin/admin.body.statistic.html"}
                     },
-                    permissions: ["ROLE_ADMIN"]
+                    permissions: [ROLE_ADMIN]
                 })
 
 
                 .state('application', {
-                    url: "/app",
+                    url: "/note",
                     views: {
                         "tool-bar": {templateUrl: "assets/views/app/app.tool-bar.html"},
                         "body": {templateUrl: "assets/views/app/app.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"},
                         "side-nav": {templateUrl: "assets/views/app/note.side-nav.html"}
                     },
-                    permissions: ["ROLE_USER"]
+                    permissions: [FORBIDDEN_ALL]
+                })
+                .state('application.latestNotes', {
+                    url: "/latest",
+                    views: {
+                        "application.body": {templateUrl: "assets/views/app/app.body.latest-notes-list.html"}
+                    },
+                    permissions: [ROLE_USER]
+                })
+                .state('application.searchNotes', {
+                    url: "/search",
+                    views: {
+                        "application.body": {templateUrl: "assets/views/app/app.body.search-notes.html"}
+                    },
+                    permissions: [ROLE_USER]
                 })
 
                 // Errors
@@ -95,7 +115,7 @@
                         "body": {templateUrl: "assets/views/errors/access-denied.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },
-                    permissions: ["*"]
+                    permissions: [PERMIT_ALL]
                 });
         };
 

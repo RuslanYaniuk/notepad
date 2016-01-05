@@ -26,7 +26,7 @@
                         }
 
                         if (sessionService.isUserSession()) {
-                            dispatcherService.goToApplicationPage();
+                            dispatcherService.goToLatestNotesPage();
                         }
                     }
                 },

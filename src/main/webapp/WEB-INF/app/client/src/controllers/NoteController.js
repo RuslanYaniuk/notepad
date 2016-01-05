@@ -7,9 +7,7 @@
 
     define(function () {
 
-        var NoteController = function ($scope, $mdDialog, $sce, noteService) {
-
-            var noteHolder = document.getElementById('content-holder');
+        var NoteController = function ($scope, $mdDialog, noteService, dispatcherService) {
 
             var onShowNewNoteDialog = function (ev) {
                     $scope.notesContainer.note.id = "";
@@ -25,20 +23,19 @@
                         });
                     };
 
-                    if ($scope.notesContainer.searchMode) {
+                    if (dispatcherService.isSearchPageCurrent()) {
                         var confirm = $mdDialog.confirm()
                             .title('You are in the search mode')
                             .content('To add a new note you need to quit the search mode')
                             .ok('Quit')
                             .cancel('Keep searching');
 
-                        $mdDialog.show(confirm).then(function onSelectYes() {
-                            $scope.notesContainer.searchString = "";
-                            $scope.notesContainer.searchMode = false;
-                            noteService.getLatest();
-
-                            newNoteDialog();
-                        });
+                        $mdDialog
+                            .show(confirm)
+                            .then(function onSelectYes() {
+                                onExitSearchMode();
+                                newNoteDialog();
+                            });
                     } else {
                         newNoteDialog();
                     }
@@ -88,34 +85,12 @@
                     return note.text;
                 },
 
-                onInitNewNoteDialog = function () {
-                    angular.element(document.getElementById('new-note-subject')).focus();
-                },
-
-                isValidNote = function (note) {
-                    if (note.subject != undefined || "") {
-                        return true;
-                    }
-                    if (note.text != undefined || "") {
-                        return true;
-                    }
-
-                    return false;
-                },
-
                 onApplySearchOptions = function () {
                     if (!$scope.notesContainer.searchInText && !$scope.notesContainer.searchInSubject) {
                         $scope.notesContainer.searchInText = true;
                         $scope.notesContainer.searchInSubject = true;
                     }
                     onCloseDialog();
-                },
-
-                init = function () {
-                    $scope.loadInProgress = true;
-                    noteService.getLatest().finally(function onFinally() {
-                        $scope.loadInProgress = false;
-                    });
                 },
 
                 onIsExpanded = function (note) {
@@ -152,37 +127,37 @@
                     if (note.expanded) {
                         return true;
                     }
-
                     //element doesn't have overflow
                     return false;
+                },
+
+                onSearchSubmit = function () {
+                    noteService.clearNotesContainer();
+                    noteService.search();
+                    dispatcherService.goToSearchNotesPage();
+                },
+
+                onExitSearchMode = function () {
+                    $scope.notesContainer.searchString = "";
+                    dispatcherService.goToLatestNotesPage();
+                },
+
+                onGetLatest = function () {
+                    noteService.getLatest();
+                },
+
+                onCompleteCurrentList = function () {
+                    noteService.loadNextPageIfNeeded().then();
                 };
 
-            noteHolder.addEventListener("scroll",
-                function () {
-                    var target = noteHolder,
-                        leftToScroll = target.scrollHeight - target.scrollTop - target.clientHeight;
-
-                    $scope.loadInProgress = true;
-
-                    if (leftToScroll < 25) {
-                        var loader;
-
-                        if ($scope.notesContainer.searchMode) {
-                            loader = noteService.searchScroll;
-                        } else {
-                            loader = noteService.getLatest;
-                        }
-
-                        loader().finally(function onFinally() {
-                            $scope.loadInProgress = false;
-                        });
-                    }
-                }, false);
+            $scope.exitSearchMode = onExitSearchMode;
 
             $scope.showNewNoteDialog = onShowNewNoteDialog;
             $scope.showEditNoteDialog = onShowEditDialog;
             $scope.closeDialog = onCloseDialog;
-            $scope.initNewNoteDialog = onInitNewNoteDialog;
+            $scope.getLatest = onGetLatest;
+
+            $scope.searchSubmit = onSearchSubmit;
 
             $scope.createNote = onCreateNote;
             $scope.updateNote = onUpdateNote;
@@ -195,15 +170,17 @@
             $scope.isTextHolderOverloaded = onIsTextHolderOverloaded;
             $scope.expandCollapse = onExpandCollapse;
 
-            $scope.init = init;
-
             $scope.notesContainer = noteService.notesContainer;
             $scope.getFormattedText = onGetFormattedText;
 
-            $scope.loadInProgress = false;
+            $scope.completeCurrentList = onCompleteCurrentList;
         };
 
-        return ["$scope", "$mdDialog", "$sce", "noteService", NoteController];
+        return [
+            "$scope",
+            "$mdDialog",
+            "noteService",
+            "dispatcherService", NoteController];
     });
 
 })(define);

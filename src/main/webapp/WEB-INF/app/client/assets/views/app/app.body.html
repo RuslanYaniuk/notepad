@@ -1,85 +1,11 @@
-<div layout="row" layout-align="center start" ng-controller="NoteController" ng-init="init()" flex>
+<div layout="row" layout-align="center start" flex>
+  <div ui-view="application.body" class="note-container" flex></div>
 
-  <div id="note-holder" class="note-container" flex>
-    <md-list class="layout-align-center-stretch" layout="column">
-
-      <md-list-item class="md-2-line" ng-show="notesContainer.searchMode">
-        <md-card flex>
-          <md-card-content>
-            <H2 class="md-title">Search results</H2>
-
-            <div layout="row" layout-align="space-between">
-              <p class="md-body-2">Found: {{notesContainer.lastPage.totalElements}}</p>
-              <md-button class="md-primary" ng-click="exitSearchMode()" ng-controller="SearchBoxController">
-                Quit search
-              </md-button>
-            </div>
-          </md-card-content>
-        </md-card>
-      </md-list-item>
-
-      <md-list-item ng-class="notesContainer.searchMode ? '' : ' repeated-item'" class="md-2-line" ng-repeat="note in notesContainer.notes">
-        <md-card flex>
-          <md-card-content layout="column">
-            <div layout="row">
-              <div class="md-block" flex>
-                <h2 class="note-subject md-headline">{{note.subject}}</h2>
-              </div>
-
-              <md-menu>
-                <md-button class="md-icon-button" ng-click="$mdOpenMenu($event)">
-                  <md-icon class="material-icons md-light">more_vert</md-icon>
-                </md-button>
-
-                <md-menu-content width="3">
-                  <md-menu-item>
-                    <md-button ng-click="showEditNoteDialog($event, note)">
-                      <md-icon class="material-icons">edit</md-icon>
-                      Edit
-                    </md-button>
-                  </md-menu-item>
-                  <md-menu-item>
-                    <md-button ng-click="deleteNote(note)">
-                      <md-icon class="material-icons">delete</md-icon>
-                      Delete
-                    </md-button>
-                  </md-menu-item>
-                </md-menu-content>
-              </md-menu>
-            </div>
-
-            <pre id="text_{{note.id}}" ng-class="isExpanded(note)" class="note-text-holder md-body-1">{{getFormattedText(note)}}</pre>
-          </md-card-content>
-
-          <div class="md-margin" layout="row" layout-align="space-between center">
-            <div>
-              <md-button ng-show="isTextHolderOverloaded(note)" class="md-icon-button" ng-click="expandCollapse(note)">
-                <md-icon class="material-icons md-light">{{getExpandIcon(note)}}</md-icon>
-              </md-button>
-            </div>
-
-            <span class="creation-date md-padding">Created {{note.creationDate | date:"MMM dd, yyyy 'at' HH:mm"}}</span>
-          </div>
-
-        </md-card>
-      </md-list-item>
-
-      <md-list-item layout="row" layout-align="center center" ng-show="loadInProgress">
-        <md-progress-circular md-mode="indeterminate"></md-progress-circular>
-      </md-list-item>
-    </md-list>
-  </div>
-
-  <div layout="row" style="top: auto;
-    right: 20px;
-    bottom: 20px;
-    left: auto;
-    position: absolute;">
+  <div ng-controller="NoteController" class="fab-container" layout="row">
     <md-button ng-click="showNewNoteDialog()" class="md-fab md-primary md-accent"
                aria-label="Add a new note">
       <md-icon class="material-icons">add</md-icon>
     </md-button>
-    <span hide show-gt-lg style="width: 250px"></span>
-
+    <span hide show-gt-lg></span>
   </div>
 </div>

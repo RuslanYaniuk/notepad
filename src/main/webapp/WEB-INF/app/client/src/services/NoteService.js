@@ -53,60 +53,34 @@
                 },
 
                 onGetLatest = function () {
-                    if ((_notesContainer.lastPage.number != 0) && _notesContainer.searchMode) {
-                        clearNotesContainer();
-                    }
-
-                    if (_notesContainer.lastPage.last) {
-                        return $q.when({});
-                    }
+                    currentLoader = onGetLatest;
 
                     return $http({
                         url: "/api/note/get-latest",
                         method: "GET",
-                        params: {pageNumber: _notesContainer.lastPage.number, pageSize: ITEMS_PER_PAGE}
+                        params: {
+                            pageNumber: _notesContainer.page.number,
+                            pageSize: ITEMS_PER_PAGE
+                        }
                     }).then(function onGetLatest_Success(response) {
                         _notesContainer.notes = _notesContainer.notes.concat(response.data.content);
-                        _notesContainer.lastPage = response.data;
-                        _notesContainer.lastPage.number += 1;
+                        _notesContainer.page = response.data;
                     });
                 },
 
                 onSearch = function () {
-                    var searchString = _notesContainer.searchString;
-                    var requestParams;
+                    currentLoader = onSearch;
 
-                    clearNotesContainer();
-
-                    requestParams = {
-                        'pageNumber': _notesContainer.lastPage.number,
+                    var requestParams = {
+                        'pageNumber': _notesContainer.page.number,
                         'pageSize': ITEMS_PER_PAGE
                     };
 
                     if (_notesContainer.searchInSubject) {
-                        requestParams.subject = searchString;
+                        requestParams.subject = _notesContainer.searchString;
                     }
                     if (_notesContainer.searchInText) {
-                        requestParams.text = searchString;
-                    }
-
-                    return $http({
-                        url: "/api/note/find",
-                        method: "GET",
-                        params: requestParams
-                    }).then(function onGetLatest_Success(response) {
-                        _notesContainer.notes = response.data.content;
-                        _notesContainer.lastPage = response.data;
-                        _notesContainer.searchMode = true;
-                        _notesContainer.lastPage.requestParams = requestParams;
-                    });
-                },
-
-                onSearchScroll = function () {
-                    var requestParams = _notesContainer.lastPage.requestParams;
-
-                    if (_notesContainer.lastPage.last) {
-                        return $q.when({});
+                        requestParams.text = _notesContainer.searchString;
                     }
 
                     return $http({
@@ -115,8 +89,8 @@
                         params: requestParams
                     }).then(function onGetLatest_Success(response) {
                         _notesContainer.notes = _notesContainer.notes.concat(response.data.content);
-                        _notesContainer.lastPage = response.data;
-                        _notesContainer.lastPage.number += 1;
+                        _notesContainer.page = response.data;
+                        _notesContainer.page.requestParams = requestParams;
                     });
                 },
 
@@ -131,9 +105,17 @@
                     return -1;
                 },
 
-                clearNotesContainer = function () {
+                onLoadNextPageIfNeeded = function () {
+                    if (_notesContainer.page.last) {
+                        return $q.when({});
+                    }
+                    _notesContainer.page.number++;
+                    return currentLoader();
+                },
+
+                onClearNotesContainer = function () {
                     _notesContainer.notes = [];
-                    _notesContainer.lastPage = {
+                    _notesContainer.page = {
                         first: true,
                         last: false,
                         number: 0,
@@ -143,9 +125,12 @@
                     };
                 },
 
+                currentLoader = $q.when({}),
+
                 _notesContainer = {
                     notes: [],
-                    lastPage: {
+
+                    page: {
                         first: true,
                         last: false,
                         number: 0,
@@ -154,25 +139,27 @@
                         totalElements: 0,
                         totalPages: 0
                     },
+
                     note: {
                         id: "",
                         subject: "",
                         text: "",
                         creationDate: ""
                     },
-                    searchMode: false,
+
                     searchString: "",
                     searchInText: true,
                     searchInSubject: true
                 };
 
             return {
-                search: onSearch,
                 createNote: onCreateNote,
-                updateNote: onUpdateNote,
+                search: onSearch,
                 getLatest: onGetLatest,
+                updateNote: onUpdateNote,
                 deleteNote: onDeleteNote,
-                searchScroll: onSearchScroll,
+                clearNotesContainer: onClearNotesContainer,
+                loadNextPageIfNeeded: onLoadNextPageIfNeeded,
                 notesContainer: _notesContainer
             }
         };

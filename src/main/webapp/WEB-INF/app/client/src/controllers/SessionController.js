@@ -12,10 +12,6 @@
                                           securityService) {
 
             var validateSession = function (event, stateTo) {
-                if(!sessionService.isEmptySession()) {
-                    securityService.validateNavigation(event, stateTo);
-                }
-
                 sessionService
                     .getAuthority()
                     .then(
@@ -29,7 +25,6 @@
              * it validates the session
              */
             $rootScope.$on('$stateChangeStart', validateSession);
-            $rootScope.isAdminSession = sessionService.isAdminSession;
             $rootScope.getUserEmail = sessionService.getUserEmail;
         };
 

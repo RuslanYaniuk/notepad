@@ -1,9 +1,9 @@
-<div class="search-box-container" ng-controller="SearchBoxController" flex>
+<div class="search-box-container" ng-controller="NoteController" flex>
 
   <div class="md-whiteframe-1dp search-box-input-wrapper" layout="row">
     <md-icon class="material-icons md-light search-box-icon">search</md-icon>
 
-    <form ng-submit="search()" name="searchBox" flex autocomplete="off">
+    <form ng-submit="searchSubmit()" name="searchBox" flex autocomplete="off">
       <input id="search-field" type="text" ng-model="notesContainer.searchString" placeholder="Search"
              class="search-box-input">
     </form>

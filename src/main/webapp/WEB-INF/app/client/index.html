@@ -35,7 +35,7 @@
 <div class="page-container" layout="column" flex>
   <div ui-view="tool-bar" class="main-toolbar"></div>
 
-  <div id="content-holder" class="content" layout="column" flex>
+  <div ng-controller="NoteController" on-scroll-end="completeCurrentList" class="content" layout="column" flex>
     <section ui-view="body" layout="row" flex></section>
     <footer ui-view="footer"></footer>
   </div>

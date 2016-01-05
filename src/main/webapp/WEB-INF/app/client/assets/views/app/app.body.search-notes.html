@@ -1,0 +1,18 @@
+<div ng-controller="NoteController">
+
+  <md-card flex>
+    <md-card-content>
+      <H2 class="md-title">Search results</H2>
+
+      <div layout="row" layout-align="space-between">
+        <p class="md-body-2">Found: {{notesContainer.page.totalElements}}</p>
+
+        <md-button class="md-primary" ng-click="exitSearchMode()">
+          Quit search
+        </md-button>
+      </div>
+    </md-card-content>
+  </md-card>
+
+  <div notes-list></div>
+</div>

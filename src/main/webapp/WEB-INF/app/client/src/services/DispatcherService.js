@@ -9,8 +9,8 @@
 
         var DispatcherService = function ($state) {
 
-            var UI_STATE_ADMIN_PAGE = "admin-page",
-                UI_STATE_APPLICATION = "application",
+            var UI_STATE_NOTES_LATEST = "application.latestNotes",
+                UI_STATE_SEARCH_NOTES = "application.searchNotes",
                 UI_STATE_INDEX = "index",
                 UI_STATE_LOGIN = "login",
                 UI_STATE_ACCESS_DENIED_ERROR = "access-denied";
@@ -19,8 +19,8 @@
                     $state.go(UI_STATE_LOGIN);
                 },
 
-                onGoToApplicationPage = function (options) {
-                    $state.go(UI_STATE_APPLICATION, null, options);
+                onGoToLatestNotesPage = function (option) {
+                    $state.go(UI_STATE_NOTES_LATEST, null, option);
                 },
 
                 onGoToIndexPage = function () {
@@ -31,14 +31,12 @@
                     $state.go(UI_STATE_ACCESS_DENIED_ERROR);
                 },
 
-                onValidateUserTransition = function (event, stateTo) {
-                    if ((stateTo.name == UI_STATE_LOGIN) ||
-                        (stateTo.name == UI_STATE_INDEX)) {
-                        onGoToApplicationPage();
-                        return;
-                    }
+                onGoToSearchNotesPage = function () {
+                    $state.go(UI_STATE_SEARCH_NOTES);
+                },
 
-                    $state.go(stateTo.name);
+                onIsSearchPageCurrent = function () {
+                    return $state.current.name == UI_STATE_SEARCH_NOTES;
                 },
 
                 onGo = function (stateTo) {
@@ -47,10 +45,11 @@
 
             return {
                 goToLoginPage: onGoToLoginPage,
-                goToApplicationPage: onGoToApplicationPage,
+                goToLatestNotesPage: onGoToLatestNotesPage,
                 goToIndexPage: onGoToIndexPage,
                 goToAccessDeniedErrorPage: onGoToAccessDeniedErrorPage,
-                validateUserTransition: onValidateUserTransition,
+                goToSearchNotesPage: onGoToSearchNotesPage,
+                isSearchPageCurrent: onIsSearchPageCurrent,
                 go: onGo
             }
         };

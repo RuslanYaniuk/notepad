@@ -27,7 +27,7 @@
 
                                 sessionService.updateAccountDetails(userDTO);
                                 sessionService.createSession(userDTO.userRoles);
-                                dispatcherService.goToApplicationPage({location: 'replace'});
+                                dispatcherService.goToLatestNotesPage({location: 'replace'});
                             },
 
                             function onFault_login(response) {
