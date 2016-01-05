@@ -10,11 +10,15 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
  * @date Jun 2015
  */
 @Controller
-@RequestMapping("/*")
 public class ApplicationController {
 
-    @RequestMapping(method = GET)
+    @RequestMapping(value = "/*", method = GET)
     public String index() {
+        return "index";
+    }
+
+    @RequestMapping(value = "/notes/**", method = GET)
+    public String notes() {
         return "index";
     }
 }

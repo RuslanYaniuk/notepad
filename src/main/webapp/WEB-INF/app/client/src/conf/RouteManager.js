@@ -83,7 +83,7 @@
 
 
                 .state('application', {
-                    url: "/note",
+                    url: "/notes",
                     views: {
                         "tool-bar": {templateUrl: "assets/views/app/app.tool-bar.html"},
                         "body": {templateUrl: "assets/views/app/app.body.html"},

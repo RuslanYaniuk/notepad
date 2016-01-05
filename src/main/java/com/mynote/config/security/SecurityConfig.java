@@ -53,6 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .ignoring()
                 .antMatchers(
                         "/*",
+                        "/notes/**",
                         "/assets/**",
                         "/vendor/**",
                         "/src/**"
