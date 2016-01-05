@@ -8,4 +8,5 @@ node_modules
 bower_components
 .directory
 /src/main/webapp/WEB-INF/app/bin
+/src/main/webapp/WEB-INF/app/client/assets/css
 /webapp_link
