@@ -70,11 +70,8 @@ module.exports = function(grunt) {
 
         less: {
             compile_production : {
-                options: {
-                    paths: ["<%= devDir %>/assets/css"]
-                },
                 files: {
-                    "<%= buildDir %>/css/main.css": "<%= devDir %>/main.less"
+                    "<%= buildDir %>/assets/css/main.css": "<%= devDir %>/assets/less/main.less"
                 }
             }
         },
