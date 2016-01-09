@@ -136,7 +136,7 @@ public class UserService {
     }
 
     public User getSystemAdministrator() {
-        return userRepository.findByLoginOrEmail(appProperties.getAdminLogin(), appProperties.getAdminEmail());
+        return userRepository.findByLogin(appProperties.getAdminLogin());
     }
 
     private User createUser(User user) throws LoginAlreadyTakenException, EmailAlreadyTakenException {
