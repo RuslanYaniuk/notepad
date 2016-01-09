@@ -9,7 +9,6 @@ import com.mynote.models.UserRole;
 import com.mynote.services.UserRoleService;
 import com.mynote.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static com.mynote.services.UserRoleService.ROLE_ADMIN;
 import static com.mynote.services.UserRoleService.ROLE_USER;
@@ -18,7 +17,6 @@ import static com.mynote.services.UserRoleService.ROLE_USER;
  * @author Ruslan Yaniuk
  * @date September 2015
  */
-@Component
 public class DatabaseInitializer {
 
     @Autowired
