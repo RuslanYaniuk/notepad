@@ -15,6 +15,9 @@ import org.dbunit.DatabaseUnitException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.sql.SQLException;
 
@@ -25,10 +28,20 @@ import static org.junit.Assert.assertThat;
  * @author Ruslan Yaniuk
  * @date September 2015
  */
+@ContextConfiguration
 public class DatabaseInitializerTests extends AbstractServiceTest {
 
+    @Configuration
+    static class TestConfig {
+
+        @Bean(initMethod = "init")
+        public DatabaseInitializer databaseInitializer() {
+            return new DatabaseInitializer();
+        }
+    }
+
     @Autowired
-    private DatabaseInitializer databaseInitializerImpl;
+    private DatabaseInitializer databaseInitializer;
 
     @Autowired
     private ApplicationProperties applicationProperties;
@@ -45,7 +58,7 @@ public class DatabaseInitializerTests extends AbstractServiceTest {
     @Before
     public void setup() throws DatabaseUnitException, SQLException, EmailAlreadyTakenException, LoginAlreadyTakenException {
         dbUnitHelper.deleteUsersFromDb();
-        databaseInitializerImpl.init();
+        databaseInitializer.init();
     }
 
     @Test
