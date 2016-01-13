@@ -138,6 +138,7 @@
                 },
 
                 onExitSearchMode = function () {
+                    noteService.clearNotesContainer();
                     $scope.notesContainer.searchString = "";
                     dispatcherService.goToLatestNotesPage();
                 },
