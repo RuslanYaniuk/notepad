@@ -62,7 +62,6 @@ public class UserRoleService {
         if (userRoleRepository.findByRole(userRole.getRole()) != null) {
             throw new UserRoleAlreadyExists();
         }
-
         return userRoleRepository.save(userRole);
     }
 }

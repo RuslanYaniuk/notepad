@@ -1,5 +1,8 @@
 package com.mynote.config;
 
+import com.mynote.config.persistence.ElasticsearchConfig;
+import com.mynote.config.persistence.JpaConfig;
+import com.mynote.config.security.SecurityConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
@@ -8,23 +11,20 @@ import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatche
  */
 public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
-    /**
-     * Provide classes with @Bean configuration
-     */
     @Override
     protected Class<?>[] getRootConfigClasses() {
         return new Class<?>[]{
-                WebConfigAdapter.class
+                ApplicationConfig.class,
+                SecurityConfig.class,
+                JpaConfig.class,
+                ElasticsearchConfig.class
         };
     }
 
-    /**
-     * Initialize viewResolver
-     */
     @Override
     protected Class<?>[] getServletConfigClasses() {
         return new Class<?>[]{
-                WebConfigAdapter.class
+                WebConfig.class
         };
     }
 

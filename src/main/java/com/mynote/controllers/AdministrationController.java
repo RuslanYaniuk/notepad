@@ -50,14 +50,12 @@ public class AdministrationController extends AbstractController {
     @RequestMapping(value = "/update-user", method = POST)
     public ResponseEntity updateUser(@Validated @RequestBody UserUpdateDTO userUpdateDTO) throws UserNotFoundException, UserRoleNotFoundException {
         userService.updateUser(userUpdateDTO.getUser());
-
         return messageOK("user.update.success");
     }
 
     @RequestMapping(value = "/delete-user", method = DELETE)
     public ResponseEntity deleteUser(@Validated @RequestBody UserDeleteDTO userDeleteDTO) throws UserNotFoundException, OperationNotPermitted {
         userService.deleteUser(userDeleteDTO.getUser());
-
         return messageOK("user.account.deleted");
     }
 
@@ -67,10 +65,8 @@ public class AdministrationController extends AbstractController {
 
         if (userFindDTO.getId() != null) {
             UserInfoDTO userDTO = new UserInfoDTO(userService.findUserById(userId));
-
             return ok(userDTO);
         }
-
         throw new SearchFieldsAreEmpty();
     }
 
@@ -95,7 +91,6 @@ public class AdministrationController extends AbstractController {
     @RequestMapping(value = "/update-user-roles", method = POST)
     public ResponseEntity updateUserRoles(@Validated @RequestBody UserUpdateRolesDTO userUpdateRolesDTO) throws UserRoleNotFoundException, UserNotFoundException {
         userService.updateUserRoles(userUpdateRolesDTO.getUser());
-
         return messageOK("user.roles.updated");
     }
 }

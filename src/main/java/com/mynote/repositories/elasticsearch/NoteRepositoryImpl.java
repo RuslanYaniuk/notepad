@@ -47,18 +47,15 @@ public class NoteRepositoryImpl extends SimpleElasticsearchRepository<Note> impl
         if (note.getText() != null) {
             textToSearch = note.getText();
         }
-
         if (note.getId() != null) {
             queryBuilder = idsQuery("note").ids(note.getId());
         } else {
             queryBuilder = multiMatchQuery(textToSearch, getFieldsToSearch(note));
         }
-
         searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(queryBuilder)
                 .withPageable(pageable)
                 .build();
-
         return elasticsearchOperations.queryForPage(searchQuery, Note.class);
     }
 
@@ -84,12 +81,10 @@ public class NoteRepositoryImpl extends SimpleElasticsearchRepository<Note> impl
         if (note.getText() != null) {
             boolQueryBuilder.should(QueryBuilders.prefixQuery(TEXT_FIELD, note.getText()));
         }
-
         searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(boolQueryBuilder)
                 .withPageable(pageable)
                 .build();
-
         return elasticsearchOperations.queryForPage(searchQuery, Note.class);
     }
 
@@ -112,7 +107,6 @@ public class NoteRepositoryImpl extends SimpleElasticsearchRepository<Note> impl
         if (note.getText() != null) {
             fields.add(TEXT_FIELD);
         }
-
         return Iterables.toArray(fields, String.class);
     }
 }

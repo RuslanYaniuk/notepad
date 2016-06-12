@@ -1,8 +1,7 @@
 package com.mynote.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mynote.config.web.Constants;
-import com.mynote.config.web.ExtendedMessageSource;
+import com.mynote.config.Constants;
 import com.mynote.dto.MessageDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.NoSuchMessageException;
@@ -14,8 +13,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Locale;
 
-import static com.mynote.config.web.Constants.APPLICATION_ENCODING;
-import static com.mynote.config.web.Constants.APPLICATION_JSON_UTF8;
+import static com.mynote.config.Constants.APPLICATION_ENCODING;
+import static com.mynote.config.Constants.APPLICATION_JSON_UTF8;
 
 /**
  * @author Ruslan Yaniuk
@@ -28,7 +27,7 @@ public class JsonResponseBuilder {
     private ObjectMapper jacksonObjectMapper;
 
     @Autowired
-    private ExtendedMessageSource messageSource;
+    private CustomMessageSource messageSource;
 
     public void sendMessageDTO(HttpServletResponse response, Integer statusCode, MessageDTO messageDTO) throws IOException {
         sendJson(response, statusCode, jacksonObjectMapper.writeValueAsString(messageDTO));
@@ -43,7 +42,6 @@ public class JsonResponseBuilder {
         } catch (NoSuchMessageException e) {
             jsonResponse = new MessageDTO(Constants.SYSTEM_MESSAGE_CODE, msg);
         }
-
         sendJson(response, statusCode, jacksonObjectMapper.writeValueAsString(jsonResponse));
     }
 

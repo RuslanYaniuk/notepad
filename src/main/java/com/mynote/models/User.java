@@ -1,12 +1,15 @@
 package com.mynote.models;
 
-import com.mynote.config.db.ZonedDateTimeConverter;
+import com.mynote.utils.jpa.ZonedDateTimeConverter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +19,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "users")
-public class User implements Serializable {
+public class User implements UserDetails, Serializable {
 
     private static final long serialVersionUID = 4849225110054584579L;
 
@@ -39,8 +42,8 @@ public class User implements Serializable {
     @Column(nullable = false, length = 60)
     private String password;
 
-    @Column(nullable = false)
-    private Boolean enabled;
+    @Column
+    private boolean enabled;
 
     @Column(name = "registration_date_utc")
     @Convert(converter = ZonedDateTimeConverter.class)
@@ -109,8 +112,13 @@ public class User implements Serializable {
         this.password = password;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles;
+    }
+
     public Set<UserRole> getRoles() {
-        return roles;
+        return this.roles;
     }
 
     public void setRoles(Set<UserRole> roles) {
@@ -125,16 +133,37 @@ public class User implements Serializable {
         roles.remove(userRole);
     }
 
-    public Boolean isEnabled() {
+    @Override
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
     public LocalDateTime getRegistrationDateUTC() {
         return registrationDateUTC;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
     @Override

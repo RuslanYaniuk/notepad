@@ -1,8 +1,8 @@
 package com.mynote.controllers;
 
-import com.mynote.config.web.Constants;
-import com.mynote.config.web.ExtendedMessageSource;
+import com.mynote.config.Constants;
 import com.mynote.dto.MessageDTO;
+import com.mynote.utils.CustomMessageSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +31,7 @@ public abstract class AbstractController {
     }
 
     @Autowired
-    private ExtendedMessageSource messageSource;
+    protected CustomMessageSource customMessageSource;
 
     public ResponseEntity messageOK(String messageCode, String... messageArgs) {
         return jsonResponse(OK, messageCode, messageArgs);
@@ -67,7 +67,7 @@ public abstract class AbstractController {
 
     private ResponseEntity jsonResponse(HttpStatus httpStatus, String messageCode, String... messageArgs) {
         Locale currentThreadLocale = LocaleContextHolder.getLocale();
-        MessageDTO messageDTO = messageSource.getMessageDTO(messageCode, currentThreadLocale, messageArgs);
+        MessageDTO messageDTO = customMessageSource.getMessageDTO(messageCode, currentThreadLocale, messageArgs);
 
         return jsonResponse(messageDTO, httpStatus);
     }

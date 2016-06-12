@@ -1,9 +1,7 @@
 package com.mynote.controllers;
 
-import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.MessageDTO;
 import com.mynote.exceptions.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,9 +14,6 @@ import java.util.Locale;
  */
 @ControllerAdvice
 public class ExceptionController extends AbstractController {
-
-    @Autowired
-    private ExtendedMessageSource messageSource;
 
     @ExceptionHandler({
             UserNotFoundException.class,
@@ -40,8 +35,7 @@ public class ExceptionController extends AbstractController {
         MessageDTO messageDTO = new MessageDTO();
 
         messageDTO.setMessageCode(e.getMessage());
-        messageDTO.setMessage(messageSource.getMessage(e.getMessageSourceResolvable(), locale));
-
+        messageDTO.setMessage(customMessageSource.getMessage(e.getMessageSourceResolvable(), locale));
         return badRequest(messageDTO);
     }
 

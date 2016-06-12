@@ -1,11 +1,11 @@
 package com.mynote.test.unit.services;
 
 import com.google.common.collect.Lists;
+import com.mynote.config.Constants;
 import com.mynote.exceptions.UserRoleAlreadyExists;
 import com.mynote.exceptions.UserRoleNotFoundException;
 import com.mynote.models.UserRole;
 import com.mynote.services.UserRoleService;
-import com.mynote.test.utils.DBUnitHelper;
 import org.dbunit.DatabaseUnitException;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
-import static com.mynote.test.utils.UserRoleTestUtils.*;
+import static com.mynote.test.utils.UserRoleTestUtils.getNotExistentRole;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -32,13 +32,10 @@ public class UserRoleServiceTests extends AbstractServiceTest {
     @Autowired
     private UserRoleService userRoleService;
 
-    @Autowired
-    private DBUnitHelper dbUnitHelper;
-
     @Before
     public void setup() throws DatabaseUnitException, SQLException, FileNotFoundException {
-        dbUnitHelper.deleteUsersFromDb();
-        dbUnitHelper.cleanInsertUsersIntoDb();
+        dbUnit.deleteAllFixtures();
+        dbUnit.insertRoles();
     }
 
     @Test
@@ -46,22 +43,17 @@ public class UserRoleServiceTests extends AbstractServiceTest {
         UserRole userRole = getNotExistentRole();
 
         userRole = userRoleService.addRole(userRole);
-
         assertNotNull(userRole.getId());
     }
 
     @Test(expected = UserRoleAlreadyExists.class)
     public void addUserRole_ExistentRole_ExceptionThrown() throws UserRoleAlreadyExists {
-        UserRole userRole = getRoleUser();
-
-        userRoleService.addRole(userRole);
+        userRoleService.addRole(Constants.ROLE_USER);
     }
 
     @Test
     public void getAdminRole_AdminRoleReturned() {
-        UserRole userRole = userRoleService.getRoleAdmin();
-
-        assertThat(userRole, is(getRoleAdmin()));
+        assertThat(userRoleService.getRoleAdmin(), is(Constants.ROLE_ADMIN));
     }
 
     @Test
@@ -69,15 +61,13 @@ public class UserRoleServiceTests extends AbstractServiceTest {
         List<UserRole> userRoleList = userRoleService.getAllUserRoles();
 
         assertThat(userRoleList, hasSize(2));
-
-        assertThat(userRoleList, hasItem(getRoleAdmin()));
-        assertThat(userRoleList, hasItem(getRoleUser()));
+        assertThat(userRoleList, hasItem(Constants.ROLE_ADMIN));
+        assertThat(userRoleList, hasItem(Constants.ROLE_USER));
     }
 
     @Test
     public void findRoles_RoleWithIdNull_UserRolesUpdated() throws UserRoleNotFoundException {
-        List<UserRole> noIdRoles = Lists.newArrayList(getRoleUser(), getRoleAdmin());
-
+        List<UserRole> noIdRoles = Lists.newArrayList(Constants.ROLE_USER, Constants.ROLE_ADMIN);
         Set<UserRole> userRoles = userRoleService.findRoles(noIdRoles);
 
         assertThat(userRoles, hasSize(2));
@@ -95,7 +85,6 @@ public class UserRoleServiceTests extends AbstractServiceTest {
         UserRole roleAdmin = userRoleService.getRoleAdmin();
 
         userRoleService.initializeUsersSet(roleAdmin);
-
         assertNotNull(roleAdmin.getUsers());
     }
 }

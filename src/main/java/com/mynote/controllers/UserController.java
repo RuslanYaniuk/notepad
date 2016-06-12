@@ -1,8 +1,10 @@
 package com.mynote.controllers;
 
-import com.mynote.config.session.HttpSessionContext;
 import com.mynote.dto.user.UserInfoDTO;
 import com.mynote.exceptions.UserNotFoundException;
+import com.mynote.models.User;
+import com.mynote.services.UserService;
+import com.mynote.utils.CustomSessionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,10 +23,15 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public class UserController extends AbstractController {
 
     @Autowired
-    private HttpSessionContext httpSessionContext;
+    private CustomSessionContext customSessionContext;
+
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(value = "/get-info", method = GET)
     public ResponseEntity getInfo() throws IOException, UserNotFoundException {
-        return ok(new UserInfoDTO(httpSessionContext.getUser()));
+        User user = userService.findUserByEmail(customSessionContext.getUser().getUsername());
+
+        return ok(new UserInfoDTO(user));
     }
 }

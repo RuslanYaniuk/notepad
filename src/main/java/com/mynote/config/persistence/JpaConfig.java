@@ -1,6 +1,7 @@
 package com.mynote.config.persistence;
 
-import com.mynote.config.web.ApplicationProperties;
+import com.mynote.config.ApplicationConfig;
+import com.mynote.utils.jpa.DatabaseInitializer;
 import org.flywaydb.core.Flyway;
 import org.hibernate.cfg.ImprovedNamingStrategy;
 import org.hibernate.jpa.HibernatePersistenceProvider;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jndi.JndiTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -21,7 +23,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-import static com.mynote.config.web.ApplicationProperties.*;
+import static com.mynote.config.ApplicationConfig.*;
 
 /**
  * @author Ruslan Yaniuk
@@ -47,7 +49,6 @@ public class JpaConfig {
         } catch (NamingException e) {
             throw new BeanCreationException("dataSource", e);
         }
-
         return dataSource;
     }
 
@@ -58,7 +59,6 @@ public class JpaConfig {
         flyway.setBaselineOnMigrate(true);
         flyway.setLocations(DB_MIGRATIONS);
         flyway.setDataSource(dataSource);
-
         return flyway;
     }
 
@@ -74,7 +74,6 @@ public class JpaConfig {
         entityManagerFactory.setPackagesToScan(PACKAGES_TO_SCAN);
         entityManagerFactory.setJpaVendorAdapter(jpaVendorAdapter);
         entityManagerFactory.setJpaProperties(hibProperties);
-
         return entityManagerFactory;
     }
 
@@ -95,14 +94,19 @@ public class JpaConfig {
     }
 
     @Bean
-    public Properties hibProperties(ApplicationProperties applicationProperties) {
+    public Properties hibProperties(ApplicationConfig applicationProperties) {
         Properties properties = new Properties();
 
         properties.put(PROPERTY_NAME_HIBERNATE_DIALECT, applicationProperties.getHibernateDialect());
         properties.put(PROPERTY_NAME_HIBERNATE_SHOW_SQL, applicationProperties.getHibernateShowSql());
         properties.put(PROPERTY_NAME_HIBERNATE_HBM2DDL_AUTO, applicationProperties.getHibernateHbm2ddlAuto());
         properties.put(PROPERTY_NAME_HIBERNATE_EJB_NAMING_STRATEGY, ImprovedNamingStrategy.class.getCanonicalName());
-
         return properties;
+    }
+
+    @Bean(initMethod = "init")
+    @Profile({"dev", "prod"})
+    public DatabaseInitializer databaseInitializer() {
+        return new DatabaseInitializer();
     }
 }

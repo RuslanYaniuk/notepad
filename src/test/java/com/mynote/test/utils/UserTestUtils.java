@@ -1,10 +1,8 @@
 package com.mynote.test.utils;
 
 import com.google.common.collect.Sets;
+import com.mynote.config.Constants;
 import com.mynote.models.User;
-
-import static com.mynote.test.utils.UserRoleTestUtils.getRoleAdmin;
-import static com.mynote.test.utils.UserRoleTestUtils.getRoleUser;
 
 /**
  * @author Ruslan Yaniuk
@@ -27,7 +25,6 @@ public class UserTestUtils {
         user.setFirstName("Non Existent FirstName");
         user.setLastName("Non existent LastName");
         user.setPassword("Pa$$w0rd");
-
         return user;
     }
 
@@ -40,8 +37,7 @@ public class UserTestUtils {
         user.setEmail("user2@email.com");
         user.setPassword("$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe");
         user.setEnabled(true);
-        user.addRole(getRoleUser());
-
+        user.addRole(Constants.ROLE_USER);
         return user;
     }
 
@@ -54,8 +50,7 @@ public class UserTestUtils {
         user.setEmail("user3@email.com");
         user.setPassword("$2a$10$4jP1RZjEdoHFd.f2RMSP1utv3semRaKYi0NOsbO8FnM0cZipCsvOe");
         user.setEnabled(true);
-        user.addRole(getRoleUser());
-
+        user.addRole(Constants.ROLE_USER);
         return user;
     }
 
@@ -64,8 +59,7 @@ public class UserTestUtils {
 
         user.setId(1L);
         user.setPassword("Passw0rd");
-        user.setRoles(Sets.newHashSet(getRoleAdmin(), getRoleUser()));
-
+        user.setRoles(Sets.newHashSet(Constants.ROLE_ADMIN, Constants.ROLE_USER));
         return user;
     }
 }

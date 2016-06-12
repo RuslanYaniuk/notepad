@@ -1,11 +1,10 @@
 package com.mynote.test.unit.services;
 
-import com.mynote.config.web.ApplicationProperties;
+import com.mynote.config.ApplicationConfig;
+import com.mynote.config.Constants;
 import com.mynote.exceptions.*;
 import com.mynote.models.User;
-import com.mynote.models.UserRole;
 import com.mynote.services.UserService;
-import com.mynote.test.utils.DBUnitHelper;
 import org.dbunit.DatabaseUnitException;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
 
-import static com.mynote.test.utils.UserRoleTestUtils.getRoleAdmin;
 import static com.mynote.test.utils.UserTestUtils.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -28,26 +26,23 @@ import static org.junit.Assert.*;
 public class UserServiceTests extends AbstractServiceTest {
 
     @Autowired
-    private ApplicationProperties applicationProperties;
+    private ApplicationConfig applicationProperties;
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private DBUnitHelper dbUnitHelper;
-
     @Before
     public void setup() throws DatabaseUnitException, SQLException, FileNotFoundException {
-        dbUnitHelper.deleteUsersFromDb();
-        dbUnitHelper.cleanInsertUsersIntoDb();
+        dbUnit.deleteAllFixtures();
+
+        dbUnit.insertUsers();
+        dbUnit.insertRoles();
+        dbUnit.insertUsersToRoles();
     }
 
     @Test
     public void addUser_NewLoginAndEmail_UserSavedIntoDB() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
-        User user = createNonExistentUser();
-
-        user = userService.addUser(user);
-
+        User user = userService.addUser(createNonExistentUser());
         assertNotNull(user.getId());
     }
 
@@ -56,9 +51,7 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = createNonExistentUser();
 
         user.setEmail("MixedCase@Email.COM");
-
         user = userService.addUser(user);
-
         assertThat(user.getEmail().toLowerCase(), is(user.getEmail()));
     }
 
@@ -67,7 +60,6 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = createNonExistentUser("miXedcASElog@4in");
 
         user = userService.addUser(user);
-
         assertThat(user.getLogin().toLowerCase(), is(user.getLogin()));
     }
 
@@ -78,7 +70,6 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = createNonExistentUser(login, email);
 
         user = userService.addUser(user);
-
         assertThat(user.getLogin(), is(login.toLowerCase().trim()));
         assertThat(user.getEmail(), is(email.toLowerCase().trim()));
     }
@@ -91,9 +82,7 @@ public class UserServiceTests extends AbstractServiceTest {
 
         user.setFirstName(firstName);
         user.setLastName(lastName);
-
         user = userService.addUser(user);
-
         assertThat(user.getFirstName(), is(firstName.trim()));
         assertThat(user.getLastName(), is(lastName.trim()));
     }
@@ -103,9 +92,7 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = createNonExistentUser();
 
         user = userService.addUser(user);
-
         user = createNonExistentUser("differentLogin", user.getEmail());
-
         userService.addUser(user);
     }
 
@@ -114,9 +101,7 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = createNonExistentUser();
 
         user = userService.addUser(user);
-
         user = createNonExistentUser(user.getLogin(), "different@email.com");
-
         userService.addUser(user);
     }
 
@@ -126,9 +111,7 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = createNonExistentUser();
 
         user.setPassword(notEncryptedPass);
-
         user = userService.addUser(user);
-
         assertThat(user.getPassword(), not(notEncryptedPass));
         assertTrue(BCrypt.checkpw(notEncryptedPass, user.getPassword()));
     }
@@ -141,22 +124,18 @@ public class UserServiceTests extends AbstractServiceTest {
         admin.setFirstName("Admin First Name");
         admin.setLastName("Admin Last Name");
         admin.setPassword("Passw0rd");
-
         admin = userService.addAdministrator(admin);
-
-        assertTrue(admin.getRoles().contains(new UserRole("ROLE_ADMIN")));
+        assertTrue(admin.getRoles().contains(Constants.ROLE_ADMIN));
     }
 
     @Test
-    public void getAllUsersSortByLastNameDesc__ReturnedUsersListInNaturalOrder() {
+    public void getAllUsersSortByLastNameDesc__UsersListInNaturalOrder() {
         List<User> users = userService.getAllUsersSortByLastNameDesc();
 
         assertThat(users, hasSize(7));
-
         for (int i = 0; i < users.size() - 1; i++) {
             char firstElement = users.get(i).getLastName().toLowerCase().charAt(0);
             char secondElement = users.get(i + 1).getLastName().toLowerCase().charAt(0);
-
             assertThat(firstElement, lessThanOrEqualTo(secondElement));
         }
     }
@@ -208,17 +187,13 @@ public class UserServiceTests extends AbstractServiceTest {
 
     @Test
     public void findByLoginOrEmail_ValidLoginOrEmail_UserReturned() throws UserNotFoundException {
-        User user = userService.findByLoginOrEmail("user2", "user2@email.com");
+        String email = "user2@email.com";
+        String login = "user2";
+        User user = userService.findByLoginOrEmail(login, "not@correct.com");
 
-        assertNotNull(user);
-
-        user = userService.findByLoginOrEmail("user2", "not@correct.com");
-
-        assertThat(user.getEmail(), is("user2@email.com"));
-
-        user = userService.findByLoginOrEmail("notExist", "user2@email.com");
-
-        assertThat(user.getLogin(), is("user2"));
+        assertThat(user.getLogin(), is(login));
+        user = userService.findByLoginOrEmail("notExist", email);
+        assertThat(user.getEmail(), is(email));
     }
 
     @Test(expected = UserNotFoundException.class)
@@ -236,9 +211,7 @@ public class UserServiceTests extends AbstractServiceTest {
 
         user.setFirstName(firstName);
         user.setLastName(lastName);
-
         user = userService.updateUser(user);
-
         assertThat(user.getFirstName(), is(firstName));
         assertThat(user.getLastName(), is(lastName));
     }
@@ -249,9 +222,7 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = getUser2();
 
         user.setEmail(email);
-
         user = userService.updateUser(user);
-
         assertThat(user.getEmail(), is(email.toLowerCase().trim()));
     }
 
@@ -263,9 +234,7 @@ public class UserServiceTests extends AbstractServiceTest {
 
         user.setFirstName(firstName);
         user.setLastName(lastName);
-
         user = userService.updateUser(user);
-
         assertThat(user.getFirstName(), is(firstName.trim()));
         assertThat(user.getLastName(), is(lastName.trim()));
     }
@@ -276,7 +245,6 @@ public class UserServiceTests extends AbstractServiceTest {
 
         user.setFirstName("updated first name");
         user.setLastName("updated last name");
-
         userService.updateUser(user);
     }
 
@@ -284,17 +252,14 @@ public class UserServiceTests extends AbstractServiceTest {
     public void updateUserRoles_UserWithNewRolesSet_RolesUpdated() throws UserRoleNotFoundException, UserNotFoundException {
         User user = getUser2();
 
-        user.addRole(getRoleAdmin());
-
+        user.addRole(Constants.ROLE_ADMIN);
         user = userService.updateUserRoles(user);
-
-        assertThat(user.getRoles(), hasItem(getRoleAdmin()));
+        assertThat(user.getRoles(), hasItem(Constants.ROLE_ADMIN));
     }
 
     @Test(expected = UserNotFoundException.class)
     public void deleteUser_ValidUserId_UserDeleted() throws OperationNotPermitted, UserNotFoundException {
         userService.deleteUser(getUser2());
-
         userService.findUserById(2L);
     }
 
@@ -309,9 +274,7 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = getUser2();
 
         user.setPassword(newPassword);
-
         user = userService.resetUserPassword(user);
-
         assertTrue(BCrypt.checkpw(newPassword, user.getPassword()));
     }
 
@@ -320,9 +283,7 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = getUser2();
 
         user.setEnabled(true);
-
         user = userService.enableUserAccount(user);
-
         assertTrue(user.isEnabled());
     }
 
@@ -331,9 +292,7 @@ public class UserServiceTests extends AbstractServiceTest {
         User user = getUser2();
 
         user.setEnabled(false);
-
         user = userService.enableUserAccount(user);
-
         assertFalse(user.isEnabled());
     }
 

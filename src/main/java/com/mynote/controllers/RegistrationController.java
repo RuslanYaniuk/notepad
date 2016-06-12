@@ -1,6 +1,5 @@
 package com.mynote.controllers;
 
-import com.mynote.config.web.ApplicationProperties;
 import com.mynote.dto.user.UserFindDTO;
 import com.mynote.dto.user.UserRegistrationDTO;
 import com.mynote.exceptions.EmailAlreadyTakenException;
@@ -29,16 +28,9 @@ public class RegistrationController extends AbstractController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ApplicationProperties appProperties;
-
     @RequestMapping(value = "/register-new-user", method = PUT)
     public ResponseEntity registerNewUser(@Validated @RequestBody UserRegistrationDTO userRegistrationDTO) throws EmailAlreadyTakenException, LoginAlreadyTakenException, InterruptedException {
-        if (appProperties.isBruteForceProtectionEnabled()) {
-            Thread.sleep(appProperties.getBruteForceDelay());
-        }
         userService.addUser(userRegistrationDTO.getUser());
-
         return messageOK("user.registration.success");
     }
 
@@ -63,7 +55,6 @@ public class RegistrationController extends AbstractController {
                 return messageOK("user.email.isAvailable");
             }
         }
-
         throw new SearchFieldsAreEmpty();
     }
 }

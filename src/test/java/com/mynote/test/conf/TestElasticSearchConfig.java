@@ -1,6 +1,6 @@
 package com.mynote.test.conf;
 
-import com.mynote.config.elasticsearch.ElasticSearchConfig;
+import com.mynote.config.persistence.ElasticsearchConfig;
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -18,7 +18,7 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-public class TestElasticSearchConfig extends ElasticSearchConfig {
+public class TestElasticSearchConfig extends ElasticsearchConfig {
 
     @Autowired
     private EmbeddedElasticsearchServer embeddedElasticsearchServer;

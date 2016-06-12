@@ -3,6 +3,7 @@ package com.mynote.config.security;
 import com.mynote.config.security.filters.JsonUsernamePasswordAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -22,7 +23,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mynote.config.web.Constants.APPLICATION_ENCODING;
+import static com.mynote.config.Constants.APPLICATION_ENCODING;
 
 /**
  * @author Ruslan Yaniuk
@@ -30,6 +31,7 @@ import static com.mynote.config.web.Constants.APPLICATION_ENCODING;
  */
 @Configuration
 @EnableWebSecurity
+@ComponentScan("com.mynote.config.security")
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String LOGIN_URL = "/api/auth/login";
@@ -81,7 +83,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/registration/*",
                         LOGOUT_URL).permitAll()
 
-                .antMatchers("/api/administration/**").hasRole("ADMIN")
+                .antMatchers(
+                        "/api/administration/**",
+                        "/api/user/**").hasRole("ADMIN")
                 .antMatchers(
                         "/api/user/**",
                         "/api/note/**").hasRole("USER")
@@ -107,7 +111,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         jsonAuthFilter.setAuthenticationManager(providerManager);
         jsonAuthFilter.setAuthenticationFailureHandler(customAuthenticationFailureHandler);
         jsonAuthFilter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
-
         return jsonAuthFilter;
     }
 

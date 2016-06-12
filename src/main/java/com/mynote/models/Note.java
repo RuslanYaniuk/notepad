@@ -2,8 +2,8 @@ package com.mynote.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.mynote.config.elasticsearch.ZonedDateTimeDeserializer;
-import com.mynote.config.elasticsearch.ZonedDateTimeSerializer;
+import com.mynote.utils.elasticsearch.ZonedDateTimeDeserializer;
+import com.mynote.utils.elasticsearch.ZonedDateTimeSerializer;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -17,7 +17,7 @@ import java.time.ZonedDateTime;
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-@Document(indexName = "mynote_#{httpSessionContext.user.id}", type = "note")
+@Document(indexName = "mynote_#{customSessionContext.user.username}", type = "note")
 public class Note {
 
     @Id

@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import static com.mynote.config.web.Constants.APPLICATION_JSON_UTF8;
+import static com.mynote.config.Constants.APPLICATION_JSON_UTF8;
 
 /**
  * @author Ruslan Yaniuk
@@ -56,9 +56,7 @@ public class JsonUsernamePasswordAuthenticationFilter extends AbstractAuthentica
         authRequest = new UsernamePasswordAuthenticationToken(
                 user.getLogin(), user.getPassword());
 
-        // Allow subclasses to set the "details" property
         setDetails(request, authRequest);
-
         return this.getAuthenticationManager().authenticate(authRequest);
     }
 
@@ -81,10 +79,6 @@ public class JsonUsernamePasswordAuthenticationFilter extends AbstractAuthentica
     protected void setDetails(HttpServletRequest request,
                               UsernamePasswordAuthenticationToken authRequest) {
         authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
-    }
-
-    public void setPostOnly(boolean postOnly) {
-        this.postOnly = postOnly;
     }
 
     private UserLoginDTO getUserLoginDTOFromJsonRequest(HttpServletRequest request) {

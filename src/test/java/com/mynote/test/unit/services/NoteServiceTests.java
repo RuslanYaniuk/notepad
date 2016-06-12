@@ -1,23 +1,17 @@
 package com.mynote.test.unit.services;
 
-import com.mynote.config.session.HttpSessionContext;
 import com.mynote.exceptions.NoteNotFoundException;
 import com.mynote.models.Note;
+import com.mynote.models.User;
 import com.mynote.services.NoteService;
-import com.mynote.test.unit.conf.MockedSessionWebConfig;
-import com.mynote.test.unit.conf.TestHttpSessionContext;
-import com.mynote.test.utils.ElasticSearchUnit;
+import com.mynote.test.conf.TestApplicationConfig;
+import com.mynote.test.utils.ElasticsearchUnit;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -33,25 +27,24 @@ import static org.junit.Assert.assertTrue;
  * @author Ruslan Yaniuk
  * @date November 2015
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = {MockedSessionWebConfig.class})
-@TestPropertySource("classpath:test-db.config.properties")
-public class NoteServiceTests {
+public class NoteServiceTests extends AbstractServiceTest {
 
     @Autowired
     private NoteService noteService;
 
     @Autowired
-    private ElasticSearchUnit elasticSearchUnit;
+    private ElasticsearchUnit elasticsearchUnit;
 
     @Autowired
-    private HttpSessionContext httpSessionContext;
+    private TestApplicationConfig testApplicationConfig;
 
     @Before
     public void setupElasticSearch() throws IOException, ExecutionException, InterruptedException {
-        ((TestHttpSessionContext) httpSessionContext).setUser(getUser2());
-        elasticSearchUnit.cleanInsertNotes(getUser2());
+        User user2 = getUser2();
+
+        testApplicationConfig.getTestSessionContext().setMocked(true);
+        testApplicationConfig.getTestSessionContext().setUser(user2);
+        elasticsearchUnit.cleanInsertNotes(user2);
     }
 
     @Test
@@ -60,9 +53,7 @@ public class NoteServiceTests {
 
         note.setText("asdasd");
         note.setSubject("qweqwe");
-
         note = noteService.saveNote(note);
-
         assertThat(note.getId().length(), greaterThan(0));
     }
 
@@ -73,9 +64,7 @@ public class NoteServiceTests {
         note.setId("1");
         note.setText("Updated text");
         note.setSubject("Updated subject");
-
         note = noteService.updateNote(note);
-
         assertThat(note.getId(), is(note.getId()));
         assertThat(note.getSubject(), is(note.getSubject()));
         assertThat(note.getText(), is(note.getText()));
@@ -88,20 +77,17 @@ public class NoteServiceTests {
         note.setId("8888");
         note.setText("Updated text");
         note.setSubject("Updated subject");
-
         noteService.updateNote(note);
     }
 
     @Test
     public void deleteNote_NoteId_NoteDeleted() {
         Note note = new Note();
+        Page notes;
 
         note.setId("3");
-
         noteService.deleteNote(note);
-
-        Page notes = noteService.findAll(new PageRequest(1, 10));
-
+        notes = noteService.findAll(new PageRequest(1, 10));
         assertThat(notes.getTotalElements(), is(3L));
     }
 
@@ -110,10 +96,7 @@ public class NoteServiceTests {
         Note note = new Note();
 
         note.setId("3");
-
-        Page<Note> page = noteService.findNotes(note, null);
-        note = page.getContent().get(0);
-
+        note = noteService.findNotes(note, null).getContent().get(0);
         assertThat(note.getId(), is("3"));
         assertThat(note.getSubject(), is("subject 23 goes here. Third"));
     }
@@ -121,12 +104,11 @@ public class NoteServiceTests {
     @Test
     public void findNote_WordInSubject_OneNoteReturned() {
         Note note = new Note();
+        Page<Note> page;
 
         note.setSubject("Third 3");
-
-        Page<Note> page = noteService.findNotes(note, null);
+        page = noteService.findNotes(note, null);
         note = page.getContent().get(0);
-
         assertThat(page.getContent(), hasSize(1));
         assertTrue(note.getSubject().contains("Third"));
         assertTrue(note.getSubject().contains("3"));
@@ -135,9 +117,7 @@ public class NoteServiceTests {
     @Test
     public void getLatest_RequestForPage0_PageWithNotesSortedByDateDESCReturned() {
         Pageable pageable = new PageRequest(0, 20);
-
         Page<Note> page = noteService.getLatest(pageable);
-
         ZonedDateTime firstNoteDateTime = page.getContent().get(0).getCreationDate();
         ZonedDateTime secondDateTime = page.getContent().get(1).getCreationDate();
 
@@ -146,11 +126,10 @@ public class NoteServiceTests {
 
     @Test
     public void getLatest_User3PageRequestFor20Notes_20NotesReturned() throws InterruptedException, ExecutionException, IOException {
-        ((TestHttpSessionContext) httpSessionContext).setUser(getUser3());
-        elasticSearchUnit.cleanInsertNotes(getUser3());
+        testApplicationConfig.getTestSessionContext().setUser(getUser3());
+        elasticsearchUnit.cleanInsertNotes(getUser3());
 
         Pageable pageable = new PageRequest(0, 20);
-
         Page page = noteService.getLatest(pageable);
 
         assertThat(page.getNumberOfElements(), is(20));
@@ -158,11 +137,10 @@ public class NoteServiceTests {
 
     @Test
     public void getLatest_User3RequestFor2Pages_FirstPageDatesAreAfterSecondPageDates() throws InterruptedException, ExecutionException, IOException {
-        ((TestHttpSessionContext) httpSessionContext).setUser(getUser3());
-        elasticSearchUnit.cleanInsertNotes(getUser3());
+        testApplicationConfig.getTestSessionContext().setUser(getUser3());
+        elasticsearchUnit.cleanInsertNotes(getUser3());
 
         Pageable pageable = new PageRequest(0, 10);
-
         Page<Note> firstPage = noteService.getLatest(pageable);
 
         pageable = new PageRequest(1, 10);

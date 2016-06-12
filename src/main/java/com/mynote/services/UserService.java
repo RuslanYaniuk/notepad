@@ -1,6 +1,6 @@
 package com.mynote.services;
 
-import com.mynote.config.web.ApplicationProperties;
+import com.mynote.config.ApplicationConfig;
 import com.mynote.exceptions.*;
 import com.mynote.models.User;
 import com.mynote.models.UserRole;
@@ -23,7 +23,7 @@ public class UserService {
     private static final int BCRYPT_GENSALT_LOG2_ROUNDS = 12;
 
     @Autowired
-    private ApplicationProperties appProperties;
+    private ApplicationConfig applicationConfig;
 
     @Autowired
     private UserRepository userRepository;
@@ -88,11 +88,9 @@ public class UserService {
         if (existentUser == null) {
             throw new UserNotFoundException("id: " + id.toString());
         }
-
         existentUser.setEmail(user.getEmail().toLowerCase().trim());
         existentUser.setFirstName(user.getFirstName().trim());
         existentUser.setLastName(user.getLastName().trim());
-
         return userRepository.save(existentUser);
     }
 
@@ -101,7 +99,6 @@ public class UserService {
 
         user = findUserById(user.getId());
         user.setRoles(userRoles);
-
         return userRepository.save(user);
     }
 
@@ -119,7 +116,6 @@ public class UserService {
 
         user = findUserById(user.getId());
         user.setPassword(getBCryptHash(newPassword));
-
         return userRepository.save(user);
     }
 
@@ -131,12 +127,11 @@ public class UserService {
             throw new OperationNotPermitted();
         }
         user.setEnabled(enabled);
-
         return userRepository.save(user);
     }
 
     public User getSystemAdministrator() {
-        return userRepository.findByLogin(appProperties.getAdminLogin());
+        return userRepository.findByLogin(applicationConfig.getAdminLogin());
     }
 
     private User createUser(User user) throws LoginAlreadyTakenException, EmailAlreadyTakenException {
@@ -151,7 +146,6 @@ public class UserService {
                 throw new EmailAlreadyTakenException(email);
             }
         }
-
         user.setLogin(login);
         user.setEmail(email);
         user.setFirstName(user.getFirstName().trim());
@@ -159,7 +153,6 @@ public class UserService {
         user.setPassword(getBCryptHash(user.getPassword()));
         user.addRole(userRoleService.getRoleUser());
         user.setEnabled(true);
-
         return user;
     }
 

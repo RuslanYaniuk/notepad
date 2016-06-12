@@ -1,10 +1,10 @@
 package com.mynote.dto.user.constraints;
 
-import com.mynote.config.validation.ValidationGroupB;
-import com.mynote.config.validation.ValidationGroupC;
-import com.mynote.config.validation.annotations.Password;
 import com.mynote.dto.user.AbstractUserDTO;
 import com.mynote.models.User;
+import com.mynote.utils.validation.ValidationGroupB;
+import com.mynote.utils.validation.ValidationGroupC;
+import com.mynote.utils.validation.annotations.Password;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 

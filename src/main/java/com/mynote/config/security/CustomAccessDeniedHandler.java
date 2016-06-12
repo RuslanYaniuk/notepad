@@ -40,7 +40,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             jsonResponseBuilder.sendMessageDTO(response, SC_UNAUTHORIZED, accessDeniedException.getMessage());
             return;
         }
-
         jsonResponseBuilder.sendMessageDTO(response, SC_UNAUTHORIZED, "Unauthorized.");
     }
 }

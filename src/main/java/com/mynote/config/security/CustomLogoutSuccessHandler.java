@@ -1,7 +1,7 @@
 package com.mynote.config.security;
 
-import com.mynote.config.web.ExtendedMessageSource;
 import com.mynote.dto.MessageDTO;
+import com.mynote.utils.CustomMessageSource;
 import com.mynote.utils.JsonResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -28,7 +28,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
     private JsonResponseBuilder jsonResponseBuilder;
 
     @Autowired
-    private ExtendedMessageSource messageSource;
+    private CustomMessageSource messageSource;
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {

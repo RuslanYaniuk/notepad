@@ -2,6 +2,7 @@ package com.mynote.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -69,11 +70,14 @@ public class UserRole implements Serializable, GrantedAuthority {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserRole role1 = (UserRole) o;
-
-        return role.equals(role1.role);
+        if (o == null) return false;
+        if (getClass() == o.getClass()) {
+            return role.equals(((UserRole) o).role);
+        }
+        if (o.getClass() == GrantedAuthority.class || o.getClass() == SimpleGrantedAuthority.class) {
+            return role.equals(((GrantedAuthority) o).getAuthority());
+        }
+        return false;
     }
 
     @Override

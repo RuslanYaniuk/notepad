@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
+    public static final String INCORRECT_LOGIN_CODE = "user.login.error.incorrectLoginPassword";
     @Autowired
     private UserService userService;
 
@@ -31,27 +32,20 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String incomingPassword = authentication.getCredentials().toString();
         String incomingLogin = authentication.getName().toLowerCase();
-        UsernamePasswordAuthenticationToken authenticationToken;
         User user;
 
         try {
             user = userService.findByLoginOrEmail(incomingLogin, incomingLogin);
         } catch (UserNotFoundException e) {
-            throw new UsernameNotFoundException("user.login.error.incorrectLoginPassword");
+            throw new UsernameNotFoundException(INCORRECT_LOGIN_CODE);
         }
-
         if (!user.isEnabled()) {
             throw new AccountIsDisabledException();
         }
-
         if (!bCryptPasswordEncoder.matches(incomingPassword, user.getPassword())) {
-            throw new AuthenticationCredentialsNotFoundException("user.login.error.incorrectLoginPassword");
+            throw new AuthenticationCredentialsNotFoundException(INCORRECT_LOGIN_CODE);
         }
-
-        authenticationToken = new UsernamePasswordAuthenticationToken(incomingLogin, incomingPassword, user.getRoles());
-        authenticationToken.setDetails(user.getId());
-
-        return authenticationToken;
+        return new UsernamePasswordAuthenticationToken(user, incomingPassword, user.getRoles());
     }
 
     @Override

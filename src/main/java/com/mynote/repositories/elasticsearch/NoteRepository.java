@@ -1,7 +1,7 @@
 package com.mynote.repositories.elasticsearch;
 
 import com.mynote.models.Note;
-import com.mynote.repositories.elasticsearch.support.ElasticsearchAdmin;
+import com.mynote.utils.elasticsearch.ElasticsearchAdmin;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;

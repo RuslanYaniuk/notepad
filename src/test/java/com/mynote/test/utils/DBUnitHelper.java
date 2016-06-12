@@ -2,9 +2,11 @@ package com.mynote.test.utils;
 
 import com.mynote.test.utils.yaml.YamlDataSetLoader;
 import org.dbunit.DatabaseUnitException;
+import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
+import org.dbunit.ext.mysql.MySqlDataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -24,36 +26,44 @@ import java.sql.SQLException;
 @Component
 public class DBUnitHelper {
 
+    public static final String DBUNIT_DATASETS = "/dbunit-datasets/";
+
     @Autowired
     private DataSource dataSource;
 
     private IDatabaseConnection dbUnitCon;
 
-    private IDataSet userDataSet;
-
-    private IDataSet usersHasRolesDataSet;
+    private IDataSet users;
+    private IDataSet roles;
+    private IDataSet usersToRoles;
 
     @PostConstruct
     private void init() throws DatabaseUnitException, IOException {
         Connection con = DataSourceUtils.getConnection(dataSource);
 
         dbUnitCon = new DatabaseConnection(con);
+        dbUnitCon.getConfig().setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new MySqlDataTypeFactory());
 
-        userDataSet = YamlDataSetLoader.load("/dbunit-datasets/users-and-roles.yml");
-        usersHasRolesDataSet = YamlDataSetLoader.load("/dbunit-datasets/users-to-roles.yml");
+        users = YamlDataSetLoader.load(DBUNIT_DATASETS + "users.yml");
+        roles = YamlDataSetLoader.load(DBUNIT_DATASETS + "roles.yml");
+        usersToRoles = YamlDataSetLoader.load(DBUNIT_DATASETS + "users-to-roles.yml");
     }
 
-    public void cleanInsertUsersIntoDb() throws FileNotFoundException, SQLException, DatabaseUnitException {
-        DatabaseOperation.CLEAN_INSERT.execute(dbUnitCon, userDataSet);
-        DatabaseOperation.CLEAN_INSERT.execute(dbUnitCon, usersHasRolesDataSet);
+    public void insertUsers() throws FileNotFoundException, SQLException, DatabaseUnitException {
+        DatabaseOperation.INSERT.execute(dbUnitCon, users);
     }
 
-    public void deleteUsersFromDb() throws DatabaseUnitException, SQLException {
-        DatabaseOperation.DELETE_ALL.execute(dbUnitCon, usersHasRolesDataSet);
-        DatabaseOperation.DELETE_ALL.execute(dbUnitCon, userDataSet);
+    public void insertRoles() throws DatabaseUnitException, SQLException {
+        DatabaseOperation.INSERT.execute(dbUnitCon, roles);
     }
 
-    public IDataSet getUserDataSet() {
-        return userDataSet;
+    public void insertUsersToRoles() throws DatabaseUnitException, SQLException {
+        DatabaseOperation.INSERT.execute(dbUnitCon, usersToRoles);
+    }
+
+    public void deleteAllFixtures() throws DatabaseUnitException, SQLException {
+        DatabaseOperation.DELETE_ALL.execute(dbUnitCon, usersToRoles);
+        DatabaseOperation.DELETE_ALL.execute(dbUnitCon, roles);
+        DatabaseOperation.DELETE_ALL.execute(dbUnitCon, users);
     }
 }

@@ -1,10 +1,10 @@
 package com.mynote.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mynote.dto.user.constraints.EnableConstraint;
 import com.mynote.dto.user.constraints.IdConstraint;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Ruslan Yaniuk
@@ -12,13 +12,11 @@ import javax.validation.Valid;
  */
 public class UserEnableDTO extends AbstractUserDTO {
 
-    @Valid
-    @JsonIgnore
-    private IdConstraint idConstraint = new IdConstraint(this.user);
+    private Boolean enabled;
 
     @Valid
     @JsonIgnore
-    private EnableConstraint enableConstraint = new EnableConstraint(this.user);
+    private IdConstraint idConstraint = new IdConstraint(this.user);
 
     // Json building getters and setters
     public Long getId() {
@@ -29,20 +27,21 @@ public class UserEnableDTO extends AbstractUserDTO {
         user.setId(id);
     }
 
-    public Boolean getEnabled() {
-        return user.isEnabled();
+    @NotNull
+    public Boolean isEnabled() {
+        return enabled;
     }
 
     public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+        if (enabled == null) {
+            enabled = false;
+        }
         user.setEnabled(enabled);
     }
 
     // Validation getters
     public IdConstraint getIdConstraint() {
         return idConstraint;
-    }
-
-    public EnableConstraint getEnableConstraint() {
-        return enableConstraint;
     }
 }

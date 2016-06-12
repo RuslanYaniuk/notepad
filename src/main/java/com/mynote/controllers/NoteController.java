@@ -43,21 +43,18 @@ public class NoteController extends AbstractController {
         if (StringUtils.isBlank(noteFindDTO.getIdOrSubjectOrText())) {
             return ok(noteService.getLatest(page));
         }
-
         return ok(noteService.findNotes(note, page));
     }
 
     @RequestMapping(value = "/update", method = POST)
     public ResponseEntity updateNote(@Validated @RequestBody NoteUpdateDTO noteUpdateDTO) throws NoteNotFoundException {
         noteService.updateNote(noteUpdateDTO.getNote());
-
         return messageOK("note.update.success");
     }
 
     @RequestMapping(value = "/delete", method = DELETE)
     public ResponseEntity deleteNote(@Validated @RequestBody NoteDeleteDTO noteDeleteDTO) {
         noteService.deleteNote(noteDeleteDTO.getNote());
-
         return messageOK("note.delete.success");
     }
 
