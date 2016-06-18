@@ -29,7 +29,7 @@ public class UserTestUtils {
     }
 
     public static User getUser2() {
-        User user = new User("user2", "user2@email.com");
+        User user = new User("user2login", "user2@email.com");
 
         user.setId(2L);
         user.setFirstName("User2 FirstName");

@@ -1,8 +1,8 @@
 package com.mynote.utils.validation.annotations;
 
-import com.mynote.utils.validation.PasswordValidator;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.SafeHtml;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -15,17 +15,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * @author Ruslan Yaniuk
- * @date October 2015
+ * @date June 2016
  */
 @NotBlank
-@Length(min = 8, max = 100)
+@Length(min = 1, max = 255)
+@SafeHtml
 @Target({METHOD, FIELD, ANNOTATION_TYPE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = PasswordValidator.class)
+@Constraint(validatedBy = {})
 @Documented
-public @interface Password {
+public @interface Name {
 
-    String message() default "does not meet minimum complexity";
+    String message() default "invalid name";
 
     Class<?>[] groups() default {};
 

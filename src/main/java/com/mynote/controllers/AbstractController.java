@@ -41,10 +41,6 @@ public abstract class AbstractController {
         return jsonResponse(body, OK);
     }
 
-    public ResponseEntity messageBadRequest(String messageCode, String... messageArgs) {
-        return jsonResponse(BAD_REQUEST, messageCode, messageArgs);
-    }
-
     public <T> ResponseEntity badRequest(T body) {
         return jsonResponse(body, BAD_REQUEST);
     }

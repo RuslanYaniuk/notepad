@@ -1,9 +1,9 @@
 package com.mynote.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mynote.dto.user.constraints.*;
-
-import javax.validation.Valid;
+import com.mynote.utils.validation.annotations.Email;
+import com.mynote.utils.validation.annotations.Login;
+import com.mynote.utils.validation.annotations.Name;
+import com.mynote.utils.validation.annotations.Password;
 
 /**
  * @author Ruslan Yaniuk
@@ -11,27 +11,7 @@ import javax.validation.Valid;
  */
 public class UserRegistrationDTO extends AbstractUserDTO {
 
-    @Valid
-    @JsonIgnore
-    private LoginConstraint loginConstraint = new LoginConstraint(this.user);
-
-    @Valid
-    @JsonIgnore
-    private EmailConstraint emailConstraint = new EmailConstraint(this.user);
-
-    @Valid
-    @JsonIgnore
-    private FirstNameConstraint firstNameConstraint = new FirstNameConstraint(this.user);
-
-    @Valid
-    @JsonIgnore
-    private LastNameConstraint lastNameConstraint = new LastNameConstraint(this.user);
-
-    @Valid
-    @JsonIgnore
-    private PasswordConstraint passwordConstraint = new PasswordConstraint(this.user);
-
-    // Json building getters and setters
+    @Login
     public String getLogin() {
         return user.getLogin();
     }
@@ -40,6 +20,7 @@ public class UserRegistrationDTO extends AbstractUserDTO {
         user.setLogin(login);
     }
 
+    @Name
     public String getFirstName() {
         return user.getFirstName();
     }
@@ -48,6 +29,7 @@ public class UserRegistrationDTO extends AbstractUserDTO {
         user.setFirstName(firstName);
     }
 
+    @Name
     public String getLastName() {
         return user.getLastName();
     }
@@ -56,6 +38,7 @@ public class UserRegistrationDTO extends AbstractUserDTO {
         user.setLastName(lastName);
     }
 
+    @Email
     public String getEmail() {
         return user.getEmail();
     }
@@ -64,32 +47,12 @@ public class UserRegistrationDTO extends AbstractUserDTO {
         user.setEmail(email);
     }
 
+    @Password
     public String getPassword() {
         return user.getPassword();
     }
 
     public void setPassword(String password) {
         user.setPassword(password);
-    }
-
-    // Validation getters
-    public LoginConstraint getLoginConstraint() {
-        return loginConstraint;
-    }
-
-    public EmailConstraint getEmailConstraint() {
-        return emailConstraint;
-    }
-
-    public FirstNameConstraint getFirstNameConstraint() {
-        return firstNameConstraint;
-    }
-
-    public LastNameConstraint getLastNameConstraint() {
-        return lastNameConstraint;
-    }
-
-    public PasswordConstraint getPasswordConstraint() {
-        return passwordConstraint;
     }
 }

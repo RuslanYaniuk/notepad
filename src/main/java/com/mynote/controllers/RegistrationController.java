@@ -1,11 +1,13 @@
 package com.mynote.controllers;
 
 import com.mynote.dto.user.UserFindDTO;
+import com.mynote.dto.user.UserInfoDTO;
 import com.mynote.dto.user.UserRegistrationDTO;
 import com.mynote.exceptions.EmailAlreadyTakenException;
 import com.mynote.exceptions.LoginAlreadyTakenException;
 import com.mynote.exceptions.SearchFieldsAreEmpty;
 import com.mynote.exceptions.UserNotFoundException;
+import com.mynote.models.User;
 import com.mynote.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +32,9 @@ public class RegistrationController extends AbstractController {
 
     @RequestMapping(value = "/register-new-user", method = PUT)
     public ResponseEntity registerNewUser(@Validated @RequestBody UserRegistrationDTO userRegistrationDTO) throws EmailAlreadyTakenException, LoginAlreadyTakenException, InterruptedException {
-        userService.addUser(userRegistrationDTO.getUser());
-        return messageOK("user.registration.success");
+        User user = userService.addUser(userRegistrationDTO.getUser());
+
+        return ok(new UserInfoDTO(user));
     }
 
     @RequestMapping(value = "/check-available", method = POST)

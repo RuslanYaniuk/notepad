@@ -1,10 +1,8 @@
 package com.mynote.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mynote.dto.user.constraints.IdConstraint;
-import com.mynote.dto.user.constraints.PasswordConstraint;
+import com.mynote.utils.validation.annotations.Password;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Ruslan Yaniuk
@@ -12,15 +10,7 @@ import javax.validation.Valid;
  */
 public class UserResetPasswordDTO extends AbstractUserDTO {
 
-    @Valid
-    @JsonIgnore
-    private IdConstraint idConstraint = new IdConstraint(this.user);
-
-    @Valid
-    @JsonIgnore
-    private PasswordConstraint passwordConstraint = new PasswordConstraint(this.user);
-
-    // Json building getters and setters
+    @NotNull
     public Long getId() {
         return user.getId();
     }
@@ -29,20 +19,12 @@ public class UserResetPasswordDTO extends AbstractUserDTO {
         user.setId(id);
     }
 
+    @Password
     public String getPassword() {
         return user.getPassword();
     }
 
     public void setPassword(String password) {
         user.setPassword(password);
-    }
-
-    // Validation getters
-    public IdConstraint getIdConstraint() {
-        return idConstraint;
-    }
-
-    public PasswordConstraint getPasswordConstraint() {
-        return passwordConstraint;
     }
 }

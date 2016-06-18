@@ -1,11 +1,9 @@
 package com.mynote.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mynote.dto.user.constraints.IdConstraint;
 import com.mynote.models.UserRole;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 /**
@@ -14,21 +12,13 @@ import java.util.Set;
  */
 public class UserUpdateRolesDTO extends AbstractUserDTO {
 
-    @Valid
-    @JsonIgnore
-    private IdConstraint idConstraint = new IdConstraint(this.user);
-
-    // Json building getters/setters and validation
-    public void setId(Long id) {
-        user.setId(id);
-    }
-
+    @NotNull
     public Long getId() {
         return user.getId();
     }
 
-    public void setUserRoles(Set<UserRole> userRoles) {
-        user.setRoles(userRoles);
+    public void setId(Long id) {
+        user.setId(id);
     }
 
     @NotEmpty
@@ -36,12 +26,7 @@ public class UserUpdateRolesDTO extends AbstractUserDTO {
         return user.getRoles();
     }
 
-    // Validation getters
-    public IdConstraint getIdConstraint() {
-        return idConstraint;
-    }
-
-    public void setIdConstraint(IdConstraint idConstraint) {
-        this.idConstraint = idConstraint;
+    public void setUserRoles(Set<UserRole> userRoles) {
+        user.setRoles(userRoles);
     }
 }

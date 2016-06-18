@@ -9,7 +9,7 @@ users:
   registration_date_utc: "2015-09-30 19:20:02"
 
 - id: 2
-  login: "user2"
+  login: "user2login"
   first_name: "User2 First Name"
   last_name: "User2 Last Name"
   email: "user2@email.com"

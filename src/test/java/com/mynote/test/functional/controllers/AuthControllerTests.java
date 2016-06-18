@@ -71,7 +71,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
 
         MvcResult result = loginUser(csrfTokenDTO, userLoginDTO)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)))
+                .andExpect(jsonPath($_MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)))
                 .andExpect(jsonPath("$.userDTO.userRoles[0].role", is(UserRoleService.ROLE_USER)))
                 .andExpect(jsonPath("$.userDTO.login", is(userLoginDTO.getLogin())))
                 .andReturn();
@@ -87,7 +87,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, userLoginDTO)
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath(MESSAGE_CODE, is("csrf.error.invalidToken")));
+                .andExpect(jsonPath($_MESSAGE_CODE, is("csrf.error.invalidToken")));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, userLoginDTO)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)));
+                .andExpect(jsonPath($_MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)));
     }
 
     @Test
@@ -110,7 +110,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, userLoginDTO)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)));
+                .andExpect(jsonPath($_MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)));
     }
 
     @Test
@@ -119,7 +119,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, user)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)));
+                .andExpect(jsonPath($_MESSAGE_CODE, Is.is(USER_LOGIN_SUCCESS_CODE)));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, user)
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.error.incorrectLoginPassword")));
+                .andExpect(jsonPath($_MESSAGE_CODE, is("user.login.error.incorrectLoginPassword")));
     }
 
     @Test
@@ -139,7 +139,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, loginDTO)
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.validation.error.emptyCredentials")));
+                .andExpect(jsonPath($_MESSAGE_CODE, is("user.login.validation.error.emptyCredentials")));
     }
 
     @Test
@@ -150,7 +150,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, user)
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.error.incorrectLoginPassword")));
+                .andExpect(jsonPath($_MESSAGE_CODE, is("user.login.error.incorrectLoginPassword")));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
 
         loginUser(csrfTokenDTO, user)
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath(MESSAGE_CODE, is("user.login.error.accountIsDisabled")));
+                .andExpect(jsonPath($_MESSAGE_CODE, is("user.login.error.accountIsDisabled")));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class AuthControllerTests extends AbstractSecuredControllerTest {
                 .session(session)
                 .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath(MESSAGE_CODE, is("user.logout.success")));
+                .andExpect(jsonPath($_MESSAGE_CODE, is("user.logout.success")));
 
         mockMvc.perform(get("/api/administration/list-all-users")
                 .session(session)

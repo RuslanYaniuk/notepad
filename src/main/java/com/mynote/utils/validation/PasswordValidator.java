@@ -1,6 +1,7 @@
 package com.mynote.utils.validation;
 
 import com.mynote.utils.validation.annotations.Password;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -27,6 +28,7 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
         List<PasswordRule> rules = new ArrayList<>(4);
 
+        if (s == null || s.equals(StringUtils.EMPTY)) return false;
         rules.add(new PasswordRule("[A-Z]", s));
         rules.add(new PasswordRule("[a-z]", s));
         rules.add(new PasswordRule("\\d", s));

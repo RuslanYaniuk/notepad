@@ -149,9 +149,10 @@ public class UserServiceTests extends AbstractServiceTest {
 
     @Test
     public void findById_ValidUserId_UserReturned() throws UserNotFoundException {
-        User user = userService.findUserById(getUser2().getId());
+        User user2 = getUser2();
+        User user = userService.findUserById(user2.getId());
 
-        assertThat(user.getLogin(), is("user2"));
+        assertThat(user.getLogin(), is(user2.getLogin()));
     }
 
     @Test(expected = UserNotFoundException.class)
@@ -187,8 +188,8 @@ public class UserServiceTests extends AbstractServiceTest {
 
     @Test
     public void findByLoginOrEmail_ValidLoginOrEmail_UserReturned() throws UserNotFoundException {
-        String email = "user2@email.com";
-        String login = "user2";
+        String email = getUser2().getEmail();
+        String login = getUser2().getLogin();
         User user = userService.findByLoginOrEmail(login, "not@correct.com");
 
         assertThat(user.getLogin(), is(login));

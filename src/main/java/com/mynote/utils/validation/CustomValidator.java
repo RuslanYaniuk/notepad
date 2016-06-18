@@ -12,14 +12,10 @@ public class CustomValidator extends OptionalValidatorFactoryBean {
 
     @Override
     public void validate(Object target, Errors errors) throws ValidationException {
-        processConstraintViolations(super.validate(target, ValidationOrder.class), errors);
+        processConstraintViolations(super.validate(target), errors);
 
         if (errors.hasErrors()) {
-            if (errors.getFieldError() != null) {
-                throw new ValidationException(errors.getFieldError());
-            } else {
-                throw new ValidationException(errors.getAllErrors());
-            }
+            throw new ValidationException(errors);
         }
     }
 }

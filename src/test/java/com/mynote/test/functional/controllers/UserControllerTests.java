@@ -43,8 +43,6 @@ public class UserControllerTests extends AbstractSecuredControllerTest {
     }
 
     private ResultActions getInfo() throws Exception {
-        return mockMvc.perform(get("/api/user/get-info")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()));
+        return mockMvc.perform(get("/api/user/get-info"));
     }
 }

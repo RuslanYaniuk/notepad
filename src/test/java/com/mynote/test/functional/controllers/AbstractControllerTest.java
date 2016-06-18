@@ -51,7 +51,16 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 })
 public abstract class AbstractControllerTest {
 
-    public static final String MESSAGE_CODE = "$.messageCode";
+    public static final String LENGTH_CODE = "Length";
+    public static final String NON_SAFE_HTML_CODE = "SafeHtml";
+    public static final String NOT_BLANK_CODE = "NotBlank";
+    public static final String EMAIL_CODE = "Email";
+    public static final String PATTERN_CODE = "Pattern";
+    public static final String TAKEN_LOGIN_CODE = "TakenLogin";
+    public static final String TAKEN_EMAIL_CODE = "TakenEmail";
+
+    public static final String $_TYPE = "$.type";
+    public static final String $_MESSAGE_CODE = "$.messageCode";
 
     @Autowired
     protected WebApplicationContext wac;
@@ -75,5 +84,9 @@ public abstract class AbstractControllerTest {
 
     protected void isResponseMediaTypeJson(MvcResult result) {
         assertThat(result.getResponse().getContentType(), is(APPLICATION_JSON_UTF8));
+    }
+
+    public static String getFieldErrorCodes(String fieldName) {
+        return "$.errors[?(@.field == '" + fieldName + "')].code";
     }
 }

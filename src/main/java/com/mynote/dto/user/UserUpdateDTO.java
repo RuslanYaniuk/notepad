@@ -1,12 +1,9 @@
 package com.mynote.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.mynote.dto.user.constraints.EmailConstraint;
-import com.mynote.dto.user.constraints.FirstNameConstraint;
-import com.mynote.dto.user.constraints.IdConstraint;
-import com.mynote.dto.user.constraints.LastNameConstraint;
+import com.mynote.utils.validation.annotations.Email;
+import com.mynote.utils.validation.annotations.Name;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Ruslan Yaniuk
@@ -14,23 +11,7 @@ import javax.validation.Valid;
  */
 public class UserUpdateDTO extends AbstractUserDTO {
 
-    @Valid
-    @JsonIgnore
-    private IdConstraint idConstraint = new IdConstraint(this.user);
-
-    @Valid
-    @JsonIgnore
-    private EmailConstraint emailConstraint = new EmailConstraint(this.user);
-
-    @Valid
-    @JsonIgnore
-    private FirstNameConstraint firstNameConstraint = new FirstNameConstraint(this.user);
-
-    @Valid
-    @JsonIgnore
-    private LastNameConstraint lastNameConstraint = new LastNameConstraint(this.user);
-
-    // Json building getters and setters
+    @NotNull
     public Long getId() {
         return user.getId();
     }
@@ -39,6 +20,7 @@ public class UserUpdateDTO extends AbstractUserDTO {
         user.setId(id);
     }
 
+    @Name
     public String getFirstName() {
         return user.getFirstName();
     }
@@ -47,6 +29,7 @@ public class UserUpdateDTO extends AbstractUserDTO {
         user.setFirstName(firstName);
     }
 
+    @Name
     public String getLastName() {
         return user.getLastName();
     }
@@ -55,28 +38,12 @@ public class UserUpdateDTO extends AbstractUserDTO {
         user.setLastName(lastName);
     }
 
+    @Email
     public String getEmail() {
         return user.getEmail();
     }
 
     public void setEmail(String email) {
         user.setEmail(email);
-    }
-
-    // Validation getters
-    public IdConstraint getIdConstraint() {
-        return idConstraint;
-    }
-
-    public EmailConstraint getEmailConstraint() {
-        return emailConstraint;
-    }
-
-    public FirstNameConstraint getFirstNameConstraint() {
-        return firstNameConstraint;
-    }
-
-    public LastNameConstraint getLastNameConstraint() {
-        return lastNameConstraint;
     }
 }
