@@ -26,17 +26,13 @@ public class UserAccessTests extends AbstractSecuredControllerTest {
 
     @Test
     public void userInfo_UserRole_AccessGranted() throws Exception {
-        mockMvc.perform(get("/api/user/get-user-info")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
+        mockMvc.perform(get("/api/user/get-user-info"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void listAllUsers_UserRole_Unauthorized() throws Exception {
-        mockMvc.perform(get("/api/administration/list-all-users")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
+        mockMvc.perform(get("/api/administration/list-all-users"))
                 .andExpect(status().isUnauthorized());
     }
 }

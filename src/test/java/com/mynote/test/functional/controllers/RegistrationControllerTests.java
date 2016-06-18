@@ -1,6 +1,5 @@
 package com.mynote.test.functional.controllers;
 
-import com.mynote.dto.CsrfTokenDTO;
 import com.mynote.dto.user.UserFindDTO;
 import com.mynote.dto.user.UserLoginDTO;
 import com.mynote.dto.user.UserRegistrationDTO;
@@ -20,6 +19,7 @@ import static com.mynote.test.utils.UserTestUtils.createNonExistentUser;
 import static com.mynote.test.utils.UserTestUtils.getUser2;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -289,22 +289,20 @@ public class RegistrationControllerTests {
 
         @Test
         public void afterSuccessRegistrationUserCanLogin() throws Exception {
-            CsrfTokenDTO csrfTokenDTO = getCsrfToken();
             User user = createNonExistentUser();
             UserRegistrationDTO registrationDTO = new UserRegistrationDTO();
             UserLoginDTO loginDTO;
 
             registrationDTO.setUser(user);
-            registerNewUser(csrfTokenDTO, registrationDTO).andExpect(status().isOk());
+            registerNewUser(registrationDTO).andExpect(status().isOk());
 
             loginDTO = new UserLoginDTO();
             loginDTO.setUser(user);
-            loginUser(csrfTokenDTO, loginDTO).andExpect(status().isOk());
+            loginUser(loginDTO).andExpect(status().isOk());
         }
 
-        private ResultActions registerNewUser(CsrfTokenDTO csrfTokenDTO, UserRegistrationDTO userRegistrationDTO) throws Exception {
-            return mockMvc.perform(put("/api/registration/register-new-user").session(session)
-                            .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue())
+        private ResultActions registerNewUser(UserRegistrationDTO userRegistrationDTO) throws Exception {
+            return mockMvc.perform(put("/api/registration/register-new-user").with(csrf())
                             .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                             .content(jacksonObjectMapper.writeValueAsString(userRegistrationDTO))
             );

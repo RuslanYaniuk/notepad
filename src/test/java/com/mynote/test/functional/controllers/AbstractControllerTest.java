@@ -21,12 +21,8 @@ import org.springframework.test.context.support.DirtiesContextTestExecutionListe
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.mynote.config.Constants.APPLICATION_JSON_UTF8;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
@@ -80,10 +76,6 @@ public abstract class AbstractControllerTest {
     public void buildWebAppContext() throws Exception {
         this.mockMvc = webAppContextSetup(this.wac)
                 .build();
-    }
-
-    protected void isResponseMediaTypeJson(MvcResult result) {
-        assertThat(result.getResponse().getContentType(), is(APPLICATION_JSON_UTF8));
     }
 
     public static String getFieldErrorCodes(String fieldName) {

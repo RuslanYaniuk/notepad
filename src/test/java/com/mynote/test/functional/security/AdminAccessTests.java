@@ -27,26 +27,20 @@ public class AdminAccessTests extends AbstractSecuredControllerTest {
 
     @Test
     public void getIndex_AdminRole_AccessGranted() throws Exception {
-        mockMvc.perform(get("/")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
+        mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("index"));
     }
 
     @Test
     public void listAllUsers_AdminRole_AccessGranted() throws Exception {
-        mockMvc.perform(get("/api/administration/list-all-users")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
+        mockMvc.perform(get("/api/administration/list-all-users"))
                 .andExpect(status().isOk()).andReturn();
     }
 
     @Test
     public void userInfo_AdminRole_AccessGranted() throws Exception {
-        mockMvc.perform(get("/api/user/get-user-info")
-                .session(session)
-                .header(csrfTokenDTO.getHeaderName(), csrfTokenDTO.getHeaderValue()))
+        mockMvc.perform(get("/api/user/get-user-info"))
                 .andExpect(status().isOk());
     }
 }
