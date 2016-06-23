@@ -49,10 +49,6 @@ public class NoteService {
         return noteRepository.findAll(pageable);
     }
 
-    public Page<Note> getLatest(Pageable pageable) {
-        return noteRepository.getLatest(pageable);
-    }
-
     public void deleteNote(Note note) {
         noteRepository.delete(note);
     }

@@ -1,6 +1,5 @@
 package com.mynote.test.functional.controllers;
 
-import com.mynote.dto.common.PageRequestDTO;
 import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.note.NoteDeleteDTO;
 import com.mynote.dto.note.NoteFindDTO;
@@ -11,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -148,6 +146,7 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
         noteFindDTO.setSubject("Second 2");
         findNote(noteFindDTO)
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].subject", is("subject 22 goes here. Second")));
     }
 
@@ -156,7 +155,17 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
         noteFindDTO.setText("xyz. not present text. abc");
         findNote(noteFindDTO)
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].text", is("xyz. text22. abc")));
+    }
+
+    @Test
+    public void findNotes_SubjectAndText_OneNoteReturned_200() throws Exception {
+        noteFindDTO.setText("xyz. not present text. abc");
+        noteFindDTO.setSubject("Third 23");
+        findNote(noteFindDTO)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)));
     }
 
     @Test
@@ -168,41 +177,35 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
     }
 
     @Test
-    public void findNotes_EmptyFieldsDTO_ReturnedAll() throws Exception {
+    public void findNotes_EmptyFieldsDTO_ReturnedAllNotesSortedByTimeDesc() throws Exception {
         findNote(noteFindDTO)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(4)));
+                .andExpect(jsonPath("$.content", hasSize(4)))
+                .andExpect(jsonPath("$.content[0].id", is("1")))
+                .andExpect(jsonPath("$.content[1].id", is("4")))
+                .andExpect(jsonPath("$.content[2].id", is("3")));
     }
 
     @Test
     @WithMockUser(username = "user3@email.com", roles = {"USER"})
-    public void findNotes_LoggedUser_UserCanGetOnlyHisOwnNotes() throws Exception {
+    public void findNotes_User3RequestForPage2_Page2Returned() throws Exception {
+        elasticsearchUnit.cleanInsertNotes(getUser3());
+
+        noteFindDTO.setPageSize(10);
+        noteFindDTO.setPageNumber(1);
+        findNote(noteFindDTO)
+                .andExpect(jsonPath("$.content", hasSize(10)));
+    }
+
+    @Test
+    @WithMockUser(username = "user3@email.com", roles = {"USER"})
+    public void findNotes_LoggedUser3_UserCanGetOnlyHisOwnNotes() throws Exception {
         elasticsearchUnit.cleanInsertNotes(getUser3());
 
         noteFindDTO.setSubject("goes");
         findNote(noteFindDTO)
                 .andExpect(jsonPath("$.content", hasSize(20)))
                 .andExpect(jsonPath("$.content[0].id", is("AVFKmX5oLbYQMtdG0GOO")));
-    }
-
-    @Test
-    @WithMockUser(username = "user3@email.com", roles = {"USER"})
-    public void getLatest_RequestForPageWith20Notes_PageWith18notesReturned() throws Exception {
-        elasticsearchUnit.cleanInsertNotes(getUser3());
-
-        getLatestNotes(new PageRequestDTO(0, 18))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(18)));
-    }
-
-    @Test
-    @WithMockUser(username = "user3@email.com", roles = {"USER"})
-    public void getLatest_RequestForPageWith0PageSize_PageWith0notesReturned() throws Exception {
-        elasticsearchUnit.cleanInsertNotes(getUser3());
-
-        getLatestNotes(new PageRequestDTO(0, 0))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(0)));
     }
 
     private ResultActions deleteNote(NoteDeleteDTO noteDeleteDTO) throws Exception {
@@ -217,30 +220,26 @@ public class NoteControllerTests extends AbstractSecuredControllerTest {
                 .content(jacksonObjectMapper.writeValueAsString(noteUpdateDTO)));
     }
 
-    private ResultActions getLatestNotes(Pageable page) throws Exception {
-        return mockMvc.perform(get("/api/note/get-latest")
-                .param("pageNumber", Integer.toString(page.getPageNumber()))
-                .param("pageSize", Integer.toString(page.getPageSize())));
-    }
-
     private ResultActions createNote(NoteCreateDTO noteCreateDTO) throws Exception {
         return mockMvc.perform(put("/api/note/create").with(csrf())
                 .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                 .content(jacksonObjectMapper.writeValueAsString(noteCreateDTO)));
     }
 
-    private ResultActions findNote(NoteFindDTO note) throws Exception {
+    private ResultActions findNote(NoteFindDTO noteFind) throws Exception {
         MockHttpServletRequestBuilder requestBuilder = get("/api/note/find");
 
-        if (note.getSubject() != null) {
-            requestBuilder = requestBuilder.param("subject", note.getSubject());
+        if (noteFind.getSubject() != null) {
+            requestBuilder = requestBuilder.param("subject", noteFind.getSubject());
         }
-        if (note.getText() != null) {
-            requestBuilder = requestBuilder.param("text", note.getText());
+        if (noteFind.getText() != null) {
+            requestBuilder = requestBuilder.param("text", noteFind.getText());
         }
-        if (note.getId() != null) {
-            requestBuilder = requestBuilder.param("id", note.getId());
+        if (noteFind.getId() != null) {
+            requestBuilder = requestBuilder.param("id", noteFind.getId());
         }
+        requestBuilder = requestBuilder.param("pageNumber", Integer.toString(noteFind.getPageNumber()));
+        requestBuilder = requestBuilder.param("pageSize", Integer.toString(noteFind.getPageSize()));
         return mockMvc.perform(requestBuilder);
     }
 }

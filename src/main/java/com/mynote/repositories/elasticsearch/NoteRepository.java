@@ -13,8 +13,4 @@ import org.springframework.data.elasticsearch.repository.ElasticsearchRepository
 public interface NoteRepository extends ElasticsearchRepository<Note, String>, ElasticsearchAdmin {
 
     Page<Note> find(Note note, Pageable pageable);
-
-    Page<Note> getLatest(Pageable pageable);
-
-    Page<Note> getByPrefixQuery(Note note, Pageable pageable);
 }

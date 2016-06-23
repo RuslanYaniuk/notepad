@@ -1,11 +1,10 @@
 package com.mynote.repositories.elasticsearch;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.mynote.models.Note;
-import org.elasticsearch.index.query.BaseQueryBuilder;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.data.domain.Page;
@@ -15,8 +14,6 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
 import org.springframework.data.elasticsearch.repository.support.SimpleElasticsearchRepository;
-
-import java.util.List;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -37,55 +34,34 @@ public class NoteRepositoryImpl extends SimpleElasticsearchRepository<Note> impl
 
     @Override
     public Page<Note> find(Note note, Pageable pageable) {
-        NativeSearchQuery searchQuery;
-        String textToSearch = null;
-        BaseQueryBuilder queryBuilder;
+        NativeSearchQuery sq;
+        QueryBuilder qb;
+        SortBuilder sb;
 
-        if (note.getSubject() != null) {
-            textToSearch = note.getSubject();
-        }
-        if (note.getText() != null) {
-            textToSearch = note.getText();
-        }
-        if (note.getId() != null) {
-            queryBuilder = idsQuery("note").ids(note.getId());
+        if (note.getSubject() == null && note.getText() == null && note.getId() == null) {
+            qb = matchAllQuery();
+            sb = SortBuilders.fieldSort("creationDate").order(SortOrder.DESC);
         } else {
-            queryBuilder = multiMatchQuery(textToSearch, getFieldsToSearch(note));
+            BoolQueryBuilder bqb = QueryBuilders.boolQuery();
+
+            if (note.getSubject() != null) {
+                bqb.should(matchQuery(SUBJECT_FIELD, note.getSubject()));
+            }
+            if (note.getText() != null) {
+                bqb.should(matchQuery(TEXT_FIELD, note.getText()));
+            }
+            if (note.getId() != null) {
+                bqb.should(idsQuery("note").ids(note.getId()));
+            }
+            qb = bqb;
+            sb = SortBuilders.scoreSort();
         }
-        searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(queryBuilder)
+        sq = new NativeSearchQueryBuilder()
+                .withQuery(qb)
                 .withPageable(pageable)
+                .withSort(sb)
                 .build();
-        return elasticsearchOperations.queryForPage(searchQuery, Note.class);
-    }
-
-    @Override
-    public Page<Note> getLatest(Pageable pageable) {
-        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(matchAllQuery())
-                .withSort(SortBuilders.fieldSort("creationDate").order(SortOrder.DESC))
-                .withPageable(pageable)
-                .build();
-
-        return elasticsearchOperations.queryForPage(searchQuery, Note.class);
-    }
-
-    @Override
-    public Page<Note> getByPrefixQuery(Note note, Pageable pageable) {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        NativeSearchQuery searchQuery;
-
-        if (note.getSubject() != null) {
-            boolQueryBuilder.should(QueryBuilders.prefixQuery(SUBJECT_FIELD, note.getSubject()));
-        }
-        if (note.getText() != null) {
-            boolQueryBuilder.should(QueryBuilders.prefixQuery(TEXT_FIELD, note.getText()));
-        }
-        searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(boolQueryBuilder)
-                .withPageable(pageable)
-                .build();
-        return elasticsearchOperations.queryForPage(searchQuery, Note.class);
+        return elasticsearchOperations.queryForPage(sq, Note.class);
     }
 
     @Override
@@ -96,17 +72,5 @@ public class NoteRepositoryImpl extends SimpleElasticsearchRepository<Note> impl
     @Override
     public void putMapping() {
         elasticsearchOperations.putMapping(getEntityClass());
-    }
-
-    private String[] getFieldsToSearch(Note note) {
-        List<String> fields = Lists.newArrayList();
-
-        if (note.getSubject() != null) {
-            fields.add(SUBJECT_FIELD);
-        }
-        if (note.getText() != null) {
-            fields.add(TEXT_FIELD);
-        }
-        return Iterables.toArray(fields, String.class);
     }
 }

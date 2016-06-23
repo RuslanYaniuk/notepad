@@ -2,8 +2,6 @@ package com.mynote.dto.note;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mynote.dto.common.PageRequestDTO;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.domain.Pageable;
 
 /**
@@ -63,20 +61,5 @@ public class NoteFindDTO extends AbstractNoteDTO {
     @JsonIgnore
     public void setPage(Pageable page) {
         this.pageRequestDTO = (PageRequestDTO) page;
-    }
-
-    @NotBlank
-    @JsonIgnore
-    public String getIdOrSubjectOrText() {
-        if (getId() != null) {
-            return getId();
-        }
-        if (!StringUtils.isBlank(getSubject())) {
-            return getSubject();
-        }
-        if (!StringUtils.isBlank(getText())) {
-            return getText();
-        }
-        return null;
     }
 }

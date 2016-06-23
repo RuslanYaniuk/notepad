@@ -115,40 +115,62 @@ public class NoteServiceTests extends AbstractServiceTest {
     }
 
     @Test
-    public void getLatest_RequestForPage0_PageWithNotesSortedByDateDESCReturned() {
+    public void findNote_WordInText_OneNoteReturned() {
+        Note note = new Note();
+        Page<Note> page;
+
+        note.setText("text22");
+        page = noteService.findNotes(note, null);
+        note = page.getContent().get(0);
+        assertThat(page.getContent(), hasSize(1));
+        assertTrue(note.getText().contains("xyz. text22."));
+    }
+
+    @Test
+    public void findNote_TextAndSubject_OneNoteReturned() {
+        Note note = new Note();
+        Page<Note> page;
+        String text = "text22";
+
+        note.setText(text);
+        note.setSubject("23");
+        page = noteService.findNotes(note, null);
+        assertThat(page.getContent(), hasSize(2));
+
+        note.setText(text);
+        note.setSubject(text);
+        page = noteService.findNotes(note, null);
+        assertThat(page.getContent(), hasSize(1));
+    }
+
+    @Test
+    public void findNotes_EmptySearchFields_AllNotesSortedByDateDESCReturned() {
         Pageable pageable = new PageRequest(0, 20);
-        Page<Note> page = noteService.getLatest(pageable);
+        Page<Note> page = noteService.findNotes(new Note(), pageable);
         ZonedDateTime firstNoteDateTime = page.getContent().get(0).getCreationDate();
         ZonedDateTime secondDateTime = page.getContent().get(1).getCreationDate();
 
+        assertThat(page.getContent(), hasSize(4));
         assertTrue(firstNoteDateTime.isAfter(secondDateTime));
     }
 
     @Test
-    public void getLatest_User3PageRequestFor20Notes_20NotesReturned() throws InterruptedException, ExecutionException, IOException {
+    public void findNotes_EmptySearchFieldsRequestFromUser3_PagesOrderedByDateReturned() throws InterruptedException, ExecutionException, IOException {
         testApplicationConfig.getTestSessionContext().setUser(getUser3());
         elasticsearchUnit.cleanInsertNotes(getUser3());
 
-        Pageable pageable = new PageRequest(0, 20);
-        Page page = noteService.getLatest(pageable);
-
-        assertThat(page.getNumberOfElements(), is(20));
-    }
-
-    @Test
-    public void getLatest_User3RequestFor2Pages_FirstPageDatesAreAfterSecondPageDates() throws InterruptedException, ExecutionException, IOException {
-        testApplicationConfig.getTestSessionContext().setUser(getUser3());
-        elasticsearchUnit.cleanInsertNotes(getUser3());
-
+        Page<Note> secondPage;
+        ZonedDateTime firstPageLastNoteDateTime;
+        ZonedDateTime secondPageFirstNoteDateTime;
         Pageable pageable = new PageRequest(0, 10);
-        Page<Note> firstPage = noteService.getLatest(pageable);
+        Page<Note> firstPage = noteService.findNotes(new Note(), pageable);
 
         pageable = new PageRequest(1, 10);
-        Page<Note> secondPage = noteService.getLatest(pageable);
+        secondPage = noteService.findNotes(new Note(), pageable);
 
-        ZonedDateTime firstPageNoteDateTime = firstPage.getContent().get(9).getCreationDate();
-        ZonedDateTime secondPageDateTime = secondPage.getContent().get(0).getCreationDate();
+        firstPageLastNoteDateTime = firstPage.getContent().get(9).getCreationDate();
+        secondPageFirstNoteDateTime = secondPage.getContent().get(0).getCreationDate();
 
-        assertTrue(firstPageNoteDateTime.isAfter(secondPageDateTime));
+        assertTrue(firstPageLastNoteDateTime.isAfter(secondPageFirstNoteDateTime));
     }
 }

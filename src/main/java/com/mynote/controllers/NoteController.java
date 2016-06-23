@@ -1,16 +1,12 @@
 package com.mynote.controllers;
 
-import com.mynote.dto.common.PageRequestDTO;
 import com.mynote.dto.note.NoteCreateDTO;
 import com.mynote.dto.note.NoteDeleteDTO;
 import com.mynote.dto.note.NoteFindDTO;
 import com.mynote.dto.note.NoteUpdateDTO;
 import com.mynote.exceptions.NoteNotFoundException;
-import com.mynote.models.Note;
 import com.mynote.services.NoteService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,13 +33,7 @@ public class NoteController extends AbstractController {
 
     @RequestMapping(value = "/find", method = GET)
     public ResponseEntity findNotes(NoteFindDTO noteFindDTO) {
-        Note note = noteFindDTO.getNote();
-        Pageable page = noteFindDTO.getPage();
-
-        if (StringUtils.isBlank(noteFindDTO.getIdOrSubjectOrText())) {
-            return ok(noteService.getLatest(page));
-        }
-        return ok(noteService.findNotes(note, page));
+        return ok(noteService.findNotes(noteFindDTO.getNote(), noteFindDTO.getPage()));
     }
 
     @RequestMapping(value = "/update", method = POST)
@@ -56,10 +46,5 @@ public class NoteController extends AbstractController {
     public ResponseEntity deleteNote(@Validated @RequestBody NoteDeleteDTO noteDeleteDTO) {
         noteService.deleteNote(noteDeleteDTO.getNote());
         return messageOK("note.delete.success");
-    }
-
-    @RequestMapping(value = "/get-latest", method = GET)
-    public ResponseEntity getLatest(PageRequestDTO pageRequest) {
-        return ok(noteService.getLatest(pageRequest));
     }
 }
