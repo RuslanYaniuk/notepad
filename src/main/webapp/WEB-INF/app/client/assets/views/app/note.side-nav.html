@@ -1,12 +1,14 @@
 <section id="side-menu" layout="row" ng-cloak ng-controller="NoteSideNavController">
 
-  <md-sidenav md-component-id="note-side-nav" class="md-sidenav-left md-whiteframe-z2" md-component-id="left">
+  <md-sidenav md-component-id="note-side-nav"
+              class="md-sidenav-left md-whiteframe-z2"
+              md-component-id="left">
 
     <md-toolbar>
       <div layout="row" layout-align="space-between center">
         <h1 class="md-toolbar-tools">NotePad Online</h1>
 
-        <md-button ng-click="closeNoteSideNav()" class="md-icon-button" style="margin-right: 20px">
+        <md-button ng-click="closeSideNav()" class="md-icon-button" style="margin-right: 20px">
           <md-icon class="material-icons">chevron_left</md-icon>
         </md-button>
       </div>

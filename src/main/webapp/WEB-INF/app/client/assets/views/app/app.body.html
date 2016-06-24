@@ -1,8 +1,15 @@
-<div layout="row" layout-align="center start" flex>
-  <div ui-view="application.body" class="note-container" flex></div>
+<div ng-controller="NoteController"
+     layout="row" layout-align="center start">
 
-  <div ng-controller="NoteController" class="fab-container" layout="row">
-    <md-button ng-click="showNewNoteDialog()" class="md-fab md-primary md-accent"
+  <div notes-list
+       class="note-container"
+       layout="row"
+       layout-align="start center" flex>
+  </div>
+
+  <div class="fab-container" layout="row" ng-hide="mainToolBar.state.searchMode">
+    <md-button ng-click="showNewNoteDialog()"
+               class="md-fab md-primary md-accent"
                aria-label="Add a new note">
       <md-icon class="material-icons">add</md-icon>
     </md-button>

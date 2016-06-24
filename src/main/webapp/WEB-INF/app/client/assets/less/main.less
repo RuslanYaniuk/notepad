@@ -118,7 +118,6 @@
 //////////////////////////
 .search-box-container {
   position: relative;
-  max-width: 660px;
 }
 
 .search-box-input-wrapper {
@@ -172,9 +171,7 @@
   visibility: hidden;
 }
 
-body {
-  overflow: hidden;
-}
+
 
 .card-body p {
   font-size: 100%;
@@ -192,8 +189,12 @@ body {
   display: none;
 }
 
-.page-container {
-  background-color: @grey-100;
+#page-container {
+  overflow: auto;
+}
+
+html, body {
+  background-color: @grey-200;
 }
 
 footer {

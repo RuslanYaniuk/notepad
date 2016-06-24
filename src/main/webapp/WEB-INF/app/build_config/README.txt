@@ -8,8 +8,13 @@ How to prepare this project for development:
   -> npm install
   -> grunt prepare
   
+Preparation before development:
+
+1. npm install
+2. bower-installer
   
-How to make a .war file:
+  
+How to make a production .war file:
 
 1. npm install -g bower-installer
 2. cd src/main/webapp/WEB-INF/app/build_config/

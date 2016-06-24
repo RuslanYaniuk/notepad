@@ -4,7 +4,7 @@
     <div class="md-toolbar-tools">
       <h2>Edit the note</h2>
       <span flex></span>
-      <md-button class="md-icon-button" ng-click="closeDialog()">
+      <md-button class="md-icon-button" ng-click="dialog.hide()">
         <md-icon class="material-icons">close</md-icon>
       </md-button>
     </div>
@@ -15,21 +15,21 @@
 
       <md-input-container class="md-block">
         <label>Subject</label>
-        <input ng-model="notesContainer.note.subject">
+        <input ng-model="notes.note.subject">
       </md-input-container>
 
       <md-input-container show-sm hide-gt-md flex>
         <label>Text...</label>
-        <textarea style="max-height: 160px; overflow-y: auto" ng-model="notesContainer.note.text" rows="3"></textarea>
+        <textarea style="max-height: 160px; overflow-y: auto" ng-model="notes.note.text" rows="3"></textarea>
       </md-input-container>
 
       <md-input-container hide show-gt-md flex>
         <label>Text...</label>
-        <textarea style="max-height: 160px; overflow-y: auto" ng-model="notesContainer.note.text" rows="6"></textarea>
+        <textarea style="max-height: 160px; overflow-y: auto" ng-model="notes.note.text" rows="6"></textarea>
       </md-input-container>
 
       <div layout="row" layout-align="end center">
-        <md-button ng-click="closeDialog()" class="md-primary">Cancel</md-button>
+        <md-button ng-click="dialog.hide()" class="md-primary">Cancel</md-button>
         <md-button ng-click="updateNote()" class="md-raised md-primary">Save changes</md-button>
       </div>
 

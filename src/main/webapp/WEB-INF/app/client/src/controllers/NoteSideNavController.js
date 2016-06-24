@@ -9,31 +9,28 @@
 
         var NoteSideNavController = function ($scope, $mdDialog, $mdSidenav) {
 
-            var onToggleSideNav = function () {
-                    $mdSidenav("note-side-nav")
-                        .toggle();
-                },
-
-                onShowSearchOptionsDialog = function (ev) {
+            var onShowSearchOptionsDialog = function (ev) {
                     $mdDialog.show({
-                        controller: 'NoteSideNavController',
-                        templateUrl: 'assets/views/app/search-options.dlg.html',
+                        controller: 'NoteSearchController',
+                        templateUrl: 'assets/views/app/note.search-options.dlg.html',
                         parent: angular.element(document.body),
                         targetEvent: ev,
                         clickOutsideToClose: true
                     });
                 },
 
-                onCloseNoteSideNav = function () {
+                onCloseSideNav = function () {
                     $mdSidenav("note-side-nav").close();
                 };
 
-            $scope.toggleSideNav = onToggleSideNav;
             $scope.showSearchOptionsDialog = onShowSearchOptionsDialog;
-            $scope.closeNoteSideNav = onCloseNoteSideNav;
+            $scope.closeSideNav = onCloseSideNav;
         };
 
-        return ["$scope", "$mdDialog", "$mdSidenav", NoteSideNavController];
+        return [
+            "$scope",
+            "$mdDialog",
+            "$mdSidenav", NoteSideNavController];
     });
 
 })(define);

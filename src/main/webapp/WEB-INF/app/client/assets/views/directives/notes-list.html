@@ -1,6 +1,6 @@
-<md-list class="layout-align-center-stretch" layout="column">
+<md-list ng-controller="NotesListController" class="layout-align-center-stretch" layout="column" flex>
 
-  <md-list-item class="md-2-line" ng-repeat="note in notesContainer.notes">
+  <md-list-item class="md-2-line" ng-repeat="note in notes.list">
     <md-card flex>
       <md-card-content layout="column">
         <div layout="row">
@@ -15,7 +15,7 @@
 
             <md-menu-content width="3">
               <md-menu-item>
-                <md-button ng-click="showEditNoteDialog($event, note)">
+                <md-button ng-click="showUpdateDialog($event, note)">
                   <md-icon class="material-icons">edit</md-icon>
                   Edit
                 </md-button>
@@ -30,12 +30,16 @@
           </md-menu>
         </div>
 
-        <pre id="text_{{note.id}}" ng-class="isExpanded(note)" class="note-text-holder md-body-1">{{getFormattedText(note)}}</pre>
+        <pre id="text_{{note.id}}"
+             ng-class="isExpanded(note)"
+             class="note-text-holder md-body-1">{{note.text}}</pre>
       </md-card-content>
 
       <div class="md-margin" layout="row" layout-align="space-between center">
         <div>
-          <md-button ng-show="isTextHolderOverloaded(note)" class="md-icon-button" ng-click="expandCollapse(note)">
+          <md-button ng-show="isTextHolderOverloaded(note)"
+                     ng-click="expandCollapse(note)"
+                     class="md-icon-button">
             <md-icon class="material-icons md-light">{{getExpandIcon(note)}}</md-icon>
           </md-button>
         </div>

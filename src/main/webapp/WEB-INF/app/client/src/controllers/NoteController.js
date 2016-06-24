@@ -7,44 +7,25 @@
 
     define(function () {
 
-        var NoteController = function ($scope, $mdDialog, noteService, dispatcherService) {
+        var NoteController = function ($scope, $mdDialog, notes, mainToolBar) {
 
             var onShowNewNoteDialog = function (ev) {
-                    $scope.notesContainer.note.id = "";
-                    $scope.notesContainer.note.subject = "";
-                    $scope.notesContainer.note.text = "";
+                    $scope.notes.note.id = "";
+                    $scope.notes.note.subject = "";
+                    $scope.notes.note.text = "";
 
-                    var newNoteDialog = function () {
-                        $mdDialog.show({
-                            controller: 'NoteController',
-                            templateUrl: 'assets/views/app/note.create.dlg.html',
-                            parent: angular.element(document.body),
-                            targetEvent: ev
-                        });
-                    };
-
-                    if (dispatcherService.isSearchPageCurrent()) {
-                        var confirm = $mdDialog.confirm()
-                            .title('You are in the search mode')
-                            .content('To add a new note you need to quit the search mode')
-                            .ok('Quit')
-                            .cancel('Keep searching');
-
-                        $mdDialog
-                            .show(confirm)
-                            .then(function onSelectYes() {
-                                onExitSearchMode();
-                                newNoteDialog();
-                            });
-                    } else {
-                        newNoteDialog();
-                    }
+                    $mdDialog.show({
+                        controller: 'NoteController',
+                        templateUrl: 'assets/views/app/note.create.dlg.html',
+                        parent: angular.element(document.body),
+                        targetEvent: ev
+                    });
                 },
 
-                onShowEditDialog = function (ev, note) {
-                    $scope.notesContainer.note.id = note.id;
-                    $scope.notesContainer.note.subject = note.subject.valueOf();
-                    $scope.notesContainer.note.text = note.text.valueOf();
+                onShowUpdateDialog = function (ev, note) {
+                    $scope.notes.note.id = note.id;
+                    $scope.notes.note.subject = note.subject.valueOf();
+                    $scope.notes.note.text = note.text.valueOf();
 
                     $mdDialog.show({
                         controller: 'NoteController',
@@ -53,18 +34,16 @@
                     });
                 },
 
-                onCloseDialog = function () {
-                    $mdDialog.hide();
-                },
-
                 onCreateNote = function () {
-                    noteService.createNote();
-                    $mdDialog.hide();
+                    notes.createNote().then(function onSuccess() {
+                        $mdDialog.hide();
+                    });
                 },
 
                 onUpdateNote = function () {
-                    noteService.updateNote();
-                    $mdDialog.hide()
+                    notes.updateNote().then(function onSuccess() {
+                        $mdDialog.hide()
+                    });
                 },
 
                 onDeleteNote = function (note) {
@@ -75,113 +54,29 @@
                         .ok('Delete')
                         .cancel('Cancel');
                     $mdDialog.show(confirm).then(function onSelectYes() {
-                        noteService.deleteNote(note.id);
+                        notes.deleteNote(note.id);
                     }, function onDecline() {
                     });
-
-                },
-
-                onGetFormattedText = function (note) {
-                    return note.text;
-                },
-
-                onApplySearchOptions = function () {
-                    if (!$scope.notesContainer.searchInText && !$scope.notesContainer.searchInSubject) {
-                        $scope.notesContainer.searchInText = true;
-                        $scope.notesContainer.searchInSubject = true;
-                    }
-                    onCloseDialog();
-                },
-
-                onIsExpanded = function (note) {
-                    if (note.expanded) {
-                        return 'note-text-expanded';
-                    }
-                    return 'note-text-collapsed';
-                },
-
-                onGetExpandIcon = function (note) {
-                    if (note.expanded == undefined || null || !note.expanded) {
-                        return 'expand_more';
-                    }
-                    if (note.expanded) {
-                        return 'expand_less';
-                    }
-                },
-
-                onExpandCollapse = function (note) {
-                    if (note.expanded == undefined || null) {
-                        note.expanded = true;
-                    } else {
-                        note.expanded = !note.expanded;
-                    }
-                },
-
-                onIsTextHolderOverloaded = function (note) {
-                    var element = document.getElementById('text_' + note.id);
-
-                    if (element.offsetHeight < element.scrollHeight ||
-                        element.offsetWidth < element.scrollWidth) {
-                        return true;
-                    }
-                    if (note.expanded) {
-                        return true;
-                    }
-                    //element doesn't have overflow
-                    return false;
-                },
-
-                onSearchSubmit = function () {
-                    noteService.clearNotesContainer();
-                    noteService.search();
-                    dispatcherService.goToSearchNotesPage();
-                },
-
-                onExitSearchMode = function () {
-                    noteService.clearNotesContainer();
-                    $scope.notesContainer.searchString = "";
-                    dispatcherService.goToLatestNotesPage();
-                },
-
-                onGetLatest = function () {
-                    noteService.getLatest();
-                },
-
-                onCompleteCurrentList = function () {
-                    noteService.loadNextPageIfNeeded().then();
                 };
 
-            $scope.exitSearchMode = onExitSearchMode;
-
             $scope.showNewNoteDialog = onShowNewNoteDialog;
-            $scope.showEditNoteDialog = onShowEditDialog;
-            $scope.closeDialog = onCloseDialog;
-            $scope.getLatest = onGetLatest;
-
-            $scope.searchSubmit = onSearchSubmit;
+            $scope.showUpdateDialog = onShowUpdateDialog;
 
             $scope.createNote = onCreateNote;
             $scope.updateNote = onUpdateNote;
             $scope.deleteNote = onDeleteNote;
 
-            $scope.applySearchOptions = onApplySearchOptions;
+            $scope.notes = notes.data;
 
-            $scope.isExpanded = onIsExpanded;
-            $scope.getExpandIcon = onGetExpandIcon;
-            $scope.isTextHolderOverloaded = onIsTextHolderOverloaded;
-            $scope.expandCollapse = onExpandCollapse;
-
-            $scope.notesContainer = noteService.notesContainer;
-            $scope.getFormattedText = onGetFormattedText;
-
-            $scope.completeCurrentList = onCompleteCurrentList;
+            $scope.mainToolBar = mainToolBar;
+            $scope.dialog = $mdDialog;
         };
 
         return [
             "$scope",
             "$mdDialog",
-            "noteService",
-            "dispatcherService", NoteController];
+            "notes",
+            "mainToolBar", NoteController];
     });
 
 })(define);

@@ -1,10 +1,12 @@
-<md-dialog ng-controller="NoteController" ng-init="initNewNoteDialog()" class="md-margin note-container" flex>
+<md-dialog ng-controller="NoteController"
+           ng-init="initNewNoteDialog()"
+           class="md-margin note-container" flex>
 
   <md-toolbar hide-sm>
     <div class="md-toolbar-tools">
       <h2>Create a new note</h2>
       <span flex></span>
-      <md-button class="md-icon-button" ng-click="closeDialog()">
+      <md-button class="md-icon-button" ng-click="dialog.hide()">
         <md-icon class="material-icons">close</md-icon>
       </md-button>
     </div>
@@ -14,21 +16,21 @@
     <div class="md-dialog-content" layout="column">
       <md-input-container>
         <label>Subject</label>
-        <input id="new-note-subject" ng-model="notesContainer.note.subject">
+        <input id="new-note-subject" ng-model="notes.note.subject">
       </md-input-container>
 
       <md-input-container show-sm hide-gt-md flex>
         <label>Text...</label>
-        <textarea style="max-height: 160px; overflow-y: auto" ng-model="notesContainer.note.text" rows="3"></textarea>
+        <textarea style="max-height: 160px; overflow-y: auto" ng-model="notes.note.text" rows="3"></textarea>
       </md-input-container>
 
       <md-input-container hide show-gt-md flex>
         <label>Text...</label>
-        <textarea style="max-height: 160px; overflow-y: auto" ng-model="notesContainer.note.text" rows="6"></textarea>
+        <textarea style="max-height: 160px; overflow-y: auto" ng-model="notes.note.text" rows="6"></textarea>
       </md-input-container>
 
       <div layout="row" layout-align="end center">
-        <md-button ng-click="closeDialog()" class="md-primary">Cancel</md-button>
+        <md-button ng-click="dialog.hide()" class="md-primary">Cancel</md-button>
         <md-button ng-click="createNote()" class="md-raised md-primary">Create</md-button>
       </div>
     </div>

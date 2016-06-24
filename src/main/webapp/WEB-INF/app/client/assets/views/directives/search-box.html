@@ -1,14 +1,25 @@
-<div class="search-box-container" ng-controller="NoteController" flex>
+<div class="search-box-container"
+     ng-controller="NoteSearchController"
+     flex>
 
   <div class="md-whiteframe-1dp search-box-input-wrapper" layout="row">
     <md-icon class="material-icons md-light search-box-icon">search</md-icon>
 
-    <form ng-submit="searchSubmit()" name="searchBox" flex autocomplete="off">
-      <input id="search-field" type="text" ng-model="notesContainer.searchString" placeholder="Search"
+    <form ng-submit="searchSubmit()"
+          name="searchBox"
+          autocomplete="off"
+          flex>
+      <input id="search-field"
+             ng-model="query.text"
+             ng-model-options='{ debounce: 500 }'
+             type="text"
+             placeholder="Search"
              class="search-box-input">
     </form>
 
-    <button ng-class="{hidden: notesContainer.searchString == ''}" ng-click="clearSearchField()" class="clear-button">
+    <button ng-class="{hidden: query.text == '' || query.text == null}"
+            ng-click="query.text = ''; findNotes()"
+            class="clear-button">
       <md-icon class="search-box-icon material-icons">clear</md-icon>
     </button>
   </div>

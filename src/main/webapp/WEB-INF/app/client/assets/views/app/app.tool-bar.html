@@ -1,60 +1,51 @@
-<md-toolbar class="md-whiteframe-1dp" ng-controller="SearchBoxController">
-  <div class="md-toolbar-tools" ng-controller="NoteSideNavController">
+<md-toolbar class="md-whiteframe-1dp" ng-controller="MainToolbarController">
+  <div class="md-toolbar-tools">
 
-    <md-button class="md-icon-button" ng-click="toggleSideNav()">
-      <md-icon class="material-icons md-light">menu</md-icon>
-    </md-button>
-    <h2 style="width: 120px" layout="row">
-      <span>NotePad</span>
-    </h2>
+    <!-- Mode 'DEFAULT' -->
+    <div flex layout="row" layout-align="start center" ng-hide="state.searchMode">
+      <md-button class="md-icon-button" ng-click="toggleSideNav()">
+        <md-icon class="material-icons md-light">menu</md-icon>
+      </md-button>
+      <h2 class="md-headline">
+        <span>NotePad</span>
+      </h2>
+      <span flex></span>
 
-    <div searchbox hide-sm layout="row" layout-align="center center" flex></div>
-
-    <span style="width: 120px" hide-md></span>
-
-    <div class="scroll-y-shifter"></div>
-    <md-menu style="padding: 0" ng-controller="AuthController">
-      <md-button class="md-icon-button" ng-click="$mdOpenMenu($event)" aria-label="Menu">
-        <md-icon class="material-icons">more_vert</md-icon>
+      <md-button class="md-icon-button" aria-label="Menu" ng-click="state.searchMode = true">
+        <md-icon class="material-icons">search</md-icon>
       </md-button>
 
-      <md-menu-content width="4">
-        <md-menu-item style="height: initial;">
-          <div layout="column" layout-align="center center" class="menu-trigger-button">
-            <md-icon class="md-default material-icons">account_circle</md-icon>
-            <p align="center" class="md-body-1" ng-bind="getUserEmail()"></p>
-          </div>
-        </md-menu-item>
+      <md-menu style="padding: 0" ng-controller="AuthController">
+        <md-button class="md-icon-button" ng-click="$mdOpenMenu($event)" aria-label="Menu">
+          <md-icon class="material-icons">more_vert</md-icon>
+        </md-button>
 
-        <md-menu-divider></md-menu-divider>
+        <md-menu-content width="4">
+          <md-menu-item style="height: initial;">
+            <div layout="column" layout-align="center center" class="menu-trigger-button">
+              <md-icon class="md-default material-icons">account_circle</md-icon>
+              <p align="center" class="md-body-1" ng-bind="getUserEmail()"></p>
+            </div>
+          </md-menu-item>
 
-<!--        <md-menu-item id="go-to-administration-button" ng-show="isAdminSession()">
-          <md-button ui-sref="admin-page">
-            <md-icon class="material-icons">dashboard</md-icon>
-            Administration page
-          </md-button>
-        </md-menu-item>
+          <md-menu-divider></md-menu-divider>
 
-        <md-menu-item>
-          <md-button>
-            <md-icon class="material-icons">settings</md-icon>
-            Account settings
-          </md-button>
-        </md-menu-item>
+          <md-menu-item>
+            <md-button id="user-menu-logout-button" ng-click="logout()">
+              <md-icon class="material-icons">exit_to_app</md-icon>
+              Sign out
+            </md-button>
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
+    </div>
 
-        <md-menu-divider></md-menu-divider>-->
-
-        <md-menu-item>
-          <md-button id="user-menu-logout-button" ng-click="logout()">
-            <md-icon class="material-icons">exit_to_app</md-icon>
-            Sign out
-          </md-button>
-        </md-menu-item>
-      </md-menu-content>
-    </md-menu>
-  </div>
-
-  <div class="md-toolbar-tools" hide show-sm>
-    <div searchbox flex></div>
+    <!-- Mode 'SEARCH' -->
+    <div flex layout="row" layout-align="start center" ng-show="state.searchMode" class="ng-hide">
+      <md-button class="md-icon-button" aria-label="Menu" ng-click="state.searchMode = false; query.text = ''">
+        <md-icon class="material-icons">arrow_back</md-icon>
+      </md-button>
+      <div searchbox layout="row" flex></div>
+    </div>
   </div>
 </md-toolbar>

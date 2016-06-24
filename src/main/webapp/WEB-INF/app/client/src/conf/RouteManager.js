@@ -50,7 +50,7 @@
                     permissions: [ROLE_ANONYMOUS]
                 })
 
-
+                /*
                 .state('admin-page', {
                     url: "/admin-page",
                     views: {
@@ -79,7 +79,7 @@
                         "admin-page.body": {templateUrl: "assets/views/admin/admin.body.statistic.html"}
                     },
                     permissions: [ROLE_ADMIN]
-                })
+                 })*/
 
 
                 .state('application', {
@@ -89,20 +89,6 @@
                         "body": {templateUrl: "assets/views/app/app.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"},
                         "side-nav": {templateUrl: "assets/views/app/note.side-nav.html"}
-                    },
-                    permissions: [FORBIDDEN_ALL]
-                })
-                .state('application.latestNotes', {
-                    url: "/latest",
-                    views: {
-                        "application.body": {templateUrl: "assets/views/app/app.body.latest-notes-list.html"}
-                    },
-                    permissions: [ROLE_USER]
-                })
-                .state('application.searchNotes', {
-                    url: "/search",
-                    views: {
-                        "application.body": {templateUrl: "assets/views/app/app.body.search-notes.html"}
                     },
                     permissions: [ROLE_USER]
                 })

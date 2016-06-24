@@ -11,6 +11,7 @@
 
             var UI_STATE_NOTES_LATEST = "application.latestNotes",
                 UI_STATE_SEARCH_NOTES = "application.searchNotes",
+                UI_STATE_APPLICATION = "application",
                 UI_STATE_INDEX = "index",
                 UI_STATE_LOGIN = "login",
                 UI_STATE_ACCESS_DENIED_ERROR = "access-denied";
@@ -35,6 +36,10 @@
                     $state.go(UI_STATE_SEARCH_NOTES);
                 },
 
+                onGoToApplicationPage = function (option) {
+                    $state.go(UI_STATE_APPLICATION, null, option);
+                },
+
                 onIsSearchPageCurrent = function () {
                     return $state.current.name == UI_STATE_SEARCH_NOTES;
                 },
@@ -48,6 +53,7 @@
                 goToLatestNotesPage: onGoToLatestNotesPage,
                 goToIndexPage: onGoToIndexPage,
                 goToAccessDeniedErrorPage: onGoToAccessDeniedErrorPage,
+                goToApplicationPage: onGoToApplicationPage,
                 goToSearchNotesPage: onGoToSearchNotesPage,
                 isSearchPageCurrent: onIsSearchPageCurrent,
                 go: onGo

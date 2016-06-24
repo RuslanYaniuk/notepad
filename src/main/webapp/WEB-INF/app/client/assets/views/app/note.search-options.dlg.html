@@ -1,0 +1,25 @@
+<md-dialog style="width: 400px;" class="md-padding" aria-label="List dialog">
+  <md-dialog-content>
+
+    <fieldset class="standard">
+      <legend>Search in</legend>
+      <div layout="column" layout-wrap>
+        <div flex="50">
+          <md-checkbox ng-model="query.searchInSubject" ng-disabled="!query.searchInText">
+            Subject
+          </md-checkbox>
+        </div>
+
+        <div flex="50">
+          <md-checkbox ng-model="query.searchInText" ng-disabled="!query.searchInSubject">
+            Text
+          </md-checkbox>
+        </div>
+      </div>
+      </fieldset>
+  </md-dialog-content>
+
+  <div class="md-actions">
+    <md-button class="md-raised md-primary" ng-click="mdDialog.hide()">OK</md-button>
+  </div>
+</md-dialog>
