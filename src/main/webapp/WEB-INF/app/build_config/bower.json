@@ -33,7 +33,6 @@
     "jasmine-as-promised": "0.0.*",
     "angular-material": "0.12.0-rc1",
     "material-design-icons": "v2.1.3",
-    "angular-material-data-table": "0.8.14",
     "angular-loading-bar": "0.8.0"
   },
   "install": {
@@ -75,11 +74,6 @@
       "underscore": [
         "bower_components/underscore/underscore.js",
         "bower_components/underscore/underscore-min.js"
-      ],
-      "angular-material-data-table": [
-        "bower_components/angular-material-data-table/dist/md-data-table.js",
-        "bower_components/angular-material-data-table/dist/md-data-table.min.js",
-        "bower_components/angular-material-data-table/dist/md-data-table.css"
       ],
       "angular-aria" : [
         "bower_components/angular-aria/angular-aria.js",

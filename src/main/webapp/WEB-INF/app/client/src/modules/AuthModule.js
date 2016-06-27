@@ -8,7 +8,6 @@
     define([
             "services/AuthService",
             "services/SessionService",
-            "services/CsrfService",
             "services/UserService",
             "services/ExceptionService",
             "services/SecurityService",
@@ -21,7 +20,6 @@
         ],
         function (AuthService,
                   SessionService,
-                  CsrfService,
                   UserService,
                   ExceptionService,
                   SecurityService,
@@ -41,7 +39,6 @@
                 .service("authService", AuthService)
                 .controller('AuthController', AuthController)
 
-                .service("csrfService", CsrfService)
                 .service("ExceptionService", ExceptionService)
                 .service("userService", UserService)
                 .service("securityService", SecurityService)

@@ -50,38 +50,6 @@
                     permissions: [ROLE_ANONYMOUS]
                 })
 
-                /*
-                .state('admin-page', {
-                    url: "/admin-page",
-                    views: {
-                        "body": {templateUrl: "assets/views/admin/admin.body.html"},
-                        "side-menu": {templateUrl: "assets/views/admin/admin.side-menu.html"}
-                    },
-                    permissions: [ROLE_ADMIN]
-                })
-                .state('admin-page.users', {
-                    url: "/users",
-                    views: {
-                        "admin-page.body": {templateUrl: "assets/views/admin/admin.body.users.html"}
-                    },
-                    permissions: [ROLE_ADMIN]
-                })
-                .state('admin-page.settings', {
-                    url: "/settings",
-                    views: {
-                        "admin-page.body": {templateUrl: "assets/views/admin/admin.body.settings.html"}
-                    },
-                    permissions: [ROLE_ADMIN]
-                })
-                .state('admin-page.statistic', {
-                    url: "/statistic",
-                    views: {
-                        "admin-page.body": {templateUrl: "assets/views/admin/admin.body.statistic.html"}
-                    },
-                    permissions: [ROLE_ADMIN]
-                 })*/
-
-
                 .state('application', {
                     url: "/notes",
                     views: {
@@ -105,7 +73,7 @@
                 });
         };
 
-        return ["$stateProvider", "$urlRouterProvider", "$locationProvider" , uiRouter];
+        return ["$stateProvider", "$urlRouterProvider", "$locationProvider", uiRouter];
     });
 
 })(define);

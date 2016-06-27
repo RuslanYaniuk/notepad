@@ -8,9 +8,8 @@
     define([
         'modules/AuthModule',
         'modules/AppModule',
-        'modules/AdminModule',
         'conf/RouteManager'
-    ], function (AuthModule, AppModule, AdminModule, RouteManager) {
+    ], function (AuthModule, AppModule, RouteManager) {
         var appName = 'mynote',
             modules = [
                 'ui.router',
@@ -19,8 +18,7 @@
                 'ngMessages',
                 'ngAnimate',
                 AuthModule,
-                AppModule,
-                AdminModule
+                AppModule
             ],
 
             app = angular.module(appName, modules)
