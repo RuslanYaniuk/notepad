@@ -10,7 +10,6 @@
         var NoteSearchController = function ($scope, $mdDialog, notes) {
             $scope.query = notes.query;
             $scope.findNotes = notes.findNotes;
-            $scope.$watch('query.text', notes.findNotes);
             $scope.mdDialog = $mdDialog;
         };
 

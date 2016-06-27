@@ -8,25 +8,14 @@
     define(function () {
 
         var OnScroll = function () {
-            var barrier = 85;
-
             return {
                 restrict: 'A',
                 link: function (scope, element) {
                     element.bind('scroll', function () {
                         var target = element[0],
-                            scrolledPercents = ((target.scrollTop + target.clientHeight) /
-                                (target.scrollHeight / 100)) | 0;
+                            leftToScroll = target.scrollHeight - (target.scrollTop + target.clientHeight);
 
-                        if (scrolledPercents < barrier) {
-                            scope.percentRiched = false;
-                        }
-                        if (scope.percentRiched == undefined || scope.percentRiched == false) {
-                            if (scrolledPercents > barrier) {
-                                scope.percentRiched = true;
-                                scope.$broadcast('scrolledDown', [element]);
-                            }
-                        }
+                        scope.$broadcast('containerScrolled', [leftToScroll]);
                     });
                 }
             };

@@ -45,14 +45,21 @@
                     }
                     //element doesn't have overflow
                     return false;
+                },
+
+                onContainerScrolled = function (e, data) {
+                    notes.findNotesNextPage(data[0]);
                 };
 
             $scope.isExpanded = onIsExpanded;
             $scope.getExpandIcon = onGetExpandIcon;
             $scope.isTextHolderOverloaded = onIsTextHolderOverloaded;
             $scope.expandCollapse = onExpandCollapse;
+            $scope.notes = notes.data;
+            $scope.query = notes.query;
 
-            $scope.$on('scrolledDown', notes.findNotesNextPage);
+            $scope.$watch('query.text', notes.findNotes);
+            $scope.$on('containerScrolled', onContainerScrolled);
         };
 
         return ["$scope", "notes", NotesListController];

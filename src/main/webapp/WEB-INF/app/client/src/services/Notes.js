@@ -7,8 +7,9 @@
 
     define(function () {
 
-        var NoteService = function ($http) {
-            var ITEMS_PER_PAGE = 10;
+        var NoteService = function ($http, $window) {
+            var NOTE_HEIGHT = 243,
+                PAGE_MULTIPLIER = 4;
 
             var onCreateNote = function () {
                     return $http.put("/api/note/create",
@@ -63,19 +64,20 @@
                     _page.last = false;
                     _page.number = 0;
                     _page.numberOfElements = 0;
-                    _page.size = ITEMS_PER_PAGE;
                     _page.totalPages = 0;
                     return findNotes().then(function onSuccess(response) {
                         _data.list = response.data.content;
                     });
                 },
 
-                onFindNotesNextPage = function () {
-                    if (!_page.last) {
-                        _page.number++;
-                        return findNotes().then(function onSuccess(response) {
-                            _data.list = _data.list.concat(response.data.content)
-                        });
+                onFindNotesNextPage = function (leftToScroll) {
+                    if (leftToScroll / NOTE_HEIGHT < (_page.size() / getPageMultiplier())) {
+                        if (!_page.last) {
+                            _page.number++;
+                            return findNotes().then(function onSuccess(response) {
+                                _data.list = _data.list.concat(response.data.content)
+                            });
+                        }
                     }
                 },
 
@@ -91,17 +93,20 @@
                         _page.last = data.last;
                         _page.number = data.number;
                         _page.numberOfElements = data.numberOfElements;
-                        _page.size = data.size;
                         _page.totalPages = data.totalPages;
                         return response;
                     });
+                },
+
+                getPageMultiplier = function () {
+                    return _page.number == 0 ? PAGE_MULTIPLIER * 2 : PAGE_MULTIPLIER;
                 },
 
                 query = function () {
                     var text = _query.text == "" ? null : _query.text;
 
                     this.pageNumber = _page.number;
-                    this.pageSize = _page.size;
+                    this.pageSize = _page.size();
                     this.text = _query.searchInText ? text : null;
                     this.subject = _query.searchInSubject ? text : null;
                 },
@@ -117,7 +122,9 @@
                     last: false,
                     number: 0,
                     numberOfElements: 0,
-                    size: ITEMS_PER_PAGE,
+                    size: function () {
+                        return (($window.innerHeight / NOTE_HEIGHT) * getPageMultiplier()) | 0
+                    },
                     totalElements: 0,
                     totalPages: 0
                 },
@@ -140,11 +147,12 @@
                 findNotesNextPage: onFindNotesNextPage,
 
                 data: _data,
-                query: _query
+                query: _query,
+                page: _page
             }
         };
 
-        return ["$http", NoteService];
+        return ["$http", "$window", NoteService];
     });
 
 })(define);
