@@ -16,7 +16,7 @@
             "controllers/AuthController",
             "controllers/SessionController",
             "controllers/RegistrationController",
-            "directives/PasswordValidator"
+            "directives/CompareTo"
         ],
         function (AuthService,
                   SessionService,
@@ -28,7 +28,7 @@
                   AuthController,
                   SessionController,
                   RegistrationController,
-                  PasswordValidator) {
+                  CompareTo) {
 
             var moduleName = "mynote.Authentication";
 
@@ -47,7 +47,7 @@
 
                 .controller("RegistrationController", RegistrationController)
 
-                .directive("password", PasswordValidator);
+                .directive("compareTo", CompareTo);
 
             return moduleName;
         });

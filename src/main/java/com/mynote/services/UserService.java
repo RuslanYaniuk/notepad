@@ -22,6 +22,10 @@ public class UserService {
 
     private static final int BCRYPT_GENSALT_LOG2_ROUNDS = 12;
 
+    public static final String USER_FIRST_NAME_SUFFIX = "_user_first_name";
+    public static final String USER_LAST_NAME_SUFFIX = "_user_last_name";
+    public static final String USER_LOGIN_SUFFIX = "_user_login";
+
     @Autowired
     private ApplicationConfig applicationConfig;
 
@@ -30,6 +34,16 @@ public class UserService {
 
     @Autowired
     private UserRoleService userRoleService;
+
+    public User addUser(String email, String password) throws LoginAlreadyTakenException, EmailAlreadyTakenException {
+        String login = email.substring(0, email.indexOf('@'));
+        User user = new User(login + USER_LOGIN_SUFFIX, email);
+
+        user.setFirstName(login + USER_FIRST_NAME_SUFFIX);
+        user.setLastName(login + USER_LAST_NAME_SUFFIX);
+        user.setPassword(password);
+        return addUser(user);
+    }
 
     public User addUser(User user) throws LoginAlreadyTakenException, EmailAlreadyTakenException {
         return userRepository.save(createUser(user));

@@ -117,6 +117,17 @@ public class UserServiceTests extends AbstractServiceTest {
     }
 
     @Test
+    public void addUser_EmailAndPassword_UserSaved() throws UserNotFoundException, EmailAlreadyTakenException, LoginAlreadyTakenException {
+        User user = createNonExistentUser();
+        String emailPrefix = "nonexistent";
+
+        user = userService.addUser(user.getEmail(), user.getPassword());
+        assertThat(user.getFirstName(), is(emailPrefix + UserService.USER_FIRST_NAME_SUFFIX));
+        assertThat(user.getLastName(), is(emailPrefix + UserService.USER_LAST_NAME_SUFFIX));
+        assertThat(user.getLogin(), is(emailPrefix + UserService.USER_LOGIN_SUFFIX));
+    }
+
+    @Test
     public void addAdministrator_NewLoginAndEmail_AdministratorAdded() throws EmailAlreadyTakenException, LoginAlreadyTakenException {
         User admin = createNonExistentUser("newAdmin", "newadmin@mail.com");
 

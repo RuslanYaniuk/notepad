@@ -9,38 +9,17 @@
 
         var RegistrationController = function ($scope,
                                                $mdToast,
-                                               userRegistrationService) {
+                                               userRegistrationService,
+                                               dispatcherService) {
 
-            var onSubmitRegistrationForm = function () {
+            var onSubmit = function () {
                     if ($scope.userRegistrationForm.$valid) {
                         userRegistrationService.registerUser($scope.user)
                             .then(
                             function onSuccess_registerUser() {
-                                $scope.step2Disabled = false;
-                                $scope.selectedTab = 1;
-                                $scope.step1Disabled = true;
-                            },
-
-                            function onFault_registerUser(response) {
-                                var messageCode = response.data.messageCode;
-
-                                if (messageCode == "") {
-
-                                }
+                                dispatcherService.goToApplicationPage({location: 'replace'});
                             });
                     }
-                },
-
-                onCheckAvailableLogin = function () {
-                    userRegistrationService.checkAvailableLogin($scope.user.login)
-                        .then(function onSuccess(response) {
-                            if (response.data.messageCode == 'user.login.isNotAvailable') {
-                                $scope.userRegistrationForm.userLogin.$error = {'notAvailable': true};
-                            }
-                            if (response.data.messageCode == 'user.login.isAvailable') {
-                                $scope.userRegistrationForm.userLogin.$error = {};
-                            }
-                        })
                 },
 
                 onCheckAvailableEmail = function () {
@@ -55,18 +34,21 @@
                         })
                 };
 
-            $scope.submitRegistrationForm = onSubmitRegistrationForm;
-            $scope.checkAvailableLogin = onCheckAvailableLogin;
+            $scope.user = {
+                email: "",
+                password: "",
+                confirmPassword: ""
+            };
+
+            $scope.submit = onSubmit;
             $scope.checkAvailableEmail = onCheckAvailableEmail;
-            $scope.step1Disabled = false;
-            $scope.step2Disabled = true;
-            $scope.selectedTab = 0;
         };
 
         return [
             "$scope",
             "$mdToast",
-            "userRegistrationService", RegistrationController];
+            "userRegistrationService",
+            "dispatcherService", RegistrationController];
     });
 
 })(define);

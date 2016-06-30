@@ -3,6 +3,7 @@ package com.mynote.controllers;
 import com.mynote.dto.user.UserFindDTO;
 import com.mynote.dto.user.UserInfoDTO;
 import com.mynote.dto.user.UserRegistrationDTO;
+import com.mynote.dto.user.UserSimpleRegistrationDTO;
 import com.mynote.exceptions.EmailAlreadyTakenException;
 import com.mynote.exceptions.LoginAlreadyTakenException;
 import com.mynote.exceptions.SearchFieldsAreEmpty;
@@ -10,7 +11,11 @@ import com.mynote.exceptions.UserNotFoundException;
 import com.mynote.models.User;
 import com.mynote.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,10 +35,31 @@ public class RegistrationController extends AbstractController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping(value = "/register-new-user", method = PUT)
+    @Autowired
+    protected ProviderManager providerManager;
+
+    @Autowired
+    protected ApplicationEventPublisher eventPublisher;
+
+    @RequestMapping(value = "/full", method = PUT)
     public ResponseEntity registerNewUser(@Validated @RequestBody UserRegistrationDTO userRegistrationDTO) throws EmailAlreadyTakenException, LoginAlreadyTakenException, InterruptedException {
         User user = userService.addUser(userRegistrationDTO.getUser());
 
+        return ok(new UserInfoDTO(user));
+    }
+
+    @RequestMapping(value = "/simple", method = PUT)
+    public ResponseEntity simple(@Validated @RequestBody UserSimpleRegistrationDTO userSimpleRegistrationDTO) throws EmailAlreadyTakenException, LoginAlreadyTakenException, InterruptedException {
+        User user = userSimpleRegistrationDTO.getUser();
+        Boolean signIn = userSimpleRegistrationDTO.getSignIn() == null ? false : userSimpleRegistrationDTO.getSignIn();
+        UsernamePasswordAuthenticationToken token;
+        String password = user.getPassword();
+
+        user = userService.addUser(user.getEmail(), password);
+        if (signIn) {
+            token = new UsernamePasswordAuthenticationToken(user, password, user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(token);
+        }
         return ok(new UserInfoDTO(user));
     }
 

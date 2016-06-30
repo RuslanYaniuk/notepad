@@ -3,16 +3,21 @@ package com.mynote.test.functional.controllers;
 import com.mynote.dto.user.UserFindDTO;
 import com.mynote.dto.user.UserLoginDTO;
 import com.mynote.dto.user.UserRegistrationDTO;
+import com.mynote.dto.user.UserSimpleRegistrationDTO;
 import com.mynote.exceptions.EmailAlreadyTakenException;
 import com.mynote.exceptions.LoginAlreadyTakenException;
 import com.mynote.exceptions.ValidationException;
 import com.mynote.models.User;
+import com.mynote.services.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.ResultActions;
+
+import javax.servlet.http.HttpSession;
 
 import static com.mynote.config.Constants.MEDIA_TYPE_APPLICATION_JSON_UTF8;
 import static com.mynote.test.utils.UserTestUtils.createNonExistentUser;
@@ -20,8 +25,7 @@ import static com.mynote.test.utils.UserTestUtils.getUser2;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -233,7 +237,7 @@ public class RegistrationControllerTests {
         }
 
         @Test
-        public void checkAvailableEmail_NewLogin_OkReturnedWithAvailableMessage() throws Exception {
+        public void checkAvailableLogin_NewLogin_OkReturnedWithAvailableMessage() throws Exception {
             userFindDTO.setLogin(createNonExistentUser().getLogin());
             checkAvailable(userFindDTO)
                     .andExpect(status().isOk())
@@ -241,11 +245,27 @@ public class RegistrationControllerTests {
         }
 
         @Test
-        public void checkAvailableEmail_RegisteredLogin_OkReturnedWithNotAvailableMessage() throws Exception {
+        public void checkAvailableLogin_RegisteredLogin_OkReturnedWithNotAvailableMessage() throws Exception {
             userFindDTO.setLogin(getUser2().getLogin());
             checkAvailable(userFindDTO)
                     .andExpect(status().isOk())
                     .andExpect(jsonPath($_MESSAGE_CODE, is("user.login.isNotAvailable")));
+        }
+
+        @Test
+        public void simpleRegistration_EmailAndPassword_OkUserRegistered() throws Exception {
+            UserSimpleRegistrationDTO userSimpleRegistrationDTO = new UserSimpleRegistrationDTO();
+            User user = createNonExistentUser();
+            String email = user.getEmail();
+
+            user.setPassword("12345678");
+            userSimpleRegistrationDTO.setUser(user);
+            mockMvc.perform(put("/api/registration/simple")
+                    .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
+                    .content(jacksonObjectMapper.writeValueAsString(userSimpleRegistrationDTO)))
+                    .andExpect(jsonPath("$.email", is(email)))
+                    .andExpect(jsonPath("$.login", is("nonexistent" + UserService.USER_LOGIN_SUFFIX)))
+                    .andExpect(jsonPath("$.registrationDateUTC", not(emptyString())));
         }
 
         private ResultActions registerUserWithValidationViolation(UserRegistrationDTO userRegistrationDTO) throws Exception {
@@ -255,7 +275,7 @@ public class RegistrationControllerTests {
         }
 
         private ResultActions registerNewUser(UserRegistrationDTO userRegistrationDTO) throws Exception {
-            return mockMvc.perform(put("/api/registration/register-new-user")
+            return mockMvc.perform(put("/api/registration/full")
                             .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                             .content(jacksonObjectMapper.writeValueAsString(userRegistrationDTO))
             );
@@ -301,8 +321,27 @@ public class RegistrationControllerTests {
             loginUser(loginDTO).andExpect(status().isOk());
         }
 
+        @Test
+        public void simpleRegistration_SignInFlagSet_OkUserRegisteredAndSignedIn() throws Exception {
+            UserSimpleRegistrationDTO userSimpleRegistrationDTO = new UserSimpleRegistrationDTO();
+            User user = createNonExistentUser();
+            HttpSession session;
+
+            user.setPassword("12345678");
+            userSimpleRegistrationDTO.setUser(user);
+            userSimpleRegistrationDTO.setSignIn(true);
+            session = mockMvc.perform(put("/api/registration/simple").with(csrf())
+                    .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
+                    .content(jacksonObjectMapper.writeValueAsString(userSimpleRegistrationDTO)))
+                    .andExpect(jsonPath("$.email", is(user.getEmail())))
+                    .andReturn().getRequest().getSession();
+
+            mockMvc.perform(get("/api/user/get-user-info").session((MockHttpSession) session))
+                    .andExpect(status().isOk());
+        }
+
         private ResultActions registerNewUser(UserRegistrationDTO userRegistrationDTO) throws Exception {
-            return mockMvc.perform(put("/api/registration/register-new-user").with(csrf())
+            return mockMvc.perform(put("/api/registration/full").with(csrf())
                             .contentType(MEDIA_TYPE_APPLICATION_JSON_UTF8)
                             .content(jacksonObjectMapper.writeValueAsString(userRegistrationDTO))
             );
