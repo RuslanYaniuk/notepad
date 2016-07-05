@@ -3,7 +3,7 @@
   right: 20px;
   bottom: 20px;
   left: auto;
-  position: absolute;
+  position: fixed;
 }
 
 .fab-container span {
@@ -171,8 +171,6 @@
   visibility: hidden;
 }
 
-
-
 .card-body p {
   font-size: 100%;
   font-weight: 400;
@@ -189,12 +187,26 @@
   display: none;
 }
 
-#page-container {
+.page-content {
+  min-height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
+.scroll-container {
   overflow: auto;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}
+
+.content-holder {
+  position: relative;
 }
 
 html, body {
   background-color: @grey-200;
+  overflow: hidden;
 }
 
 footer {
@@ -231,7 +243,7 @@ fieldset.standard {
   background-color: @orange-600;
 }
 
-#loading-bar{
+#loading-bar {
   background-color: @orange-100;
 }
 
@@ -296,7 +308,7 @@ md-icon.login-card-logo {
   background: -o-linear-gradient(top, @startColor 0%,@color2 @loc2,@color3 @loc3,@endColor 100%); /* Opera 11.10+ */
   background: -ms-linear-gradient(top, @startColor 0%,@color2 @loc2,@color3 @loc3,@endColor 100%); /* IE10+ */
   background: linear-gradient(to bottom, @startColor 0%,@color2 @loc2,@color3 @loc3,@endColor 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='@startColor', endColorstr='@endColor',GradientType=0 ); /* IE6-9 */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@startColor', endColorstr='@endColor', GradientType=0); /* IE6-9 */
 }
 
 //////////////////////////////////////////////////////////////////
@@ -397,7 +409,6 @@ md-icon.login-card-logo {
   -webkit-font-smoothing: antialiased;
 }
 
-
 //////////////////////////////////////////////////////////////////
 // Google Colors
 //////////////////////////////////////////////////////////////////
@@ -418,7 +429,6 @@ md-icon.login-card-logo {
 @red-A400: #FF1744;
 @red-A700: #D50000;
 
-
 @blue-50: #E3F2FD;
 @blue-100: #BBDEFB;
 @blue-200: #90CAF9;
@@ -434,7 +444,6 @@ md-icon.login-card-logo {
 @blue-A200: #448AFF;
 @blue-A400: #2979FF;
 @blue-A700: #2962FF;
-
 
 @cyan-50: #E0F7FA;
 @cyan-100: #B2EBF2;
@@ -452,12 +461,10 @@ md-icon.login-card-logo {
 @cyan-A400: #00E5FF;
 @cyan-A700: #00B8D4;
 
-
 @grey-300: #E0E0E0;
 @grey-400: #BDBDBD;
 @grey-500: #9E9E9E;
 @grey-600: #757575;
-
 
 @blue-grey-50: #ECEFF1;
 @blue-grey-100: #CFD8DC;
@@ -469,7 +476,6 @@ md-icon.login-card-logo {
 @blue-grey-700: #455A64;
 @blue-grey-800: #37474F;
 @blue-grey-900: #263238;
-
 
 @teal-50: #E0F2F1;
 @teal-100: #B2DFDB;
@@ -487,7 +493,6 @@ md-icon.login-card-logo {
 @teal-A400: #1DE9B6;
 @teal-A700: #00BFA5;
 
-
 @pink-50: #FCE4EC;
 @pink-100: #F8BBD0;
 @pink-200: #F48FB1;
@@ -503,7 +508,6 @@ md-icon.login-card-logo {
 @pink-A200: #FF4081;
 @pink-A400: #F50057;
 @pink-A700: #C51162;
-
 
 @purple-50: #F3E5F5;
 @purple-100: #E1BEE7;
@@ -521,7 +525,6 @@ md-icon.login-card-logo {
 @purple-A400: #D500F9;
 @purple-A700: #AA00FF;
 
-
 @deep-purple-50: #EDE7F6;
 @deep-purple-100: #D1C4E9;
 @deep-purple-200: #B39DDB;
@@ -537,7 +540,6 @@ md-icon.login-card-logo {
 @deep-purple-A200: #7C4DFF;
 @deep-purple-A400: #651FFF;
 @deep-purple-A700: #6200EA;
-
 
 @indigo-50: #E8EAF6;
 @indigo-100: #C5CAE9;
@@ -555,8 +557,6 @@ md-icon.login-card-logo {
 @indigo-A400: #3D5AFE;
 @indigo-A700: #304FFE;
 
-
-
 @light-blue-50: #E1F5FE;
 @light-blue-100: #B3E5FC;
 @light-blue-200: #81D4FA;
@@ -572,8 +572,6 @@ md-icon.login-card-logo {
 @light-blue-A200: #40C4FF;
 @light-blue-A400: #00B0FF;
 @light-blue-A700: #0091EA;
-
-
 
 @green-50: #E8F5E9;
 @green-100: #C8E6C9;
@@ -591,7 +589,6 @@ md-icon.login-card-logo {
 @green-A400: #00E676;
 @green-A700: #00C853;
 
-
 @light-green-50: #F1F8E9;
 @light-green-100: #DCEDC8;
 @light-green-200: #C5E1A5;
@@ -607,7 +604,6 @@ md-icon.login-card-logo {
 @light-green-A200: #B2FF59;
 @light-green-A400: #76FF03;
 @light-green-A700: #64DD17;
-
 
 @lime-50: #F9FBE7;
 @lime-100: #F0F4C3;
@@ -625,7 +621,6 @@ md-icon.login-card-logo {
 @lime-A400: #C6FF00;
 @lime-A700: #AEEA00;
 
-
 @yellow-50: #FFFDE7;
 @yellow-100: #FFF9C4;
 @yellow-200: #FFF59D;
@@ -641,7 +636,6 @@ md-icon.login-card-logo {
 @yellow-A200: #FFFF00;
 @yellow-A400: #FFEA00;
 @yellow-A700: #FFD600;
-
 
 @amber-50: #FFF8E1;
 @amber-100: #FFECB3;
@@ -659,7 +653,6 @@ md-icon.login-card-logo {
 @amber-A400: #FFC400;
 @amber-A700: #FFAB00;
 
-
 @orange-50: #FFF3E0;
 @orange-100: #FFE0B2;
 @orange-200: #FFCC80;
@@ -675,7 +668,6 @@ md-icon.login-card-logo {
 @orange-A200: #FFAB40;
 @orange-A400: #FF9100;
 @orange-A700: #FF6D00;
-
 
 @deep-orange-50: #FBE9E7;
 @deep-orange-100: #FFCCBC;
@@ -693,7 +685,6 @@ md-icon.login-card-logo {
 @deep-orange-A400: #FF3D00;
 @deep-orange-A700: #DD2C00;
 
-
 @brown-50: #EFEBE9;
 @brown-100: #D7CCC8;
 @brown-200: #BCAAA4;
@@ -705,7 +696,6 @@ md-icon.login-card-logo {
 @brown-800: #4E342E;
 @brown-900: #3E2723;
 
-
 @grey-50: #FAFAFA;
 @grey-100: #F5F5F5;
 @grey-200: #EEEEEE;
@@ -716,7 +706,6 @@ md-icon.login-card-logo {
 @grey-700: #616161;
 @grey-800: #424242;
 @grey-900: #212121;
-
 
 @black: #000000;
 @white: #FFFFFF;

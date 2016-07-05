@@ -32,12 +32,18 @@
 <body ng-controller="SessionController" layout="row">
 <div ui-view="side-nav"></div>
 
-<div layout="column" flex>
+<div flex layout="column">
   <div ui-view="tool-bar" class="main-toolbar"></div>
-  <div id="page-container" on-scroll layout="column" flex>
-    <section ui-view="body" flex></section>
-    <footer ui-view="footer"></footer>
+
+  <div flex class="content-holder">
+    <div on-scroll layout="column" class="scroll-container">
+      <div layout="column" class="page-content">
+        <section ui-view="body" flex layout="column"></section>
+        <footer ui-view="footer"></footer>
+      </div>
+    </div>
   </div>
+
 </div>
 
 <script src="vendor/headjs/head.min.js"></script>
