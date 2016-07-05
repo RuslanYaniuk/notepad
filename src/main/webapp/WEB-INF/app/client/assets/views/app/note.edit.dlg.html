@@ -30,7 +30,9 @@
 
       <div layout="row" layout-align="end center">
         <md-button ng-click="dialog.hide()" class="md-primary">Cancel</md-button>
-        <md-button ng-click="updateNote()" class="md-raised md-primary">Save changes</md-button>
+        <md-button ng-click="updateNote()"
+                   ng-disabled="(notes.note.text == '') && (notes.note.subject == '')"
+                   class="md-raised md-primary">Save changes</md-button>
       </div>
 
     </div>
