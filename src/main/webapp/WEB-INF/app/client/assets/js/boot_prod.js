@@ -16,7 +16,6 @@
         { ng_aria       : "vendor/angular-aria/angular-aria.min.js" },
         { ng_material   : "vendor/angular-material/angular-material.min.js" },
         { ng_animate    : "vendor/angular-animate/angular-animate.min.js" },
-        { ng_table      : "vendor/angular-material-data-table/md-data-table.min.js" },
         { ng_messages   : "vendor/angular-messages/angular-messages.min.js" },
         { ng_loading_bar: "vendor/angular-loading-bar/loading-bar.min.js"},
 

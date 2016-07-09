@@ -16,19 +16,9 @@
                 PERMIT_ALL = "*";
 
             $locationProvider.html5Mode(true);
-            $urlRouterProvider.otherwise("/");
+            $urlRouterProvider.otherwise("/login");
 
             $stateProvider
-                .state('index', {
-                    url: "/",
-                    views: {
-                        "body": {templateUrl: "assets/views/index/index.body.html"},
-                        "footer": {templateUrl: "assets/views/index/index.footer.html"}
-                    },
-                    permissions: [ROLE_ANONYMOUS]
-                })
-
-
                 .state('login', {
                     url: "/login",
                     views: {
@@ -65,7 +55,7 @@
                 .state('access-denied', {
                     url: "/access-denied",
                     views: {
-                        "tool-bar": {templateUrl: "assets/views/index/index.tool-bar.html"},
+                        "tool-bar": {templateUrl: "assets/views/login/login.tool-bar.html"},
                         "body": {templateUrl: "assets/views/errors/access-denied.body.html"},
                         "footer": {templateUrl: "assets/views/index/index.footer.html"}
                     },

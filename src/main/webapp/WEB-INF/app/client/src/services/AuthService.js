@@ -11,7 +11,7 @@
 
             GET_AUTH_URL = "/api/auth/get-authorities";
 
-        var AuthService = function ($http) {
+        var AuthService = function ($http, notes) {
 
             var loginUser = function (login, password) {
                     var credentials = {
@@ -27,6 +27,7 @@
                 },
 
                 logoutUser = function () {
+                    notes.data.list = [];
                     return $http.post(LOGOUT_URL);
                 },
 
@@ -41,7 +42,7 @@
             }
         };
 
-        return ["$http", AuthService];
+        return ["$http", "notes", AuthService];
     })
 
 })(define);

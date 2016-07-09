@@ -6,7 +6,6 @@
     "use strict";
 
     var ROLE_USER = "ROLE_USER",
-        ROLE_ADMIN = "ROLE_ADMIN",
         ROLE_ANONYMOUS = "ROLE_ANONYMOUS";
 
     define(function () {
@@ -31,10 +30,6 @@
                     return false;
                 },
 
-                onContainsRoleAdmin = function (rolesSet) {
-                    return containsRole(rolesSet, ROLE_ADMIN);
-                },
-
                 onContainsRoleUser = function (rolesSet) {
                     return containsRole(rolesSet, ROLE_USER);
                 },
@@ -44,10 +39,6 @@
                 },
 
                 onGetHighestRole = function (rolesSet) {
-                    if (onContainsRoleAdmin(rolesSet)) {
-                        return ROLE_ADMIN;
-                    }
-
                     if (onContainsRoleUser(rolesSet)) {
                         return ROLE_USER;
                     }
@@ -64,10 +55,6 @@
 
                 onIsUser = function (role) {
                     return role == ROLE_USER;
-                },
-
-                onIsAdmin = function (role) {
-                    return role == ROLE_ADMIN
                 },
 
                 onCompareUserRoles = function (userRolesA, userRolesB) {
@@ -89,13 +76,11 @@
 
             return {
                 containsPermission: onContainsPermission,
-                containsRoleAdmin: onContainsRoleAdmin,
                 containsRoleUser: onContainsRoleUser,
                 containsRoleAnonymous: onContainsRoleAnonymous,
                 getHighestRole: onGetHighestRole,
                 isAnonymous: onIsAnonymous,
                 isUser: onIsUser,
-                isAdmin: onIsAdmin,
                 compareUserRoles: onCompareUserRoles
             }
         };

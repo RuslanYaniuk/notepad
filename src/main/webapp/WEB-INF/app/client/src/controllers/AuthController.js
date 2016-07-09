@@ -47,7 +47,7 @@
                         .then(
                         function onSuccess_Logout() {
                             sessionService.clearSession();
-                            dispatcherService.goToIndexPage();
+                            dispatcherService.goToLoginPage({location: 'replace'});
                         });
                 },
 

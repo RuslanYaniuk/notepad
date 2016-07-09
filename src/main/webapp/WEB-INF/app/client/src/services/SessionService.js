@@ -35,7 +35,7 @@
                     _session.account.userRoles = userRoles;
                     _session.type = userRoleService.getHighestRole(userRoles);
 
-                    if (onIsAdminSession() || onIsUserSession()) {
+                    if (onIsUserSession()) {
                         $rootScope.logged = true;
                     }
                 },
@@ -70,10 +70,6 @@
                     return userRoleService.isAnonymous(_session.type);
                 },
 
-                onIsAdminSession = function () {
-                    return userRoleService.isAdmin(_session.type);
-                },
-
                 onIsUserSession = function () {
                     return userRoleService.isUser(_session.type);
                 },
@@ -99,7 +95,6 @@
                 isEmptySession: onIsEmptySession,
                 isAnonymousSession: onIsAnonymousSession,
                 isUserSession: onIsUserSession,
-                isAdminSession: onIsAdminSession,
                 isEmptyAccountDetails: onIsEmptyAccountDetails,
                 updateAccountDetails: onUpdateAccountDetails,
                 getUserEmail: onGetUserEmail,
